@@ -26,7 +26,9 @@ structure G = SLgrammar
 
 exception NotImplemented
 
-fun stringOfStm _ = raise NotImplemented
+fun stringOfNum (G.NumExp(s)): string = Int.toString(s);
+
+fun stringOfStm (s:G.stm): string = case s of G.AssignStm s => (#1 s) ^ " := " ^ stringOfNum(#2 s)
 fun buildEnv _    = raise NotImplemented
 fun interpStm _   = raise NotImplemented
 fun printEnv _    = raise NotImplemented
@@ -51,6 +53,8 @@ val prog =
         G.PrintStm [G.IdExp "a", G.OpExp (G.IdExp "a", G.Minus, G.NumExp 1)],
         G.OpExp (G.NumExp 10, G.Times, G.IdExp "a"))),
       G.PrintStm [G.IdExp "b"]))
+
+
 
 (* ... *)
 
