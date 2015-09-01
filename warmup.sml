@@ -35,17 +35,13 @@ fun stringOfBinop (s:G.binop): string =
       case s of G.NumExp s => Int.toString(s)
           | G.IdExp s => s
           | G.OpExp s => stringOfExp(#1 s) ^ stringOfBinop(#2 s) ^ stringOfExp(#3 s)
-          | G.EseqExp s => stringOfStm(#1 s) ^ ", " ^ stringOfExp(#2 s) 		  
-  and stringOfPrnt [] = ""
-          | stringOfPrnt(x::xs) = stringOfExp(x) ^ ", " ^ stringOfPrnt(xs)
+          | G.EseqExp s => "(" ^ stringOfStm(#1 s) ^ ", " ^ stringOfExp(#2 s) ^ ")" 		  
+  and stringOfList [] = ""
+          | stringOfList(x::xs) = stringOfExp(x) ^ ", " ^ stringOfList(xs)
   and stringOfStm (s:G.stm): string =
-  case s of G.AssignStm s => (#1 s) ^ " := " ^ stringOfExp(#2 s)
-          | G.CompoundStm s => stringOfStm(#1 s) ^ " " ^ stringOfStm(#2 s)
-	  | G.PrintStm s => "print(" ^ stringOfPrnt(s) ^ ")"
-
-
-
-
+      case s of G.AssignStm s => (#1 s) ^ " := " ^ stringOfExp(#2 s)
+          | G.CompoundStm s => stringOfStm(#1 s) ^ "; " ^ stringOfStm(#2 s)
+	  | G.PrintStm s => "print(" ^ stringOfList(s) ^ ")"
 
 fun buildEnv _    = raise NotImplemented
 fun interpStm _   = raise NotImplemented
