@@ -31,13 +31,14 @@ fun stringOfBinop (s:G.binop): string =
           | G.Minus => "-"
 	  | G.Times => "x" 
 	  | G.Div   => "/"
+  and stringOfList [a] = stringOfExp(a)
+          | stringOfList(x::xs) = stringOfExp(x) ^ ", " ^ stringOfList(xs)
   and stringOfExp (s:G.exp): string =
   case s of G.NumExp s  => Int.toString(s)
           | G.IdExp s   => s
           | G.OpExp s   => stringOfExp(#1 s) ^ stringOfBinop(#2 s) ^ stringOfExp(#3 s)
           | G.EseqExp s => "(" ^ stringOfStm(#1 s) ^ ", " ^ stringOfExp(#2 s) ^ ")" 		 
-  and stringOfList [a] = stringOfExp(a)
-          | stringOfList(x::xs) = stringOfExp(x) ^ ", " ^ stringOfList(xs)
+
   and stringOfStm (s:G.stm): string =
   case s of G.AssignStm s   => (#1 s) ^ " := " ^ stringOfExp(#2 s)
           | G.CompoundStm s => stringOfStm(#1 s) ^ "; " ^ stringOfStm(#2 s)
