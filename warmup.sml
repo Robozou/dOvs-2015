@@ -27,26 +27,38 @@ structure G = SLgrammar
 exception NotImplemented
 
 fun stringOfBinop (s:G.binop): string = 
-  case s of G.Plus => "+"
+  case s of G.Plus  => "+"
           | G.Minus => "-"
 	  | G.Times => "x" 
-	  | G.Div => "/"
+	  | G.Div   => "/"
   and stringOfExp (s:G.exp): string =
-      case s of G.NumExp s => Int.toString(s)
-          | G.IdExp s => s
-          | G.OpExp s => stringOfExp(#1 s) ^ stringOfBinop(#2 s) ^ stringOfExp(#3 s)
-          | G.EseqExp s => "(" ^ stringOfStm(#1 s) ^ ", " ^ stringOfExp(#2 s) ^ ")" 		  
+  case s of G.NumExp s  => Int.toString(s)
+          | G.IdExp s   => s
+          | G.OpExp s   => stringOfExp(#1 s) ^ stringOfBinop(#2 s) ^ stringOfExp(#3 s)
+          | G.EseqExp s => "(" ^ stringOfStm(#1 s) ^ ", " ^ stringOfExp(#2 s) ^ ")" 		 
   and stringOfList [] = ""
           | stringOfList(x::xs) = stringOfExp(x) ^ ", " ^ stringOfList(xs)
   and stringOfStm (s:G.stm): string =
-      case s of G.AssignStm s => (#1 s) ^ " := " ^ stringOfExp(#2 s)
+  case s of G.AssignStm s   => (#1 s) ^ " := " ^ stringOfExp(#2 s)
           | G.CompoundStm s => stringOfStm(#1 s) ^ "; " ^ stringOfStm(#2 s)
-	  | G.PrintStm s => "print(" ^ stringOfList(s) ^ ")"
+	  | G.PrintStm s    => "print(" ^ stringOfList(s) ^ ")"
 
 fun buildEnv _    = raise NotImplemented
 fun interpStm _   = raise NotImplemented
 fun printEnv _    = raise NotImplemented
 
+fun maxArgs (s:G.stm): int =
+    case s of G.PrintStm s    => 1 + maxArgsOfExpList(s)
+	    | G.CompoundStm s => maxArgs(#1 s) + maxArgs(#2 s)
+	    | G.AssignStm s   => 0 + maxArgsExp(#2 s)
+    and maxArgsOfExpList [] = 0
+            | maxArgsOfExpList(x::xs) = maxArgsExp(x) + maxArgsOfExpList (xs)
+    and maxArgsExp (s:G.exp): int =
+    case s of G.IdExp s       => 0
+	    | G.NumExp s      => 0
+	    | G.OpExp s       => 0
+	    | G.EseqExp s     => maxArgs(#1 s) + 0
+	      
 (* ... *)
 
 fun interp (s: G.stm): unit =
@@ -68,6 +80,14 @@ val prog =
         G.OpExp (G.NumExp 10, G.Times, G.IdExp "a"))),
       G.PrintStm [G.IdExp "b"]))
 
+val prog2 =
+    G.CompoundStm(
+	G.PrintStm[G.EseqExp(
+			G.PrintStm[G.EseqExp(G.AssignStm("a", G.IdExp "b"), G.IdExp "a")],
+			G.IdExp "a")],
+	G.PrintStm[G.EseqExp(
+			G.PrintStm[G.EseqExp(G.AssignStm("a", G.IdExp "b"), G.IdExp "a")],
+			G.IdExp "a")])		
 
 
 (* ... *)
@@ -76,4 +96,3 @@ val prog =
    -- default implementation will raise NotImplemented exception *)
 
 (* val _ = interp prog *)
-
