@@ -1,4 +1,16 @@
 (* ---------- Initial code for hand-in 1, dOvs 2015: warmup.sml ---------- *)
+structure Table = struct
+
+type intTable = string -> int option
+
+fun emptyTable (x:string) = NONE: int option
+
+fun updateTable (t: intTable, y:string, v:int) x =
+  if x = y then SOME v
+           else t x
+
+end
+
 
 structure SLgrammar = struct
 
@@ -19,7 +31,7 @@ end (* SLgrammar *)
 (* ----- Fill in: Interpret SLgrammar as specified ----- *)
 
 structure G = SLgrammar
-
+structure T = Table
 (* ... *)
 
 (* placeholder definitions for not implemented functions *)
@@ -37,17 +49,27 @@ fun stringOfBinop (s:G.binop): string =
   case s of G.NumExp s  => Int.toString(s)
           | G.IdExp s   => s
           | G.OpExp s   => stringOfExp(#1 s) ^ stringOfBinop(#2 s) ^ stringOfExp(#3 s)
-          | G.EseqExp s => "(" ^ stringOfStm(#1 s) ^ ", " ^ stringOfExp(#2 s) ^ ")" 		 
-
+          | G.EseqExp s => "(" ^ stringOfStm(#1 s) ^ "," ^ stringOfExp(#2 s) ^ ")"
   and stringOfStm (s:G.stm): string =
   case s of G.AssignStm s   => (#1 s) ^ " := " ^ stringOfExp(#2 s)
           | G.CompoundStm s => stringOfStm(#1 s) ^ "; " ^ stringOfStm(#2 s)
 	  | G.PrintStm s    => "print(" ^ stringOfList(s) ^ ")"
 
-fun buildEnv _    = raise NotImplemented
+
+fun buildEnv (s:G.stm) (t:intTable) =
+  case s of G.AssignStm s => updateTable(t, #1 s, 0)
+	  | G.CompoundStm s => let 
+	                          val t2 = buildEnv (#1 s) t
+			       in
+				   buildEnv (#2 s) t2
+			       end
+	  | G.PrintStm s => updateTable(t, "", 0)
+
 fun interpStm _   = raise NotImplemented
 fun printEnv _    = raise NotImplemented
 
+
+(*WRONG IMPLEMENTATION*)
 fun maxArgs (s:G.stm): int =
     case s of G.PrintStm s    => 1 + maxArgsOfExpList(s)
 	    | G.CompoundStm s => maxArgs(#1 s) + maxArgs(#2 s)
@@ -59,12 +81,14 @@ fun maxArgs (s:G.stm): int =
 	    | G.NumExp s      => 0
 	    | G.OpExp s       => 0
 	    | G.EseqExp s     => maxArgs(#1 s) + 0
+(*WRONG IMPLEMENTATION*)
+
 	      
 (* ... *)
 
 fun interp (s: G.stm): unit =
     let val _ = print ("Executing: " ^ (stringOfStm s) ^ "\n")
-        val env = buildEnv s
+        val env = buildEnv s emptyTable
         val env' = interpStm (s, env)
     in printEnv env'
     end
