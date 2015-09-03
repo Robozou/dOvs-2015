@@ -65,12 +65,51 @@ fun buildEnv (s:G.stm) (t:intTable) =
 			       end
 	  | G.PrintStm s => updateTable(t, "", 0)
 
-fun interpStm _   = raise NotImplemented
-fun printEnv _    = raise NotImplemented
+
+
+
+
+fun interpStm (s:G.stm, env:intTable) = 
+  case s of G.CompoundStm s => let
+                                  val env' = interpStm (#1 s, env)
+			       in
+                                  interpStm (#2 s, env')
+                               end
+	  | G.AssignStm s => updateTable(env, #1 s, interpExp(#2 s, env))
+	  | G.PrintStm s  => interpPrintList(s, env) 
+  and interpExp (e:G.exp, env:intTable) =
+      case e of G.IdExp e => 5 (*THIS SHIT DOESNT WORK YET FIX IT BITCH*)
+	      | G.NumExp e => e:int
+	      | G.OpExp e => interpOpExp(G.OpExp(e),env)
+	      | G.EseqExp e => let val env' = interpStm(#1 e, env)
+                               in
+                                   interpExp(#2 e, env')
+                               end
+  and interpPrintList (el: G.exp list, env:intTable) =
+      case el of [] => env
+              |  (x::xs) => (print(Int.toString(interpExp(x, env)) ^ "\n"); interpPrintList(xs, env))
+  and interpOpExp (G.OpExp(e1,b,e2), env:intTable) =
+      let val ls = interpExp(e1, env)
+          val rs = interpExp(e2, env)
+      in
+          evalBinop(ls,rs,b)
+      end
+  and evalBinop (ls,rs,b:G.binop) =
+      case b of G.Plus  => ls + rs
+              | G.Minus => ls - rs
+	      | G.Times => (print("Left side: " ^ Int.toString(ls * rs) ^ "\n");ls * rs)
+	      | G.Div   => ls div rs
+                            
+                            
+
+                            
+
+
+fun printEnv (e:intTable) = print("HALLO")
 
 
 (*WRONG IMPLEMENTATION*)
-fun maxArgs (s:G.stm): int =
+fun maxArgs (s:G.stm) =
     case s of G.PrintStm s    => 1 + maxArgsOfExpList(s)
 	    | G.CompoundStm s => maxArgs(#1 s) + maxArgs(#2 s)
 	    | G.AssignStm s   => 0 + maxArgsExp(#2 s)
