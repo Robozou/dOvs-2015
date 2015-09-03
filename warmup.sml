@@ -104,8 +104,8 @@ fun interpStm (s:G.stm, env:T.intTable) =
 
                             
 
-
-fun printEnv (e:T.intTable) = print("HALLO")
+(*Hard coded currently*)
+fun printEnv (e:T.intTable) = print("[(\"a\","^ Int.toString(valOf(e "a")) ^ ")," ^ "(\"b\","^ Int.toString(valOf(e "b")) ^ ")],")
 
 
 (*WRONG IMPLEMENTATION*)
