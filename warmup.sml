@@ -78,7 +78,7 @@ fun interpStm (s:G.stm, env:T.intTable) =
 	  | G.AssignStm s => T.updateTable(env, #1 s, interpExp(#2 s, env))
 	  | G.PrintStm s  => interpPrintList(s, env) 
   and interpExp (e:G.exp, env:T.intTable) =
-      case e of G.IdExp e => valOf(env e) (*THIS SHIT DOESNT WORK YET FIX IT BITCH*)
+      case e of G.IdExp e => valOf(env e) 
 	      | G.NumExp e => e
 	      | G.OpExp e => interpOpExp(G.OpExp(e),env)
 	      | G.EseqExp e => let val env' = interpStm(#1 e, env)
