@@ -86,8 +86,8 @@ fun interpStm (s:G.stm, env:T.intTable) =
                                    interpExp(#2 e, env')
                                end
   and interpPrintList (el: G.exp list, env:T.intTable) =
-      case el of [] => env
-              |  (x::xs) => (print(Int.toString(interpExp(x, env)) ^ "\n"); interpPrintList(xs, env))
+      case el of [] => (print("\n"); env)
+              |  (x::xs) => (print(Int.toString(interpExp(x, env)) ^ " "); interpPrintList(xs, env))
   and interpOpExp (G.OpExp(e1,b,e2), env:T.intTable) =
       let val ls = interpExp(e1, env)
           val rs = interpExp(e2, env)
