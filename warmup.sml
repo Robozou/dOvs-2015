@@ -56,28 +56,28 @@ fun stringOfBinop (s:G.binop): string =
 	  | G.PrintStm s    => "print(" ^ stringOfList(s) ^ ")"
 
 
-fun buildEnv (s:G.stm) (t:intTable) =
-  case s of G.AssignStm s => updateTable(t, #1 s, 0)
+fun buildEnv (s:G.stm) (t:T.intTable) =
+  case s of G.AssignStm s => T.updateTable(t, #1 s, 0)
 	  | G.CompoundStm s => let 
 	                          val t2 = buildEnv (#1 s) t
 			       in
 				   buildEnv (#2 s) t2
 			       end
-	  | G.PrintStm s => updateTable(t, "", 0)
+	  | G.PrintStm s => T.updateTable(t, "", 0)
 
 
 
 
 
-fun interpStm (s:G.stm, env:intTable) = 
+fun interpStm (s:G.stm, env:T.intTable) = 
   case s of G.CompoundStm s => let
                                   val env' = interpStm (#1 s, env)
 			       in
                                   interpStm (#2 s, env')
                                end
-	  | G.AssignStm s => updateTable(env, #1 s, interpExp(#2 s, env))
+	  | G.AssignStm s => T.updateTable(env, #1 s, interpExp(#2 s, env))
 	  | G.PrintStm s  => interpPrintList(s, env) 
-  and interpExp (e:G.exp, env:intTable) =
+  and interpExp (e:G.exp, env:T.intTable) =
       case e of G.IdExp e => 5 (*THIS SHIT DOESNT WORK YET FIX IT BITCH*)
 	      | G.NumExp e => e:int
 	      | G.OpExp e => interpOpExp(G.OpExp(e),env)
@@ -85,10 +85,10 @@ fun interpStm (s:G.stm, env:intTable) =
                                in
                                    interpExp(#2 e, env')
                                end
-  and interpPrintList (el: G.exp list, env:intTable) =
+  and interpPrintList (el: G.exp list, env:T.intTable) =
       case el of [] => env
               |  (x::xs) => (print(Int.toString(interpExp(x, env)) ^ "\n"); interpPrintList(xs, env))
-  and interpOpExp (G.OpExp(e1,b,e2), env:intTable) =
+  and interpOpExp (G.OpExp(e1,b,e2), env:T.intTable) =
       let val ls = interpExp(e1, env)
           val rs = interpExp(e2, env)
       in
@@ -105,7 +105,7 @@ fun interpStm (s:G.stm, env:intTable) =
                             
 
 
-fun printEnv (e:intTable) = print("HALLO")
+fun printEnv (e:T.intTable) = print("HALLO")
 
 
 (*WRONG IMPLEMENTATION*)
@@ -127,7 +127,7 @@ fun maxArgs (s:G.stm) =
 
 fun interp (s: G.stm): unit =
     let val _ = print ("Executing: " ^ (stringOfStm s) ^ "\n")
-        val env = buildEnv s emptyTable
+        val env = buildEnv s T.emptyTable
         val env' = interpStm (s, env)
     in printEnv env'
     end
