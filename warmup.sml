@@ -97,7 +97,7 @@ fun interpStm (s:G.stm, env:T.intTable) =
   and evalBinop (ls,rs,b:G.binop) =
       case b of G.Plus  => ls + rs
               | G.Minus => ls - rs
-	      | G.Times => (print("Left side: " ^ Int.toString(ls * rs) ^ "\n");ls * rs)
+	      | G.Times => ls * rs
 	      | G.Div   => ls div rs
                             
                             
