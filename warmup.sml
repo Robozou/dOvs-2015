@@ -72,45 +72,45 @@ fun stringOfBinop (s:G.binop): string =
 	  | G.PrintStm s    => "print(" ^ stringOfList(s) ^ ")"
 
 
-fun buildEnv (s:G.stm) (t:T.intTable) =
-  case s of G.AssignStm s => T.updateTable(t, #1 s, 0)
+fun buildEnv (s:G.stm) (t:(string * int option) list) =
+  case s of G.AssignStm s => T.updateEnv(t, #1 s, NONE)
 	  | G.CompoundStm s => let 
 	                          val t2 = buildEnv (#1 s) t
 			       in
 				   buildEnv (#2 s) t2
 			       end
-	  | G.PrintStm s => T.updateTable(t, "", 0)
+	  | G.PrintStm s => T.updateEnv(t, "", NONE)
 
 
 
 
 
-fun interpStm (s:G.stm, env:T.intTable) = 
+fun interpStm (s:G.stm, (env:(string * int option) list)) = 
   case s of G.CompoundStm s => let
                                   val env' = interpStm (#1 s, env)
 			       in
                                   interpStm (#2 s, env')
                                end
-	  | G.AssignStm s => T.updateTable(env, #1 s, interpExp(#2 s, env))
-	  | G.PrintStm s  => interpPrintList(s, env) 
-  and interpExp (e:G.exp, env:T.intTable) =
-      case e of G.IdExp e => valOf(env e) 
-	      | G.NumExp e => e
+	  | G.AssignStm s => T.updateEnv(env, #1 s, interpExp(#2 s, env))
+	  | G.PrintStm s  => interpPrintList(s, env)
+  and interpExp (e:G.exp, (env:(string * int option) list)) = 
+      case e of G.IdExp e => valOf(T.lookup (env, e))
+	      | G.NumExp e =>  e
 	      | G.OpExp e => interpOpExp(G.OpExp(e),env)
 	      | G.EseqExp e => let val env' = interpStm(#1 e, env)
                                in
-                                   interpExp(#2 e, env')
+                                   valOf(interpExp(#2 e, env'))
                                end
-  and interpPrintList (el: G.exp list, env:T.intTable) =
+  and interpPrintList (el: G.exp list, (env:(string * int option) list)) =
       case el of [] => (print("\n"); env)
-              |  (x::xs) => (print(Int.toString(interpExp(x, env)) ^ " "); interpPrintList(xs, env))
-  and interpOpExp (G.OpExp(e1,b,e2), env:T.intTable) =
+              |  (x::xs) => (print(Int.toString(valOf((interpExp(x, env)))) ^ " "); interpPrintList(xs, env))
+  and interpOpExp (G.OpExp(e1,b,e2), (env:(string * int option) list)) =
       let val ls = interpExp(e1, env)
           val rs = interpExp(e2, env)
       in
-          evalBinop(ls,rs,b)
+          evalBinop(valOf(ls),valOf(rs),b)
       end
-  and evalBinop (ls,rs,b:G.binop) =
+  and evalBinop (ls:int,rs:int,b:G.binop) =
       case b of G.Plus  => ls + rs
               | G.Minus => ls - rs
 	      | G.Times => ls * rs
@@ -121,7 +121,7 @@ fun interpStm (s:G.stm, env:T.intTable) =
                             
 
 (*Hard coded currently*)
-fun printEnv (e:T.intTable) = print("[(\"a\","^ Int.toString(valOf(e "a")) ^ ")," ^ "(\"b\","^ Int.toString(valOf(e "b")) ^ ")],")
+fun printEnv (e:(string * int option) list) = print("[(\"a\"," ^ Int.toString(valOf(T.lookup (e,"a"))) ^ ")," ^ "(\"b\","^ Int.toString(valOf(T.lookup(e ,"b"))) ^ ")],")
 
 
 
@@ -145,7 +145,7 @@ fun maxArgs (s:G.stm) =
 
 fun interp (s: G.stm): unit =
     let val _ = print ("Executing: " ^ (stringOfStm s) ^ "\n")
-        val env = buildEnv s T.emptyTable
+        val env = buildEnv s []
         val env' = interpStm (s, env)
     in printEnv env'
     end
