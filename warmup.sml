@@ -5,9 +5,25 @@ type intTable = string -> int option
 
 fun emptyTable (x:string) = NONE: int option
 
+
 fun updateTable (t: intTable, y:string, v:int) x =
   if x = y then SOME v
-           else t x
+  else t x
+
+
+(*fun updateEnv (e:env, y:string, v:int) =*)
+
+fun matchstring (p:string * int option , s:string) = 
+  if #1 p = s then #2 p
+              else NONE
+  
+fun lookup (e:(string * int option) list, y:string) =
+  case e of [] => NONE
+         |  (x::xs) => matchstring (x, y)
+
+fun updateEnv (e:(string * int option) list, y:string, v:int option) =
+  case lookup (e,y) of NONE => (y,v)::e
+
 
 end
 
@@ -106,6 +122,8 @@ fun interpStm (s:G.stm, env:T.intTable) =
 
 (*Hard coded currently*)
 fun printEnv (e:T.intTable) = print("[(\"a\","^ Int.toString(valOf(e "a")) ^ ")," ^ "(\"b\","^ Int.toString(valOf(e "b")) ^ ")],")
+
+
 
 
 (*WRONG IMPLEMENTATION*)
