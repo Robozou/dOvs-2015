@@ -119,15 +119,8 @@ fun envToString (e:(string * int option) list) =
                         |  _ => "[(\"" ^ x ^ "\"," ^ Int.toString(valOf(y)) ^ ")" ^ envToString(xs)
      
                             
-
-(*Hard coded currently*)
 fun printEnv (e:(string * int option) list) = 
     print(envToString(e))
-
-
-(*print("[(\"a\"," ^ Int.toString(valOf(T.lookup (e,"a"))) ^ ")," ^ "(\"b\","^ Int.toString(valOf(T.lookup(e ,"b"))) ^ ")],")*)
-
-
 
 
 (*WRONG IMPLEMENTATION*)
