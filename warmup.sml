@@ -1,28 +1,20 @@
 (* ---------- Initial code for hand-in 1, dOvs 2015: warmup.sml ---------- *)
 structure Table = struct
 
-type intTable = string -> int option
-
-fun emptyTable (x:string) = NONE: int option
-
-
-fun updateTable (t: intTable, y:string, v:int) x =
-  if x = y then SOME v
-  else t x
-
-
-(*fun updateEnv (e:env, y:string, v:int) =*)
-
 fun matchstring (p:string * int option , s:string) = 
   if #1 p = s then #2 p
               else NONE
   
 fun lookup (e:(string * int option) list, y:string) =
-  case e of [] => NONE
+    case e of [] => NONE
          |  (x::xs) => matchstring (x, y)
 
 fun updateEnv (e:(string * int option) list, y:string, v:int option) =
-  case lookup (e,y) of NONE => (y,v)::e
+    case y of "" => e
+	   |  _  => case lookup (e,y) of NONE => (y,v)::e
+		   
+
+
 
 
 end
@@ -93,13 +85,13 @@ fun interpStm (s:G.stm, (env:(string * int option) list)) =
                                end
 	  | G.AssignStm s => T.updateEnv(env, #1 s, interpExp(#2 s, env))
 	  | G.PrintStm s  => interpPrintList(s, env)
-  and interpExp (e:G.exp, (env:(string * int option) list)) = 
-      case e of G.IdExp e => valOf(T.lookup (env, e))
-	      | G.NumExp e =>  e
+  and interpExp (e:G.exp, env:(string * int option) list) = 
+      case e of G.IdExp e => T.lookup (env, e)
+	      | G.NumExp e => SOME e
 	      | G.OpExp e => interpOpExp(G.OpExp(e),env)
 	      | G.EseqExp e => let val env' = interpStm(#1 e, env)
                                in
-                                   valOf(interpExp(#2 e, env'))
+                                   interpExp(#2 e, env')
                                end
   and interpPrintList (el: G.exp list, (env:(string * int option) list)) =
       case el of [] => (print("\n"); env)
@@ -111,17 +103,29 @@ fun interpStm (s:G.stm, (env:(string * int option) list)) =
           evalBinop(valOf(ls),valOf(rs),b)
       end
   and evalBinop (ls:int,rs:int,b:G.binop) =
-      case b of G.Plus  => ls + rs
-              | G.Minus => ls - rs
-	      | G.Times => ls * rs
-	      | G.Div   => ls div rs
+      case b of G.Plus  => SOME (ls + rs)
+              | G.Minus => SOME (ls - rs)
+	      | G.Times => SOME (ls * rs)
+	      | G.Div   => SOME (ls div rs)
                             
-                            
+(*Loops through environment to create string representation
+  Used in the printEnv function further down
 
+  Based on how we create our environment we need to do another case pattern matching 
+  to check if the integer exists*)                            
+fun envToString (e:(string * int option) list) = 
+    case e of [] => "]\n"
+  | (x,y)::xs => case y of NONE => "" ^ envToString(xs)
+                        |  _ => "[(\"" ^ x ^ "\"," ^ Int.toString(valOf(y)) ^ ")" ^ envToString(xs)
+     
                             
 
 (*Hard coded currently*)
-fun printEnv (e:(string * int option) list) = print("[(\"a\"," ^ Int.toString(valOf(T.lookup (e,"a"))) ^ ")," ^ "(\"b\","^ Int.toString(valOf(T.lookup(e ,"b"))) ^ ")],")
+fun printEnv (e:(string * int option) list) = 
+    print(envToString(e))
+
+
+(*print("[(\"a\"," ^ Int.toString(valOf(T.lookup (e,"a"))) ^ ")," ^ "(\"b\","^ Int.toString(valOf(T.lookup(e ,"b"))) ^ ")],")*)
 
 
 
