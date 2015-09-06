@@ -1,7 +1,7 @@
 (* ---------- Initial code for hand-in 1, dOvs 2015: warmup.sml ---------- *)
 structure Table = struct
 
-exception UnintializedVar
+exception UninitializedVar
 
 fun matchstring (p:string * int option , s:string) = 
   if #1 p = s then #2 p
@@ -14,10 +14,6 @@ fun lookup (e:(string * int option) list, y:string) =
 fun updateEnv (e:(string * int option) list, y:string, v:int option) =
     case y of "" => e
 	   |  _  => case lookup (e,y) of NONE => (y,v)::e
-		   
-
-
-
 
 end
 
@@ -73,7 +69,7 @@ fun buildEnv (s:G.stm) (t:(string * int option) list) =
 			       in
 				   buildEnv (#2 s) t2
 			       end
-	  | G.PrintStm s => T.updateEnv(t, "", NONE)
+	  | G.PrintStm s => t
 
 
 
