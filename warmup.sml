@@ -1,6 +1,8 @@
 (* ---------- Initial code for hand-in 1, dOvs 2015: warmup.sml ---------- *)
 structure Table = struct
 
+exception UnintializedVar
+
 fun matchstring (p:string * int option , s:string) = 
   if #1 p = s then #2 p
               else NONE
@@ -49,7 +51,7 @@ exception NotImplemented
 fun stringOfBinop (s:G.binop): string = 
   case s of G.Plus  => "+"
           | G.Minus => "-"
-	  | G.Times => "x" 
+	  | G.Times => "*" 
 	  | G.Div   => "/"
   and stringOfList [a] = stringOfExp(a)
           | stringOfList(x::xs) = stringOfExp(x) ^ ", " ^ stringOfList(xs)
