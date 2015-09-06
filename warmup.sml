@@ -164,11 +164,11 @@ val prog =
 val prog2 =
     G.CompoundStm(
 	G.PrintStm[G.EseqExp(
-			G.PrintStm[G.EseqExp(G.AssignStm("a", G.NumExp 17), G.NumExp 88)],
-			G.NumExp 17)],
+			G.PrintStm[G.EseqExp(G.AssignStm("a", G.NumExp 17), G.IdExp "a")],
+			G.IdExp "a")],
 	G.PrintStm[G.EseqExp(
-			G.PrintStm[G.EseqExp(G.AssignStm("b", G.NumExp 23), G.NumExp 7)],
-			G.NumExp 77)])		
+			G.PrintStm[G.EseqExp(G.AssignStm("b", G.NumExp 23), G.IdExp "b")],
+			G.IdExp "b")])		
 
 
 (* ... *)
