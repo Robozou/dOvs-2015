@@ -81,22 +81,26 @@ fun interpStm (s:G.stm, (env:(string * int option) list)) =
 			       in
                                   interpStm (#2 s, env')
                                end
-	  | G.AssignStm s => T.updateEnv(env, #1 s, interpExp(#2 s, env))
-	  | G.PrintStm s  => interpPrintList(s, env)
+	  | G.AssignStm s => T.updateEnv(env, #1 s, #1 (interpExp(#2 s, env)))
+	  | G.PrintStm s  => #2 (interpPrintList(s, env))
   and interpExp (e:G.exp, env:(string * int option) list) = 
-      case e of G.IdExp e => T.lookup (env, e)
-	      | G.NumExp e => SOME e
-	      | G.OpExp e => interpOpExp(G.OpExp(e),env)
+      case e of G.IdExp e => (T.lookup (env, e), env)
+	      | G.NumExp e => (SOME e, env)
+	      | G.OpExp e => (interpOpExp(G.OpExp(e),env), env)
 	      | G.EseqExp e => let val env' = interpStm(#1 e, env)
                                in
                                    interpExp(#2 e, env')
                                end
   and interpPrintList (el: G.exp list, (env:(string * int option) list)) =
-      case el of [] => (print("\n"); env)
-              |  (x::xs) => (print(Int.toString(valOf((interpExp(x, env)))) ^ " "); interpPrintList(xs, env))
+      case el of [] => (print("\n"); (NONE, env))
+              |  (x::xs) => let val res = interpExp(x, env)
+		                (*val toprint = Int.toString(valOf(#1 res))*)
+                            in                               
+				(print(Int.toString(valOf(#1 res)) ^ " "); interpPrintList(xs, #2 res))
+                            end
   and interpOpExp (G.OpExp(e1,b,e2), (env:(string * int option) list)) =
-      let val ls = interpExp(e1, env)
-          val rs = interpExp(e2, env)
+      let val ls = #1 (interpExp(e1, env))
+          val rs = #1 (interpExp(e2, env))
       in
           evalBinop(valOf(ls),valOf(rs),b)
       end
@@ -114,11 +118,11 @@ fun interpStm (s:G.stm, (env:(string * int option) list)) =
 fun envToString (e:(string * int option) list) = 
     case e of [] => "]\n"
   | (x,y)::xs => case y of NONE => "" ^ envToString(xs)
-                        |  _ => "[(\"" ^ x ^ "\"," ^ Int.toString(valOf(y)) ^ ")" ^ envToString(xs)
+                        |  _ => "(\"" ^ x ^ "\"," ^ Int.toString(valOf(y)) ^ ")" ^ envToString(xs)
      
                             
 fun printEnv (e:(string * int option) list) = 
-    print(envToString(e))
+    print("[" ^ envToString(e))
 
 
 (*WRONG IMPLEMENTATION*)
@@ -160,11 +164,11 @@ val prog =
 val prog2 =
     G.CompoundStm(
 	G.PrintStm[G.EseqExp(
-			G.PrintStm[G.EseqExp(G.AssignStm("a", G.IdExp "b"), G.IdExp "a")],
-			G.IdExp "a")],
+			G.PrintStm[G.EseqExp(G.AssignStm("a", G.NumExp 17), G.NumExp 88)],
+			G.NumExp 17)],
 	G.PrintStm[G.EseqExp(
-			G.PrintStm[G.EseqExp(G.AssignStm("a", G.IdExp "b"), G.IdExp "a")],
-			G.IdExp "a")])		
+			G.PrintStm[G.EseqExp(G.AssignStm("b", G.NumExp 23), G.NumExp 7)],
+			G.NumExp 77)])		
 
 
 (* ... *)
