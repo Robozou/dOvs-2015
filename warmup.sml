@@ -15,13 +15,6 @@ fun lookup (e:(string * int option) list, y:string) =
 				       | _    => match
                        end
 
-fun updateEnv (e:(string * int option) list, y:string, v:int option) =
-    case y of "" => e
-	   |  _  => case lookup (e,y) of NONE => (y,v)::e
-                                      |  _    => let val res = split(e,y,[])
-					         in
-						     List.concat([(y,v)::List.tl(#1 res), #2 res])
-					         end
 
 (* Function used for splitting lists into a pair of two.
    Input is the full list, the string to split by and an empty list for accumulating
@@ -31,8 +24,14 @@ fun split (inp:(string * int option) list, y:string, spl:(string * int option) l
 	   |  _  => case inp of []        => (spl, inp)
 			     |  (s,i)::xs => if s = y then ((s,i)::spl, xs)
 						      else split (xs, y, (s,i)::spl)
-    
 
+fun updateEnv (e:(string * int option) list, y:string, v:int option) =
+    case y of "" => e
+	   |  _  => case lookup (e,y) of NONE => (y,v)::e
+                                      |  _    => let val res = split(e,y,[])
+					         in
+						     List.concat([(y,v)::List.tl(#1 res), #2 res])
+					         end
 end
 
 
