@@ -9,11 +9,29 @@ fun matchstring (p:string * int option , s:string) =
   
 fun lookup (e:(string * int option) list, y:string) =
     case e of [] => NONE
-         |  (x::xs) => matchstring (x, y)
+         |  (x::xs) => let val match = matchstring (x, y)
+		       in
+			   case match of NONE => lookup(xs, y)
+				       | _    => match
+                       end
 
 fun updateEnv (e:(string * int option) list, y:string, v:int option) =
     case y of "" => e
 	   |  _  => case lookup (e,y) of NONE => (y,v)::e
+                                      |  _    => let val res = split(e,y,[])
+					         in
+						     List.concat([(y,v)::List.tl(#1 res), #2 res])
+					         end
+
+(* Function used for splitting lists into a pair of two.
+   Input is the full list, the string to split by and an empty list for accumulating
+   Returns af pair of the two lists split by the input string *)
+fun split (inp:(string * int option) list, y:string, spl:(string * int option) list) =
+    case y of "" => (spl, inp)
+	   |  _  => case inp of []        => (spl, inp)
+			     |  (s,i)::xs => if s = y then ((s,i)::spl, xs)
+						      else split (xs, y, (s,i)::spl)
+    
 
 end
 
@@ -81,28 +99,33 @@ fun interpStm (s:G.stm, (env:(string * int option) list)) =
 			       in
                                   interpStm (#2 s, env')
                                end
-	  | G.AssignStm s => T.updateEnv(env, #1 s, #1 (interpExp(#2 s, env)))
+	  | G.AssignStm s =>   let
+	                          val res = interpExp(#2 s, env)
+			       in
+				  T.updateEnv(#2 res, #1 s, #1 res)
+			       end
 	  | G.PrintStm s  => #2 (interpPrintList(s, env))
   and interpExp (e:G.exp, env:(string * int option) list) = 
       case e of G.IdExp e => (T.lookup (env, e), env)
 	      | G.NumExp e => (SOME e, env)
-	      | G.OpExp e => (interpOpExp(G.OpExp(e),env), env)
+	      | G.OpExp e => interpOpExp(G.OpExp(e),env)
 	      | G.EseqExp e => let val env' = interpStm(#1 e, env)
                                in
                                    interpExp(#2 e, env')
                                end
   and interpPrintList (el: G.exp list, (env:(string * int option) list)) =
       case el of [] => (print("\n"); (NONE, env))
-              |  (x::xs) => let val res = interpExp(x, env)
-		                (*val toprint = Int.toString(valOf(#1 res))*)
+              |  (x::xs) => let val res = interpExp(x, env)		               
                             in                               
 				(print(Int.toString(valOf(#1 res)) ^ " "); interpPrintList(xs, #2 res))
                             end
   and interpOpExp (G.OpExp(e1,b,e2), (env:(string * int option) list)) =
-      let val ls = #1 (interpExp(e1, env))
-          val rs = #1 (interpExp(e2, env))
+      let val res = interpExp(e1, env)
+	  val ls = #1 res
+	  val res' = interpExp(e2, #2 res)
+          val rs = #1 res'
       in
-          evalBinop(valOf(ls),valOf(rs),b)
+          (evalBinop(valOf(ls),valOf(rs),b), #2 res')
       end
   and evalBinop (ls:int,rs:int,b:G.binop) =
       case b of G.Plus  => SOME (ls + rs)
@@ -143,7 +166,7 @@ fun maxArgs (s:G.stm) =
 (* ... *)
 
 fun interp (s: G.stm): unit =
-    let val _ = print ("Executing: " ^ (stringOfStm s) ^ "\n")
+    let val _ = print ("Executing: " ^ (stringOfStm s) ^ ";\n")
         val env = buildEnv s []
         val env' = interpStm (s, env)
     in printEnv env'
@@ -161,6 +184,8 @@ val prog =
         G.OpExp (G.NumExp 10, G.Times, G.IdExp "a"))),
       G.PrintStm [G.IdExp "b"]))
 
+
+(* print((print((a := 17, a)), a)); print((print((b := 23, b)), b)) *)
 val prog2 =
     G.CompoundStm(
 	G.PrintStm[G.EseqExp(
@@ -170,7 +195,34 @@ val prog2 =
 			G.PrintStm[G.EseqExp(G.AssignStm("b", G.NumExp 23), G.IdExp "b")],
 			G.IdExp "b")])		
 
+(* b := 7; a := 19; b := a - b; print(a,b); *)
 
+val prog3 =
+    G.CompoundStm (
+	G.AssignStm ("b", G.NumExp 7),
+	G.CompoundStm (
+	    G.AssignStm ("a", G.NumExp 19), G.CompoundStm(
+		G.AssignStm("b", G.OpExp (G.IdExp "a", G.Minus, G.IdExp "b")),
+		G.PrintStm[G.IdExp "a", G.IdExp "b"])))
+
+(* a := 8; print(a, a-a); *)
+
+val prog4 =
+    G.CompoundStm (
+	G.AssignStm ("a", G.NumExp 8),
+	G.PrintStm[G.IdExp "a", G.OpExp (G.IdExp "a", G.Minus, G.IdExp "a")])
+
+
+val prog5 =
+    G.CompoundStm (
+	G.AssignStm ("b", G.NumExp 7),
+	G.CompoundStm (
+	    G.AssignStm ("a", G.NumExp 19),
+	    G.AssignStm("b", G.OpExp (G.IdExp "a", G.Minus, G.IdExp "b"))))
+		
+
+
+		
 (* ... *)
 
 (* Calling the interpreter on the example program. Uncomment to proceed
