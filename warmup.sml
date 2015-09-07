@@ -146,11 +146,9 @@ fun envToString (e:(string * int option) list) =
 fun printEnv (e:(string * int option) list) = 
     print("[" ^ envToString(e))
 
-
-(*WRONG IMPLEMENTATION*)
 fun maxArgs (s:G.stm) =
-    case s of G.PrintStm s    => 1 + maxArgsOfExpList(s)
-	    | G.CompoundStm s => maxArgs(#1 s) + maxArgs(#2 s)
+    case s of G.PrintStm s    => if length s > maxArgsOfExpList(s) then length s else maxArgsOfExpList(s) 
+	    | G.CompoundStm s => if maxArgs(#1 s) > maxArgs(#2 s) then maxArgs(#1 s) else maxArgs(#2 s)
 	    | G.AssignStm s   => 0 + maxArgsExp(#2 s)
     and maxArgsOfExpList [] = 0
             | maxArgsOfExpList(x::xs) = maxArgsExp(x) + maxArgsOfExpList (xs)
@@ -159,8 +157,8 @@ fun maxArgs (s:G.stm) =
 	    | G.NumExp s      => 0
 	    | G.OpExp s       => 0
 	    | G.EseqExp s     => maxArgs(#1 s) + 0
-(*WRONG IMPLEMENTATION*)
-
+    and length [] = 0
+            | length (x::xs) = 1 + length
 	      
 (* ... *)
 
