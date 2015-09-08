@@ -89,7 +89,26 @@ fun buildEnv (s:G.stm) (t:(string * int option) list) =
    | G.CompoundStm (s1,s2) => let val t2 = buildEnv (s1) t in
  			        buildEnv (s2) t2
 			      end
-   | G.PrintStm s          => t
+   | G.PrintStm s          => buildFromExpList s t
+  and buildFromExp (e:G.exp) (t:(string * int option) list) =
+   case e of
+     G.IdExp e         => t
+   | G.NumExp e        => t
+   | G.OpExp (e1,_,e2) => let val res = buildFromExp e1 t
+			  in
+			     buildFromExp e2 res
+		          end
+   | G.EseqExp (st,ex) => let val res = buildEnv st t
+		          in
+			     buildFromExp ex res
+			  end
+  and buildFromExpList (e:G.exp list) (t:(string * int option) list) =
+   case e of
+     [e]     => buildFromExp e t
+   | (x::xs) => let val res = buildFromExp x t
+		in
+		  buildFromExpList xs res
+		end
 
 
 
@@ -103,19 +122,19 @@ fun interpStm (s:G.stm, (env:(string * int option) list)) =
    | G.AssignStm (id,ex)   => let val res = interpExp(ex, env) in
 			 	T.updateEnv(#2 res, id, #1 res)
 			      end
-   | G.PrintStm s  => #2 (interpPrintList(s, env))
+   | G.PrintStm s          => #2 (interpPrintList(s, env))
   and interpExp (e:G.exp, env:(string * int option) list) = 
    case e of
-     G.IdExp e => (T.lookup (env, e), env)
-   | G.NumExp e => (SOME e, env)
-   | G.OpExp e => interpOpExp(G.OpExp(e),env)
+     G.IdExp e   => (T.lookup (env, e), env)
+   | G.NumExp e  => (SOME e, env)
+   | G.OpExp e   => interpOpExp(G.OpExp(e),env)
    | G.EseqExp e => let val env' = interpStm(#1 e, env) in
                       interpExp(#2 e, env')
                     end
   and interpPrintList (el: G.exp list, (env:(string * int option) list)) =
    case el of
      [] => (print("\n"); (NONE, env))
-   |  (x::xs) => let val res = interpExp(x, env) in                               
+   | (x::xs) => let val res = interpExp(x, env) in                               
 		   (print(Int.toString(valOf(#1 res)) ^ " ");
 		    interpPrintList(xs, #2 res))
                  end
@@ -233,9 +252,18 @@ val prog5 =
 val prog6 =
     G.CompoundStm(G.PrintStm[G.NumExp 5, G.NumExp 4, G.NumExp 7, G.NumExp 8],
 		  G.PrintStm[G.NumExp 5, G.NumExp 3, G.NumExp 7])
-			    
-	
 
+(* b := 9; a := 4; b := a - b; c := a - b; print(c,a,b) *)			    
+val prog7 =
+    G.CompoundStm(G.CompoundStm(
+		       G.AssignStm("b", G.NumExp 9),
+		       G.CompoundStm(G.AssignStm("a", G.NumExp 4),
+				     G.AssignStm("b", G.OpExp(G.IdExp "a", G.Minus, G.IdExp "b")))),
+		  G.CompoundStm(G.AssignStm("c", G.OpExp(G.IdExp "a", G.Minus, G.IdExp "b")),
+				G.PrintStm[G.IdExp "c", G.IdExp "a", G.IdExp "b"]))
+    
+val prog8 =
+    G.CompoundStm(G.PrintStm[G.EseqExp(G.AssignStm("a",G.NumExp 6), G.NumExp 5)], G.PrintStm[G.IdExp "a"])
 		
 (* ... *)
 
