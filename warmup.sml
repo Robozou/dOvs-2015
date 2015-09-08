@@ -9,10 +9,10 @@ fun matchstring (p:string * int option , s:string) =
   
 fun lookup (e:(string * int option) list, y:string) =
     case e of [] => NONE
-         |  (x::xs) => let val match = matchstring (x, y)
-		       in
-			   case match of NONE => lookup(xs, y)
-				       | _    => match
+         |  (x::xs) => let val match = matchstring (x, y) in
+			 case match of
+			   NONE => lookup(xs, y)
+		  	 | _    => match
                        end
 
 
@@ -21,17 +21,18 @@ fun lookup (e:(string * int option) list, y:string) =
    Returns af pair of the two lists split by the input string *)
 fun split (inp:(string * int option) list, y:string, spl:(string * int option) list) =
     case y of "" => (spl, inp)
-	   |  _  => case inp of []        => (spl, inp)
-			     |  (s,i)::xs => if s = y then ((s,i)::spl, xs)
-						      else split (xs, y, (s,i)::spl)
+	   |  _  => case inp of 
+                      []        => (spl, inp)
+	            | (s,i)::xs => if s = y then ((s,i)::spl, xs)
+				            else split (xs, y, (s,i)::spl)
 
 fun updateEnv (e:(string * int option) list, y:string, v:int option) =
     case y of "" => e
-	   |  _  => case lookup (e,y) of NONE => (y,v)::e
-                                      |  _    => let val res = split(e,y,[])
-					         in
-						     List.concat([(y,v)::List.tl(#1 res), #2 res])
-					         end
+	   |  _  => case lookup (e,y) of 
+                      NONE => (y,v)::e
+                    |  _   => let val res = split(e,y,[]) in
+	 			List.concat([(y,v)::List.tl(#1 res), #2 res])
+		              end
 end
 
 
@@ -62,75 +63,77 @@ structure T = Table
 exception NotImplemented
 
 fun stringOfBinop (s:G.binop): string = 
-  case s of G.Plus  => "+"
-          | G.Minus => "-"
-	  | G.Times => "*" 
-	  | G.Div   => "/"
+    case s of
+      G.Plus  => "+"
+    | G.Minus => "-"
+    | G.Times => "*" 
+    | G.Div   => "/"
   and stringOfList [a] = stringOfExp(a)
-          | stringOfList(x::xs) = stringOfExp(x) ^ ", " ^ stringOfList(xs)
-  and stringOfExp (s:G.exp): string =
-  case s of G.NumExp s  => Int.toString(s)
-          | G.IdExp s   => s
-          | G.OpExp s   => stringOfExp(#1 s) ^ stringOfBinop(#2 s) ^ stringOfExp(#3 s)
-          | G.EseqExp s => "(" ^ stringOfStm(#1 s) ^ "," ^ stringOfExp(#2 s) ^ ")"
+    | stringOfList(x::xs) = stringOfExp(x) ^ ", " ^ stringOfList(xs)
+  and stringOfExp (e:G.exp): string =
+    case e of
+      G.NumExp e          => Int.toString(e)
+    | G.IdExp e           => e
+    | G.OpExp (e1,b,e2)   => stringOfExp(e1) ^ stringOfBinop(b) ^ stringOfExp(e2)
+    | G.EseqExp (st,ex)   => "(" ^ stringOfStm(st) ^ "," ^ stringOfExp(ex) ^ ")"
   and stringOfStm (s:G.stm): string =
-  case s of G.AssignStm s   => (#1 s) ^ " := " ^ stringOfExp(#2 s)
-          | G.CompoundStm s => stringOfStm(#1 s) ^ "; " ^ stringOfStm(#2 s)
-	  | G.PrintStm s    => "print(" ^ stringOfList(s) ^ ")"
+    case s of
+      G.AssignStm (id,ex)   => id ^ " := " ^ stringOfExp(ex)
+    | G.CompoundStm (s1,s2) => stringOfStm(s1) ^ "; " ^ stringOfStm(s2)
+    | G.PrintStm s          => "print(" ^ stringOfList(s) ^ ")"
 
 
 fun buildEnv (s:G.stm) (t:(string * int option) list) =
-  case s of G.AssignStm s => T.updateEnv(t, #1 s, NONE)
-	  | G.CompoundStm s => let 
-	                          val t2 = buildEnv (#1 s) t
-			       in
-				   buildEnv (#2 s) t2
-			       end
-	  | G.PrintStm s => t
+  case s of
+     G.AssignStm (id,ex)   => T.updateEnv(t, id, NONE)
+   | G.CompoundStm (s1,s2) => let val t2 = buildEnv (s1) t in
+ 			        buildEnv (s2) t2
+			      end
+   | G.PrintStm s          => t
 
 
 
 
 
 fun interpStm (s:G.stm, (env:(string * int option) list)) = 
-  case s of G.CompoundStm s => let
-                                  val env' = interpStm (#1 s, env)
-			       in
-                                  interpStm (#2 s, env')
-                               end
-	  | G.AssignStm s =>   let
-	                          val res = interpExp(#2 s, env)
-			       in
-				  T.updateEnv(#2 res, #1 s, #1 res)
-			       end
-	  | G.PrintStm s  => #2 (interpPrintList(s, env))
+   case s of
+     G.CompoundStm (s1,s2) => let val env' = interpStm (s1, env) in
+                                interpStm (s2, env')
+                              end
+   | G.AssignStm (id,ex)   => let val res = interpExp(ex, env) in
+			 	T.updateEnv(#2 res, id, #1 res)
+			      end
+   | G.PrintStm s  => #2 (interpPrintList(s, env))
   and interpExp (e:G.exp, env:(string * int option) list) = 
-      case e of G.IdExp e => (T.lookup (env, e), env)
-	      | G.NumExp e => (SOME e, env)
-	      | G.OpExp e => interpOpExp(G.OpExp(e),env)
-	      | G.EseqExp e => let val env' = interpStm(#1 e, env)
-                               in
-                                   interpExp(#2 e, env')
-                               end
+   case e of
+     G.IdExp e => (T.lookup (env, e), env)
+   | G.NumExp e => (SOME e, env)
+   | G.OpExp e => interpOpExp(G.OpExp(e),env)
+   | G.EseqExp e => let val env' = interpStm(#1 e, env) in
+                      interpExp(#2 e, env')
+                    end
   and interpPrintList (el: G.exp list, (env:(string * int option) list)) =
-      case el of [] => (print("\n"); (NONE, env))
-              |  (x::xs) => let val res = interpExp(x, env)		               
-                            in                               
-				(print(Int.toString(valOf(#1 res)) ^ " "); interpPrintList(xs, #2 res))
-                            end
+   case el of
+     [] => (print("\n"); (NONE, env))
+   |  (x::xs) => let val res = interpExp(x, env) in                               
+		   (print(Int.toString(valOf(#1 res)) ^ " ");
+		    interpPrintList(xs, #2 res))
+                 end
   and interpOpExp (G.OpExp(e1,b,e2), (env:(string * int option) list)) =
-      let val res = interpExp(e1, env)
-	  val ls = #1 res
-	  val res' = interpExp(e2, #2 res)
-          val rs = #1 res'
-      in
-          (evalBinop(valOf(ls),valOf(rs),b), #2 res')
-      end
+   let 
+      val res = interpExp(e1, env)
+      val ls = #1 res
+      val res' = interpExp(e2, #2 res)
+      val rs = #1 res'
+   in
+      (evalBinop(valOf(ls),valOf(rs),b), #2 res')
+   end
   and evalBinop (ls:int,rs:int,b:G.binop) =
-      case b of G.Plus  => SOME (ls + rs)
-              | G.Minus => SOME (ls - rs)
-	      | G.Times => SOME (ls * rs)
-	      | G.Div   => SOME (ls div rs)
+   case b of
+     G.Plus  => SOME (ls + rs)
+   | G.Minus => SOME (ls - rs)
+   | G.Times => SOME (ls * rs)
+   | G.Div   => SOME (ls div rs)
                             
 (*Loops through environment to create string representation
   Used in the printEnv function further down
@@ -138,35 +141,43 @@ fun interpStm (s:G.stm, (env:(string * int option) list)) =
   Based on how we create our environment we need to do another case pattern matching 
   to check if the integer exists*)                            
 fun envToString (e:(string * int option) list) = 
-    case e of [] => "]\n"
-  | (x,y)::xs => case y of NONE => "" ^ envToString(xs)
-                        |  _ => "(\"" ^ x ^ "\"," ^ Int.toString(valOf(y)) ^ ")" ^ envToString(xs)
+    case e of
+      []        => "]\n"
+    | (x,y)::xs => case y of
+		     NONE => "" ^ envToString(xs)
+                   |  _   => "(\"" ^ x ^
+			     "\"," ^ Int.toString(valOf(y)) ^
+			     ")"   ^ envToString(xs)
      
                             
 fun printEnv (e:(string * int option) list) = 
     print("[" ^ envToString(e))
 
 fun maxArgs (s:G.stm) =
-    case s of G.PrintStm s    => Int.max(length s,maxArgsOfExpList(s)) 
-	    | G.CompoundStm s => Int.max(maxArgs(#1 s), maxArgs(#2 s))
-	    | G.AssignStm s   => 0 + maxArgsExp(#2 s)
+      case s of
+        G.PrintStm s    => Int.max(length s,maxArgsOfExpList(s)) 
+      | G.CompoundStm s => Int.max(maxArgs(#1 s), maxArgs(#2 s))
+      | G.AssignStm s   => 0 + maxArgsExp(#2 s)
     and maxArgsOfExpList [] = 0
-            | maxArgsOfExpList(x::xs) = maxArgsExp(x) + maxArgsOfExpList (xs)
+      | maxArgsOfExpList(x::xs) = maxArgsExp(x) + maxArgsOfExpList (xs)
     and maxArgsExp (e:G.exp): int =
-    case e of G.IdExp e         => 0
-	    | G.NumExp e        => 0
-	    | G.OpExp (e1,_,e2) => Int.max(maxArgsExp(e1), maxArgsExp(e2)) 
-	    | G.EseqExp (st,ex) => Int.max(maxArgs(st), maxArgsExp(ex))
+      case e of
+        G.IdExp e         => 0
+      | G.NumExp e        => 0
+      | G.OpExp (e1,_,e2) => Int.max(maxArgsExp(e1), maxArgsExp(e2)) 
+      | G.EseqExp (st,ex) => Int.max(maxArgs(st), maxArgsExp(ex))
     and length [] = 0
-            | length (x::xs) = 1 + length xs
+      | length (x::xs) = 1 + length xs
 	      
 (* ... *)
 
 fun interp (s: G.stm): unit =
-    let val _ = print ("Executing: " ^ (stringOfStm s) ^ ";\n")
-        val env = buildEnv s []
-        val env' = interpStm (s, env)
-    in printEnv env'
+    let
+       val _ = print ("Executing: " ^ (stringOfStm s) ^ ";\n")
+       val env = buildEnv s []
+       val env' = interpStm (s, env)
+    in
+       printEnv env'
     end
 
 (* ----- Example for testing ----- *)
@@ -209,6 +220,7 @@ val prog4 =
 	G.AssignStm ("a", G.NumExp 8),
 	G.PrintStm[G.IdExp "a", G.OpExp (G.IdExp "a", G.Minus, G.IdExp "a")])
 
+(* b := 7; a := 19; b := a - b; *)
 
 val prog5 =
     G.CompoundStm (
@@ -216,9 +228,12 @@ val prog5 =
 	G.CompoundStm (
 	    G.AssignStm ("a", G.NumExp 19),
 	    G.AssignStm("b", G.OpExp (G.IdExp "a", G.Minus, G.IdExp "b"))))
-		
+
+(* For testing maxArgs *)		
 val prog6 =
-    G.PrintStm[G.NumExp 5, G.NumExp 4, G.NumExp 7, G.NumExp 8]
+    G.CompoundStm(G.PrintStm[G.NumExp 5, G.NumExp 4, G.NumExp 7, G.NumExp 8],
+		  G.PrintStm[G.NumExp 5, G.NumExp 3, G.NumExp 7])
+			    
 	
 
 		
