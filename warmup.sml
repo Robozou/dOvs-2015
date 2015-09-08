@@ -147,18 +147,18 @@ fun printEnv (e:(string * int option) list) =
     print("[" ^ envToString(e))
 
 fun maxArgs (s:G.stm) =
-    case s of G.PrintStm s    => if length s > maxArgsOfExpList(s) then length s else maxArgsOfExpList(s) 
-	    | G.CompoundStm s => if maxArgs(#1 s) > maxArgs(#2 s) then maxArgs(#1 s) else maxArgs(#2 s)
+    case s of G.PrintStm s    => Int.max(length s,maxArgsOfExpList(s)) 
+	    | G.CompoundStm s => Int.max(maxArgs(#1 s), maxArgs(#2 s))
 	    | G.AssignStm s   => 0 + maxArgsExp(#2 s)
     and maxArgsOfExpList [] = 0
             | maxArgsOfExpList(x::xs) = maxArgsExp(x) + maxArgsOfExpList (xs)
-    and maxArgsExp (s:G.exp): int =
-    case s of G.IdExp s       => 0
-	    | G.NumExp s      => 0
-	    | G.OpExp s       => 0
-	    | G.EseqExp s     => maxArgs(#1 s) + 0
+    and maxArgsExp (e:G.exp): int =
+    case e of G.IdExp e         => 0
+	    | G.NumExp e        => 0
+	    | G.OpExp (e1,_,e2) => Int.max(maxArgsExp(e1), maxArgsExp(e2)) 
+	    | G.EseqExp (st,ex) => Int.max(maxArgs(st), maxArgsExp(ex))
     and length [] = 0
-            | length (x::xs) = 1 + length
+            | length (x::xs) = 1 + length xs
 	      
 (* ... *)
 
@@ -217,7 +217,9 @@ val prog5 =
 	    G.AssignStm ("a", G.NumExp 19),
 	    G.AssignStm("b", G.OpExp (G.IdExp "a", G.Minus, G.IdExp "b"))))
 		
-
+val prog6 =
+    G.PrintStm[G.NumExp 5, G.NumExp 4, G.NumExp 7, G.NumExp 8]
+	
 
 		
 (* ... *)
