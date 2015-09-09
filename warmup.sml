@@ -264,6 +264,12 @@ val prog7 =
     
 val prog8 =
     G.CompoundStm(G.PrintStm[G.EseqExp(G.AssignStm("a",G.NumExp 6), G.NumExp 5)], G.PrintStm[G.IdExp "a"])
+
+
+
+
+val prog9 =
+    G.CompoundStm(G.AssignStm("a", G.EseqExp(G.CompoundStm(G.AssignStm("a", G.NumExp 5), G.PrintStm[G.IdExp "a"]), G.NumExp 6)), G.PrintStm[G.IdExp "a"])
 		
 (* ... *)
 
