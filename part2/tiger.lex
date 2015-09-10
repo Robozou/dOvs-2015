@@ -1,6 +1,7 @@
 type pos = int
 type lexresult = Tokens.token
 
+val commCount = ref 0
 val lineNum = ErrorMsg.lineNum
 val linePos = ErrorMsg.linePos
 
@@ -16,6 +17,7 @@ fun eof () =
         Tokens.EOF (pos,pos)
     end
 
+    
 fun s2i t pos =
     let
         val opti = (Int.fromString t) 
@@ -34,6 +36,7 @@ fun dopos3 token value yypos yylen = token (value, yypos, yypos + yylen)
 letter=[a-zA-Z];
 digits=[0-9]+;
 idchars=[a-zA-Z0-9_]*;
+stringlit=[a-z|A-Z|0-9|_|"\\n"|"\\t"| |"\\"|"\""]*;
 %s [COMMENT STRING];
 %%
 
@@ -80,14 +83,14 @@ idchars=[a-zA-Z0-9_]*;
 <INITIAL>";"                        => (dopos Tokens.SEMICOLON yypos 1);
 <INITIAL>":"                        => (dopos Tokens.COLON yypos 1);
 <INITIAL>" "                        => (continue());
-<INITIAL>"/*"                       => (YYBEGIN COMMENT; continue());
-<COMMENT>"*/"                       => (YYBEGIN INITIAL; continue());
+<INITIAL>"/*"                       => (commCount := !commCount + 1; YYBEGIN COMMENT; continue());
+<COMMENT>"/*"                       => (commCount := !commCount + 1; continue());
+<COMMENT>"*/"                       => (commCount := !commCount - 1; if true then YYBEGIN INITIAL else continue(); continue());
 <COMMENT>.                          => (continue());
-<INITIAL>"int"                      => (dopos Tokens.TYPE yypos 3);
 <INITIAL>"^"                        => (dopos Tokens.CARET yypos 1);
 <INITIAL>"\""                       => (YYBEGIN STRING; continue());
 <STRING>"\""                        => (YYBEGIN INITIAL; continue());
-<STRING>.                           => (dopos3 Tokens.STRING yytext yypos (size yytext));
+<STRING>{stringlit}                 => (dopos3 Tokens.STRING ("\"" ^ yytext) yypos (size yytext));
 <INITIAL>{digits}                   => (dopos3 Tokens.INT (s2i yytext yypos) yypos
                                                  (size yytext));
 <INITIAL>{idchars}                  => (dopos3 Tokens.ID yytext yypos (size yytext));
