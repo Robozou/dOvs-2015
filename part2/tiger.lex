@@ -34,15 +34,63 @@ fun dopos3 token value yypos yylen = token (value, yypos, yypos + yylen)
 letter=[a-zA-Z];
 digits=[0-9]+;
 idchars=[a-zA-Z0-9_]*;
+%s [COMMENT STRING];
 %%
 
-"\n"	                   => (lineNum := !lineNum+1;
+<INITIAL>"\n"	                   => (lineNum := !lineNum+1;
                                linePos := yypos :: !linePos;
                                continue());
-","                        => (dopos Tokens.COMMA yypos 1);
-"var"                      => (dopos Tokens.VAR yypos 3);
-{digits}                   => (dopos3 Tokens.INT (s2i yytext yypos) yypos
+<INITIAL>","                        => (dopos Tokens.COMMA yypos 1);
+<INITIAL>"var"                      => (dopos Tokens.VAR yypos 3);
+<INITIAL>"if"                       => (dopos Tokens.IF yypos 2);
+<INITIAL>"then"                     => (dopos Tokens.THEN yypos 4);
+<INITIAL>"else"                     => (dopos Tokens.ELSE yypos 4);
+<INITIAL>"function"                 => (dopos Tokens.FUNCTION yypos 8);
+<INITIAL>"break"                    => (dopos Tokens.BREAK yypos 5);
+<INITIAL>"of"                       => (dopos Tokens.OF yypos 2);
+<INITIAL>"end"                      => (dopos Tokens.END yypos 3);
+<INITIAL>"in"                       => (dopos Tokens.IN yypos 2);
+<INITIAL>"nil"                      => (dopos Tokens.NIL yypos 3);
+<INITIAL>"let"                      => (dopos Tokens.LET yypos 3);
+<INITIAL>"do"                       => (dopos Tokens.DO yypos 2);
+<INITIAL>"to"                       => (dopos Tokens.TO yypos 2);
+<INITIAL>"for"                      => (dopos Tokens.FOR yypos 3);
+<INITIAL>"while"                    => (dopos Tokens.WHILE yypos 5);
+<INITIAL>"array"                    => (dopos Tokens.ARRAY yypos 5);
+<INITIAL>":="                       => (dopos Tokens.ASSIGN yypos 2);
+<INITIAL>"or"                       => (dopos Tokens.OR yypos 2);
+<INITIAL>"and"                      => (dopos Tokens.AND yypos 3);
+<INITIAL>">"                        => (dopos Tokens.GT yypos 1);
+<INITIAL>">="                       => (dopos Tokens.GE yypos 2);
+<INITIAL>"<="                       => (dopos Tokens.LE yypos 2);
+<INITIAL>"<"                        => (dopos Tokens.LT yypos 1);
+<INITIAL>"<>"                       => (dopos Tokens.NEQ yypos 2);
+<INITIAL>"="                        => (dopos Tokens.EQ yypos 1);
+<INITIAL>"/"                        => (dopos Tokens.DIVIDE yypos 1);
+<INITIAL>"*"                        => (dopos Tokens.TIMES yypos 1);
+<INITIAL>"-"                        => (dopos Tokens.MINUS yypos 1);
+<INITIAL>"+"                        => (dopos Tokens.PLUS yypos 1);
+<INITIAL>"."                        => (dopos Tokens.DOT yypos 1);
+<INITIAL>"}"                        => (dopos Tokens.RBRACE yypos 1);
+<INITIAL>"{"                        => (dopos Tokens.LBRACE yypos 1);
+<INITIAL>"]"                        => (dopos Tokens.RBRACK yypos 1);
+<INITIAL>"["                        => (dopos Tokens.LBRACK yypos 1);
+<INITIAL>")"                        => (dopos Tokens.RPAREN yypos 1);
+<INITIAL>"("                        => (dopos Tokens.LPAREN yypos 1);
+<INITIAL>";"                        => (dopos Tokens.SEMICOLON yypos 1);
+<INITIAL>":"                        => (dopos Tokens.COLON yypos 1);
+<INITIAL>" "                        => (continue());
+<INITIAL>"/*"                       => (YYBEGIN COMMENT; continue());
+<COMMENT>"*/"                       => (YYBEGIN INITIAL; continue());
+<COMMENT>.                          => (continue());
+<INITIAL>"int"                      => (dopos Tokens.TYPE yypos 3);
+<INITIAL>"^"                        => (dopos Tokens.CARET yypos 1);
+<INITIAL>"\""                       => (YYBEGIN STRING; continue());
+<STRING>"\""                        => (YYBEGIN INITIAL; continue());
+<STRING>.                           => (dopos3 Tokens.STRING yytext yypos (size yytext));
+<INITIAL>{digits}                   => (dopos3 Tokens.INT (s2i yytext yypos) yypos
                                                  (size yytext));
+<INITIAL>{idchars}                  => (dopos3 Tokens.ID yytext yypos (size yytext));
 .                          => (ErrorMsg.error yypos ("illegal char " ^ yytext);
                                continue());
 
