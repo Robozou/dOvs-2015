@@ -305,7 +305,7 @@ fun yyAction50 (strm, lastMatch : yymatch) = (yystrm := strm;
 fun yyAction51 (strm, lastMatch : yymatch) = (yystrm := strm;
       (YYBEGIN ESCAPE; continue()))
 fun yyAction52 (strm, lastMatch : yymatch) = (yystrm := strm;
-      (ErrorMsg.error yypos ("Newlines should be put into ignore escape sequence")))
+      (ErrorMsg.error yypos ("Newlines should be put into ignore escape sequence in string"); continue()))
 fun yyAction53 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)
       in
@@ -349,7 +349,7 @@ fun yyAction61 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)
       in
         yystrm := strm;
-        (ErrorMsg.error yypos ("Invalid escape character " ^ yytext))
+        (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); continue())
       end
 fun yyAction62 (strm, lastMatch : yymatch) = (yystrm := strm; (continue()))
 fun yyAction63 (strm, lastMatch : yymatch) = (yystrm := strm;
@@ -358,7 +358,7 @@ fun yyAction64 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)
       in
         yystrm := strm;
-        (ErrorMsg.error yypos ("Invalid character in ignore. No support for " ^ yytext))
+        (ErrorMsg.error yypos ("Invalid character in ignore. No support for " ^ yytext); continue())
       end
 fun yyAction65 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)

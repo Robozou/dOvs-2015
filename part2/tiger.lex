@@ -108,7 +108,7 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
                                         dopos3 Tokens.STRING (!currentString) yypos (size(!currentString)));
 
 <STRING>"\\"                        => (YYBEGIN ESCAPE; continue());
-<STRING>\n                          => (ErrorMsg.error yypos ("Newlines should be put into ignore escape sequence"); eof());
+<STRING>\n                          => (ErrorMsg.error yypos ("Newlines should be put into ignore escape sequence in string"); continue());
 <STRING>.                           => (currentString := !currentString ^ yytext; continue());
 
 <ESCAPE>"n"                         => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
@@ -118,12 +118,12 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 <ESCAPE>{ascii}                     => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>{control}                   => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>{ignore}                    => (YYBEGIN IGNORE; continue());
-<ESCAPE>.                           => (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); eof());
+<ESCAPE>.                           => (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); continue());
 
 
 <IGNORE>{ignore}                    => (continue()); 
 <IGNORE>"\\"                        => (YYBEGIN STRING; continue());
-<IGNORE>.                           => (ErrorMsg.error yypos ("Invalid character in ignore. No support for " ^ yytext); eof());
+<IGNORE>.                           => (ErrorMsg.error yypos ("Invalid character in ignore. No support for " ^ yytext); continue());
 
 
 <INITIAL>{digits}                   => (dopos3 Tokens.INT (s2i yytext yypos) yypos
