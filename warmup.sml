@@ -164,8 +164,8 @@ fun envToString (e:(string * int option) list) =
       []        => "]\n"
     | (x,y)::xs => case y of
 		     NONE => "" ^ envToString(xs)
-                   |  _   => "(\"" ^ x ^
-			     "\"," ^ Int.toString(valOf(y)) ^
+                   | SOME y'   => "(\"" ^ x ^
+			     "\"," ^ Int.toString(y') ^
 			     ")"   ^ envToString(xs)
      
                             

@@ -1,6 +1,7 @@
 type pos = int
 type lexresult = Tokens.token
 
+val inString = ref false
 val curString = ref ""
 val commCount = ref 0
 val lineNum = ErrorMsg.lineNum
@@ -15,8 +16,8 @@ fun eof () =
     let
         val pos = hd (!linePos)
     in
-    if !commCount <> 0
-    then (ErrorMsg.error pos "unclosed comment")
+    if !commCount <> 0 then (ErrorMsg.error pos "unclosed comment")
+      else if !inString = true then (ErrorMsg.error pos "unclosed string")
       else (); commCount := 0; Tokens.EOF (pos,pos)
     end
 
@@ -41,12 +42,14 @@ digits=[0-9]+;
 idchars=[a-zA-Z0-9_]*;
 ignore=[\t\ ]+|\n;
 control=\^[@A-Z\\_\^];
+ascii=[0-255];
 %s [COMMENT STRING ESCAPE IGNORE];
 %%
 
-<INITIAL>"\n"	                   => (lineNum := !lineNum+1;
-                               linePos := yypos :: !linePos;
-                               continue());
+<INITIAL,COMMENT>"\n"	            => (lineNum := !lineNum+1;
+                                        linePos := yypos :: !linePos;
+                                        continue());
+<INITIAL>"\t"                       => (continue());
 <INITIAL>","                        => (dopos Tokens.COMMA yypos 1);
 <INITIAL>"var"                      => (dopos Tokens.VAR yypos 3);
 <INITIAL>"if"                       => (dopos Tokens.IF yypos 2);
@@ -98,25 +101,26 @@ control=\^[@A-Z\\_\^];
                                         else continue());
 <COMMENT>.                          => (continue());
 
-<INITIAL>\"                         => (curString := ""; YYBEGIN STRING; continue());
+<INITIAL>\"                         => (curString := ""; inString := true; YYBEGIN STRING; continue());
 
-<STRING>\"                          => (YYBEGIN INITIAL; dopos3 Tokens.STRING (!curString) yypos (size(!curString)));
+<STRING>\"                          => (inString := false; YYBEGIN INITIAL; dopos3 Tokens.STRING (!curString) yypos (size(!curString)));
 
 <STRING>"\\"                        => (YYBEGIN ESCAPE; continue());
 <STRING>.                           => (curString := !curString ^ yytext; continue());
 
-<ESCAPE>"n"                         => (curString := !curString ^ yytext; YYBEGIN STRING; continue());
-<ESCAPE>"t"                         => (curString := !curString ^ yytext; YYBEGIN STRING; continue());
-<ESCAPE>"\""                        => (curString := !curString ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>"n"                         => (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>"t"                         => (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>"\""                        => (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>"\\"                        => (curString := !curString ^ "\\" ^ "\\"; YYBEGIN STRING; continue());
+<ESCAPE>{ascii}                     => (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>{control}                   => (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>{ignore}                    => (YYBEGIN IGNORE; continue());
+<ESCAPE>.                           => (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); eof());
 
 
-<IGNORE>{ignore}                    => (continue());
+<IGNORE>{ignore}                    => (continue()); 
 <IGNORE>"\\"                        => (YYBEGIN STRING; continue());
-<IGNORE>.                           => (ErrorMsg.error yypos ("Invalid character. No support for " ^ yytext); eof());
-
-
+<IGNORE>.                           => (ErrorMsg.error yypos ("Invalid character in ignore. No support for " ^ yytext); eof());
 
 
 <INITIAL>{digits}                   => (dopos3 Tokens.INT (s2i yytext yypos) yypos
