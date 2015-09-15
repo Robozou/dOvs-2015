@@ -15,7 +15,7 @@ fun eof () =
         val pos = hd (!linePos)
     in
     if !commentLevel <> 0 then (ErrorMsg.error pos "unclosed comment")
-      else if !inString = true then (ErrorMsg.error pos "unclosed string")
+      else if !inString = true then (inString := false; (ErrorMsg.error pos "unclosed string"))
       else (); commentLevel := 0; Tokens.EOF (pos,pos)
     end
 
@@ -89,9 +89,10 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 <INITIAL>":"                        => (dopos Tokens.COLON yypos 1);
 <INITIAL>"&"                        => (dopos Tokens.AND yypos 1);
 <INITIAL>"|"                        => (dopos Tokens.OR yypos 1);
+<INITIAL>"^"                        => (dopos Tokens.CARET yypos 1);
 <INITIAL>" "                        => (continue());
 <INITIAL>"/*"                       => (commentLevel := !commentLevel + 1; YYBEGIN COMMENT; continue());
-<INITIAL>"^"                        => (dopos Tokens.CARET yypos 1);
+
 
 
 <COMMENT>"/*"                       => (commentLevel := !commentLevel + 1; continue());
@@ -103,9 +104,11 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 
 <INITIAL>\"                         => (currentString := ""; inString := true; YYBEGIN STRING; continue());
 
-<STRING>\"                          => (inString := false; YYBEGIN INITIAL; dopos3 Tokens.STRING (!currentString) yypos (size(!currentString)));
+<STRING>\"                          => (inString := false; YYBEGIN INITIAL;
+                                        dopos3 Tokens.STRING (!currentString) yypos (size(!currentString)));
 
 <STRING>"\\"                        => (YYBEGIN ESCAPE; continue());
+<STRING>\n                          => (ErrorMsg.error yypos ("Newlines should be put into ignore escape sequence"); eof());
 <STRING>.                           => (currentString := !currentString ^ yytext; continue());
 
 <ESCAPE>"n"                         => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
@@ -127,7 +130,7 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
                                                  (size yytext));
 <INITIAL>{idchars}                  => (dopos3 Tokens.ID yytext yypos (size yytext));
 
-.                          => (ErrorMsg.error yypos ("illegal char " ^ yytext);
-                               continue());
+.                                   => (ErrorMsg.error yypos ("illegal char " ^ yytext);
+                                        continue());
 
 
