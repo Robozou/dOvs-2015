@@ -130,3 +130,6 @@ ascii=[0-255];
 .                          => (ErrorMsg.error yypos ("illegal char " ^ yytext);
                                continue());
 
+/* 1. Digit escape sequences (skal de oversættes?)
+   2. Newlines i ignore escape i strings (skal de håndteres som i Initial og Comment)
+ */
