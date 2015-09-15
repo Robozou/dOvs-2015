@@ -87,6 +87,8 @@ ascii=[0-255];
 <INITIAL>"("                        => (dopos Tokens.LPAREN yypos 1);
 <INITIAL>";"                        => (dopos Tokens.SEMICOLON yypos 1);
 <INITIAL>":"                        => (dopos Tokens.COLON yypos 1);
+<INITIAL>"&"                        => (dopos Tokens.AND yypos 1);
+<INITIAL>"|"                        => (dopos Tokens.OR yypos 1);
 <INITIAL>" "                        => (continue());
 <INITIAL>"/*"                       => (commentLevel := !commentLevel + 1; YYBEGIN COMMENT; continue());
 <INITIAL>"^"                        => (dopos Tokens.CARET yypos 1);
