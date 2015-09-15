@@ -106,8 +106,6 @@ type pos = int
 type lexresult = Tokens.token
 
 val inString = ref false
-val curString = ref ""
-val commCount = ref 0
 val lineNum = ErrorMsg.lineNum
 val linePos = ErrorMsg.linePos
 
@@ -120,9 +118,9 @@ fun eof () =
     let
         val pos = hd (!linePos)
     in
-    if !commCount <> 0 then (ErrorMsg.error pos "unclosed comment")
+    if !commentLevel <> 0 then (ErrorMsg.error pos "unclosed comment")
       else if !inString = true then (ErrorMsg.error pos "unclosed string")
-      else (); commCount := 0; Tokens.EOF (pos,pos)
+      else (); commentLevel := 0; Tokens.EOF (pos,pos)
     end
 
     
@@ -284,59 +282,59 @@ fun yyAction40 (strm, lastMatch : yymatch) = (yystrm := strm;
       (dopos Tokens.COLON yypos 1))
 fun yyAction41 (strm, lastMatch : yymatch) = (yystrm := strm; (continue()))
 fun yyAction42 (strm, lastMatch : yymatch) = (yystrm := strm;
-      (commCount := !commCount + 1; YYBEGIN COMMENT; continue()))
+      (commentLevel := !commentLevel + 1; YYBEGIN COMMENT; continue()))
 fun yyAction43 (strm, lastMatch : yymatch) = (yystrm := strm;
       (dopos Tokens.CARET yypos 1))
 fun yyAction44 (strm, lastMatch : yymatch) = (yystrm := strm;
-      (commCount := !commCount + 1; continue()))
+      (commentLevel := !commentLevel + 1; continue()))
 fun yyAction45 (strm, lastMatch : yymatch) = (yystrm := strm;
-      (commCount := !commCount - 1;
-                                        if (!commCount = 0)
+      (commentLevel := !commentLevel - 1;
+                                        if (!commentLevel = 0)
                                         then (YYBEGIN INITIAL; continue())
                                         else continue()))
 fun yyAction46 (strm, lastMatch : yymatch) = (yystrm := strm; (continue()))
 fun yyAction47 (strm, lastMatch : yymatch) = (yystrm := strm;
-      (curString := ""; inString := true; YYBEGIN STRING; continue()))
+      (currentString := ""; inString := true; YYBEGIN STRING; continue()))
 fun yyAction48 (strm, lastMatch : yymatch) = (yystrm := strm;
-      (inString := false; YYBEGIN INITIAL; dopos3 Tokens.STRING (!curString) yypos (size(!curString))))
+      (inString := false; YYBEGIN INITIAL; dopos3 Tokens.STRING (!currentString) yypos (size(!currentString))))
 fun yyAction49 (strm, lastMatch : yymatch) = (yystrm := strm;
       (YYBEGIN ESCAPE; continue()))
 fun yyAction50 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)
       in
-        yystrm := strm; (curString := !curString ^ yytext; continue())
+        yystrm := strm; (currentString := !currentString ^ yytext; continue())
       end
 fun yyAction51 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)
       in
         yystrm := strm;
-        (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue())
+        (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue())
       end
 fun yyAction52 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)
       in
         yystrm := strm;
-        (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue())
+        (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue())
       end
 fun yyAction53 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)
       in
         yystrm := strm;
-        (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue())
+        (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue())
       end
 fun yyAction54 (strm, lastMatch : yymatch) = (yystrm := strm;
-      (curString := !curString ^ "\\" ^ "\\"; YYBEGIN STRING; continue()))
+      (currentString := !currentString ^ "\\" ^ "\\"; YYBEGIN STRING; continue()))
 fun yyAction55 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)
       in
         yystrm := strm;
-        (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue())
+        (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue())
       end
 fun yyAction56 (strm, lastMatch : yymatch) = let
       val yytext = yymktext(strm)
       in
         yystrm := strm;
-        (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue())
+        (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue())
       end
 fun yyAction57 (strm, lastMatch : yymatch) = (yystrm := strm;
       (YYBEGIN IGNORE; continue()))

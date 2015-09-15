@@ -2,8 +2,6 @@ type pos = int
 type lexresult = Tokens.token
 
 val inString = ref false
-val curString = ref ""
-val commCount = ref 0
 val lineNum = ErrorMsg.lineNum
 val linePos = ErrorMsg.linePos
 
@@ -16,9 +14,9 @@ fun eof () =
     let
         val pos = hd (!linePos)
     in
-    if !commCount <> 0 then (ErrorMsg.error pos "unclosed comment")
+    if !commentLevel <> 0 then (ErrorMsg.error pos "unclosed comment")
       else if !inString = true then (ErrorMsg.error pos "unclosed string")
-      else (); commCount := 0; Tokens.EOF (pos,pos)
+      else (); commentLevel := 0; Tokens.EOF (pos,pos)
     end
 
     
@@ -90,30 +88,30 @@ ascii=[0-255];
 <INITIAL>";"                        => (dopos Tokens.SEMICOLON yypos 1);
 <INITIAL>":"                        => (dopos Tokens.COLON yypos 1);
 <INITIAL>" "                        => (continue());
-<INITIAL>"/*"                       => (commCount := !commCount + 1; YYBEGIN COMMENT; continue());
+<INITIAL>"/*"                       => (commentLevel := !commentLevel + 1; YYBEGIN COMMENT; continue());
 <INITIAL>"^"                        => (dopos Tokens.CARET yypos 1);
 
 
-<COMMENT>"/*"                       => (commCount := !commCount + 1; continue());
-<COMMENT>"*/"                       => (commCount := !commCount - 1;
-                                        if (!commCount = 0)
+<COMMENT>"/*"                       => (commentLevel := !commentLevel + 1; continue());
+<COMMENT>"*/"                       => (commentLevel := !commentLevel - 1;
+                                        if (!commentLevel = 0)
                                         then (YYBEGIN INITIAL; continue())
                                         else continue());
 <COMMENT>.                          => (continue());
 
-<INITIAL>\"                         => (curString := ""; inString := true; YYBEGIN STRING; continue());
+<INITIAL>\"                         => (currentString := ""; inString := true; YYBEGIN STRING; continue());
 
-<STRING>\"                          => (inString := false; YYBEGIN INITIAL; dopos3 Tokens.STRING (!curString) yypos (size(!curString)));
+<STRING>\"                          => (inString := false; YYBEGIN INITIAL; dopos3 Tokens.STRING (!currentString) yypos (size(!currentString)));
 
 <STRING>"\\"                        => (YYBEGIN ESCAPE; continue());
-<STRING>.                           => (curString := !curString ^ yytext; continue());
+<STRING>.                           => (currentString := !currentString ^ yytext; continue());
 
-<ESCAPE>"n"                         => (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
-<ESCAPE>"t"                         => (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
-<ESCAPE>"\""                        => (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
-<ESCAPE>"\\"                        => (curString := !curString ^ "\\" ^ "\\"; YYBEGIN STRING; continue());
-<ESCAPE>{ascii}                     => (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
-<ESCAPE>{control}                   => (curString := !curString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>"n"                         => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>"t"                         => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>"\""                        => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>"\\"                        => (currentString := !currentString ^ "\\" ^ "\\"; YYBEGIN STRING; continue());
+<ESCAPE>{ascii}                     => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>{control}                   => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>{ignore}                    => (YYBEGIN IGNORE; continue());
 <ESCAPE>.                           => (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); eof());
 
@@ -130,6 +128,4 @@ ascii=[0-255];
 .                          => (ErrorMsg.error yypos ("illegal char " ^ yytext);
                                continue());
 
-/* 1. Digit escape sequences (skal de oversættes?)
-   2. Newlines i ignore escape i strings (skal de håndteres som i Initial og Comment)
- */
+
