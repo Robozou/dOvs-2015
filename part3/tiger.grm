@@ -48,7 +48,7 @@ fun makeFundecl (idsym, ps, rty, e, p) =
   | INT of int | STRING of string
   | COMMA | COLON | SEMICOLON | LPAREN | RPAREN | LBRACK | RBRACK
   | LBRACE | RBRACE | DOT
-  | PLUS | MINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE | CARET
+  | PLUS | MINUS | UMINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE | CARET
   | AND | OR | ASSIGN
   | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF
   | BREAK | NIL
@@ -56,7 +56,19 @@ fun makeFundecl (idsym, ps, rty, e, p) =
 
 (* [add missing nonterminals; in second phase: add semantic values] *)
 
-%nonterm program | exp
+%nonterm program
+       | exp
+       | exps
+       | seqexp
+       | recfields
+       | decl
+       | decls
+       | tydecl
+       | ty
+       | tyfields
+       | vardecl
+       | fundecl
+       | lvalue
 
 %pos int
 %verbose
@@ -77,17 +89,97 @@ fun makeFundecl (idsym, ps, rty, e, p) =
 
 (* [specify precedence/associativity, least tight binding first] *)
 
-%nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN
-%right      ELSE
+%left       AND OR
+%nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN NEQ GT LT GE LE EQ
+%left       PLUS MINUS
+%left       TIMES DIVIDE
+%right      CARET
+%right      UMINUS
 (* [..more tokens & levels..] *)
 
 %%
 
 (* Top level constructs *)
 
-program: exp                  ()
+(* Program *)
+program   : exp                                                ()
 
-exp: INT                      ()
+(* Expressions *)
+exp       : INT                                                ()
+   |        NIL                                                ()
+   |        STRING                                             ()
+   |        lvalue                                             ()
+   |        lvalue ASSIGN exp                                  ()
+   |        ID LBRACK exp RBRACK OF exp                        ()
+   |        IF exp THEN exp ELSE exp                           ()
+   |        IF exp THEN exp                                    ()
+   |        WHILE exp DO exp                                   ()
+   |        FOR ID ASSIGN exp TO exp DO exp                    ()
+   |        BREAK                                              ()
+   |        LET decls IN seqexp END                            ()
+   |        LPAREN seqexp RPAREN                               ()
+   |        ID LBRACE recfields RBRACE                         ()
+   |        ID LPAREN exps RPAREN                              ()
+   (* Binary operators *)
+   |        exp EQ exp                                         ()
+   |        exp OR exp                                         ()
+   |        exp AND exp                                        ()
+   |        exp LE exp                                         ()
+   |        exp GE exp                                         ()
+   |        exp LT exp                                         ()
+   |        exp GT exp                                         ()
+   |        exp NEQ exp                                        ()
+   |        exp MINUS exp                                      ()
+   |        exp PLUS exp                                       ()
+   |        exp DIVIDE exp                                     ()
+   |        exp TIMES exp                                      ()
+   |        exp CARET exp                                      ()
+   |        MINUS exp  %prec UMINUS                            ()
     (* [..missing rules for exp..] *)
 
+exps      :                                                    ()
+   |        exp                                                ()
+   |        exps COMMA exp                                     ()
+
+seqexp    :                                                    ()
+   |        exp                                                ()
+   |        seqexp SEMICOLON exp                               ()
+
+(* Record fields *)
+recfields :                                                    () (* We get an error test 49, since NIL is not included, but if we do this, 29 reduce/reduce errors follow *)
+   |        ID EQ exp                                          ()
+   |        ID EQ exp COMMA recfields                          ()
+
+(* Declarations *)
+decl      : tydecl                                             ()
+   |        vardecl                                            ()
+   |        fundecl                                            ()
+
+decls     : decl                                               ()
+   |        decl decls                                         ()
+
+(* Type declarations *)
+tydecl    : TYPE ID EQ ty                                      ()
+
+ty        : ID                                                 ()
+   |        LBRACE tyfields RBRACE                             ()
+   |        ARRAY OF ID                                        ()
+
+tyfields  :                                                    ()
+   |        ID COLON ID                                        ()
+   |        ID COLON ID COMMA tyfields                         ()
+
+(* Variable declarations *)
+vardecl   : VAR ID ASSIGN exp                                  ()
+   |        VAR ID COLON ID ASSIGN exp                         ()
+
+(* Function declarations *)
+fundecl   : FUNCTION ID LPAREN tyfields RPAREN EQ exp          ()
+   |        FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp ()
+
+(* Left values *)
+lvalue    : ID                                                 ()
+   |        lvalue DOT ID                                      ()
+   |        lvalue LBRACK exp RBRACK                           ()
+   |        ID LBRACK exp RBRACK                               () (* lvalue did not see ID when handling arrays, so we had to introduce this rule for many tests *)
 (* [..missing rules for missing nonterminals..] *)

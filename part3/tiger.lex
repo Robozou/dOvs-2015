@@ -26,8 +26,8 @@ fun eof () =
 
 fun s2i t pos =
     let
-        val opti = (Int.fromString t) 
-            handle Overflow => 
+        val opti = (Int.fromString t)
+            handle Overflow =>
                    (ErrorMsg.error pos "Integer too large"; SOME 0)
         fun s2i_aux NONE = (ErrorMsg.error pos "Ill-formed integer"; 0)
           | s2i_aux (SOME n) = n
@@ -48,7 +48,7 @@ idchars=[a-zA-Z0-9_]*;
 ignore=[\t\ \n]+;
 control=\^[@A-Z\\_\^];
 ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
-%s [COMMENT STRING ESCAPE IGNORE];
+%s COMMENT STRING ESCAPE IGNORE;
 
 %%
 
@@ -74,6 +74,7 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 <INITIAL>"for"                      => (dopos Tokens.FOR yypos 3);
 <INITIAL>"while"                    => (dopos Tokens.WHILE yypos 5);
 <INITIAL>"array"                    => (dopos Tokens.ARRAY yypos 5);
+<INITIAL>"type"                     => (dopos Tokens.TYPE yypos 4);
 <INITIAL>":="                       => (dopos Tokens.ASSIGN yypos 2);
 <INITIAL>"or"                       => (dopos Tokens.OR yypos 2);
 <INITIAL>"and"                      => (dopos Tokens.AND yypos 3);
@@ -130,7 +131,7 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 <ESCAPE>.                           => (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); continue());
 
 
-<IGNORE>{ignore}                    => (continue()); 
+<IGNORE>{ignore}                    => (continue());
 <IGNORE>"\\"                        => (YYBEGIN STRING; continue());
 <IGNORE>.                           => (ErrorMsg.error yypos ("Invalid character in ignore. No support for " ^ yytext); continue());
 
@@ -141,4 +142,3 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 
 .                                   => (ErrorMsg.error yypos ("illegal char " ^ yytext);
                                         continue());
-

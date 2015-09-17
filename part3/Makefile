@@ -45,3 +45,10 @@ clean:
 	rm -f tiger.lex.* tiger.grm.*
 	rm -f tigerc.x86-linux
 	rm -f tigerc.x86-darwin
+
+# clean compilation, run tests
+test: 	clean sa;
+	./compiletests
+
+testlog: clean sa;
+	./compiletests > testlog.txt
