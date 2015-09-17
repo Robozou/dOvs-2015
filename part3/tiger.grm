@@ -91,10 +91,12 @@ fun makeFundecl (idsym, ps, rty, e, p) =
 
 %left       AND OR
 %nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN NEQ GT LT GE LE EQ
+%right      ELSE
 %left       PLUS MINUS
 %left       TIMES DIVIDE
 %right      CARET
 %right      UMINUS
+
 (* [..more tokens & levels..] *)
 
 %%

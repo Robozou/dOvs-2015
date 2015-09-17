@@ -1,6 +1,20 @@
-1 shift/reduce conflict
+15 shift/reduce conflicts
 
 error:  state 13: shift/reduce conflict (shift LBRACK, reduce by rule 55)
+error:  state 86: shift/reduce conflict (shift ELSE, reduce by rule 8)
+error:  state 113: shift/reduce conflict (shift OR, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift AND, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift CARET, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift GE, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift GT, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift LE, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift LT, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift NEQ, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift EQ, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift DIVIDE, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift TIMES, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift MINUS, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift PLUS, reduce by rule 7)
 
 state 0:
 
@@ -1689,11 +1703,11 @@ state 77:
 
 state 78:
 
-	lvalue : lvalue LBRACK exp RBRACK .  (reduce by rule 58)
+	lvalue : lvalue LBRACK exp RBRACK .  (reduce by rule 57)
 
 
 
-	.	reduce by rule 58
+	.	reduce by rule 57
 
 
 state 79:
@@ -1844,6 +1858,7 @@ state 85:
 
 	.	error
 
+error:  state 86: shift/reduce conflict (shift ELSE, reduce by rule 8)
 
 state 86:
 
@@ -1960,12 +1975,12 @@ state 89:
 state 90:
 
 	exp : ID LBRACK exp RBRACK . OF exp 
-	lvalue : ID LBRACK exp RBRACK .  (reduce by rule 57)
+	lvalue : ID LBRACK exp RBRACK .  (reduce by rule 58)
 
 	OF	shift 105
 
 
-	.	reduce by rule 57
+	.	reduce by rule 58
 
 
 state 91:
@@ -2352,6 +2367,19 @@ state 112:
 
 	.	error
 
+error:  state 113: shift/reduce conflict (shift OR, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift AND, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift CARET, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift GE, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift GT, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift LE, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift LT, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift NEQ, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift EQ, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift DIVIDE, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift TIMES, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift MINUS, reduce by rule 7)
+error:  state 113: shift/reduce conflict (shift PLUS, reduce by rule 7)
 
 state 113:
 
@@ -2374,7 +2402,15 @@ state 113:
 	MINUS	shift 28
 	TIMES	shift 27
 	DIVIDE	shift 26
+	EQ	shift 25
+	NEQ	shift 24
+	LT	shift 23
+	LE	shift 22
+	GT	shift 21
+	GE	shift 20
 	CARET	shift 19
+	AND	shift 18
+	OR	shift 17
 
 
 	.	reduce by rule 7
@@ -2736,5 +2772,5 @@ state 131:
 
 	.	error
 
-577 of 1086 action table entries left after compaction
+585 of 1094 action table entries left after compaction
 94 goto table entries
