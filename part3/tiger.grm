@@ -72,9 +72,9 @@ fun makeCallExp (fnc, ags, p) =
 fun makeArExp (ty, sz, ini, p) =
     A.ArrayExp { typ = ty
 	       , size = sz
-	       , init = ini 
+	       , init = ini
 	       , pos = p}
-	     
+
 fun makeAssign (idsym, e, p) =
     A.AssignExp { var = idsym
 		, exp = e
@@ -170,20 +170,20 @@ exp       : INT                                                (A.IntExp INT)
    |        ID LBRACE recfields RBRACE                         ()
    |        ID LPAREN exps RPAREN                              () (*Rule 15*)
    (* Binary operators *)
-   |        exp EQ exp                                         ()
-   |        exp OR exp                                         ()
-   |        exp AND exp                                        ()
-   |        exp LE exp                                         ()
-   |        exp GE exp                                         () (*Rule 20*)
-   |        exp LT exp                                         ()
-   |        exp GT exp                                         ()
-   |        exp NEQ exp                                        ()
-   |        exp MINUS exp                                      ()
-   |        exp PLUS exp                                       () (*Rule 25*)
-   |        exp DIVIDE exp                                     ()
-   |        exp TIMES exp                                      ()
-   |        exp CARET exp                                      ()
-   |        MINUS exp  %prec UMINUS                            ()
+   |        exp OR exp                                         (makeIf(exp1,A.IntExp(1),exp2,exp1left))
+   |        exp AND exp                                        (makeIf(exp1,exp2,A.IntExp(0),exp1left))
+   |        exp EQ exp                                         (makeBinop(exp1,A.EqOp,exp2,exp1left))
+   |        exp LE exp                                         (makeBinop(exp1,A.LeOp,exp2,exp1left))
+   |        exp GE exp                                         (makeBinop(exp1,A.GeOp,exp2,exp1left)) (*Rule 20*)
+   |        exp LT exp                                         (makeBinop(exp1,A.LtOp,exp2,exp1left))
+   |        exp GT exp                                         (makeBinop(exp1,A.GtOp,exp2,exp1left))
+   |        exp NEQ exp                                        (makeBinop(exp1,A.NeqOp,exp2,exp1left))
+   |        exp MINUS exp                                      (makeBinop(exp1,A.MinusOp,exp2,exp1left))
+   |        exp PLUS exp                                       (makeBinop(exp1,A.PlusOp,exp2,exp1left)) (*Rule 25*)
+   |        exp DIVIDE exp                                     (makeBinop(exp1,A.DivideOp,exp2,exp1left))
+   |        exp TIMES exp                                      (makeBinop(exp1,A.TimesOp,exp2,exp1left))
+   |        exp CARET exp                                      (makeBinop(exp1,A.ExponentOp,exp2,exp1left))
+   |        MINUS exp  %prec UMINUS                            (makeBinop(A.IntExp(0),A.MinusOp,exp,MINUSleft))
     (* [..missing rules for exp..] *)
 
 exps      :                                                    () (*Rule 30*)
