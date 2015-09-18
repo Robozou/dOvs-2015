@@ -1,3 +1,4 @@
+structure A = Absyn
 structure S = Symbol
 
 (* [these functions and similar ones may be convenient
@@ -40,6 +41,51 @@ fun makeFundecl (idsym, ps, rty, e, p) =
              , body = e
              , pos = p} : A.fundecldata
 
+fun makeTyDec (idsym, t, p) =
+	     { name = idsym
+	     , ty = t
+	     , pos = p} : A.tydecldata
+
+fun makeForExp (idsym, el, eh, eb, p) =
+    A.ForExp { var = idsym
+	     , escape = ref true
+	     , lo = el
+	     , hi = eh
+	     , body = eb
+	     , pos = p}
+
+fun makeWhileExp (et, eb, p) =
+    A.WhileExp { test = et
+	       , body = eb
+	       , pos = p}
+
+fun makeLetExp (decs, eb, p) =
+    A.LetExp { decls = decs
+	     , body = eb
+	     , pos = p}
+
+fun makeCallExp (fnc, ags, p) =
+    A.CallExp { func = fnc
+	      , args = ags
+	      , pos = p}
+
+fun makeArExp (ty, sz, ini, p) =
+    A.ArrayExp { typ = ty
+	       , size = sz
+	       , init = ini 
+	       , pos = p}
+	     
+fun makeAssign (idsym, e, p) =
+    A.AssignExp { var = idsym
+		, exp = e
+		, pos = p}
+
+fun makeRecExp (flds, ty, p) =
+    A.RecordExp { fields = flds
+		, typ = ty
+		, pos = p}
+
+
 %%
 %term
     EOF
@@ -55,19 +101,20 @@ fun makeFundecl (idsym, ps, rty, e, p) =
 
 (* [add missing nonterminals; in second phase: add semantic values] *)
 
-%nonterm program
-       | exp
-       | exps
-       | seqexp
-       | recfields
-       | decl
-       | decls
-       | tydecl
-       | ty
-       | tyfields
-       | vardecl
-       | fundecl
-       | lvalue
+%nonterm program of A.exp
+       | exp of A.exp
+       | exps of A.exp list
+       | seqexp of (A.exp * pos) list
+       | recfields of (S.symbol * A.exp * pos) list
+       | decl of A.decl
+       | decls of A.decl list
+       | tydecl of A.tydecldata
+       | ty of A.ty
+       | tyfields of A.fielddata
+       | vardecl of A.vardecldata
+       | fundecl of A.fundecldata
+       | lvalue of A.var
+       | lvalue_p of A.exp
 
 %pos int
 %verbose
@@ -96,6 +143,7 @@ fun makeFundecl (idsym, ps, rty, e, p) =
 %right      CARET
 %right      UMINUS
 
+
 (* [..more tokens & levels..] *)
 
 %%
@@ -103,14 +151,14 @@ fun makeFundecl (idsym, ps, rty, e, p) =
 (* Top level constructs *)
 
 (* Program *)
-program   : exp                                                ()
+program   : exp                                                (exp)
 
 (* Expressions *)
-exp       : INT                                                ()
-   |        NIL                                                ()
-   |        STRING                                             ()
-   |        lvalue                                             ()
-   |        lvalue ASSIGN exp                                  () (*Rule 5*)
+exp       : INT                                                (A.IntExp INT)
+   |        NIL                                                (A.NilExp)
+   |        STRING                                             (A.StringExp (STRING, STRINGleft)
+   |        lvalue                                             (A.VarExp(lvalue))
+   |        lvalue ASSIGN exp                                  (makeAssign(lvalue,exp,lvalueleft)) (*Rule 5*)
    |        ID LBRACK exp RBRACK OF exp                        ()
    |        IF exp THEN exp ELSE exp                           ()
    |        IF exp THEN exp                                    ()
@@ -179,8 +227,10 @@ fundecl   : FUNCTION ID LPAREN tyfields RPAREN EQ exp          ()
    |        FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp ()
 
 (* Left values *)
-lvalue    : ID                                                 () (*Rule 55*)
-   |        lvalue DOT ID                                      ()
-   |        lvalue LBRACK exp RBRACK                           ()
-   |        ID LBRACK exp RBRACK                               () (* lvalue did not see ID when handling arrays, so we had to introduce this rule for many tests *)
-(* [..missing rules for missing nonterminals..] *)
+lvalue    : ID                                                 ()
+	  | lvalue_p                                           ()
+
+lvalue_p  : ID DOT ID                                          ()
+	  | lvalue_p DOT ID                                    ()
+	  | lvalue_p LBRACK exp RBRACK                         ()
+          | ID LBRACK exp RBRACK                               ()
