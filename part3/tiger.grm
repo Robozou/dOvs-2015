@@ -1,4 +1,3 @@
-structure A = Absyn
 structure S = Symbol
 
 (* [these functions and similar ones may be convenient

@@ -1689,11 +1689,11 @@ state 77:
 
 state 78:
 
-	lvalue : lvalue LBRACK exp RBRACK .  (reduce by rule 58)
+	lvalue : lvalue LBRACK exp RBRACK .  (reduce by rule 57)
 
 
 
-	.	reduce by rule 58
+	.	reduce by rule 57
 
 
 state 79:
@@ -1960,12 +1960,12 @@ state 89:
 state 90:
 
 	exp : ID LBRACK exp RBRACK . OF exp 
-	lvalue : ID LBRACK exp RBRACK .  (reduce by rule 57)
+	lvalue : ID LBRACK exp RBRACK .  (reduce by rule 58)
 
 	OF	shift 105
 
 
-	.	reduce by rule 57
+	.	reduce by rule 58
 
 
 state 91:

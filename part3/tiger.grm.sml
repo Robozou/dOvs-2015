@@ -265,8 +265,8 @@ val table=let val actionRows =
 \\028\000\019\000\000\000\
 \\189\000\008\000\048\000\010\000\047\000\012\000\046\000\000\000\
 \\190\000\000\000\
-\\191\000\041\000\107\000\000\000\
-\\192\000\000\000\
+\\191\000\000\000\
+\\192\000\041\000\107\000\000\000\
 \"
 val actionRowNumbers =
 "\012\000\051\000\047\000\049\000\
@@ -288,10 +288,10 @@ val actionRowNumbers =
 \\079\000\039\000\024\000\029\000\
 \\012\000\012\000\012\000\055\000\
 \\012\000\033\000\040\000\032\000\
-\\023\000\067\000\094\000\028\000\
+\\023\000\067\000\093\000\028\000\
 \\018\000\012\000\019\000\084\000\
 \\036\000\004\000\003\000\071\000\
-\\056\000\012\000\093\000\057\000\
+\\056\000\012\000\094\000\057\000\
 \\012\000\054\000\080\000\045\000\
 \\084\000\081\000\087\000\043\000\
 \\030\000\025\000\012\000\012\000\
@@ -1041,14 +1041,6 @@ end; ()))
  in ( LrTable.NT 12, ( result, lvalue1left, ID1right), rest671)
 end
 |  ( 57, ( ( _, ( _, _, RBRACK1right)) :: ( _, ( MlyValue.ntVOID exp1,
- _, _)) :: _ :: ( _, ( MlyValue.ID ID1, ID1left, _)) :: rest671)) =>
- let val  result = MlyValue.ntVOID (fn _ => ( let val  ID1 = ID1 ()
- val  exp1 = exp1 ()
- in ()
-end; ()))
- in ( LrTable.NT 12, ( result, ID1left, RBRACK1right), rest671)
-end
-|  ( 58, ( ( _, ( _, _, RBRACK1right)) :: ( _, ( MlyValue.ntVOID exp1,
  _, _)) :: _ :: ( _, ( MlyValue.ntVOID lvalue1, lvalue1left, _)) :: 
 rest671)) => let val  result = MlyValue.ntVOID (fn _ => ( let val  
 lvalue1 = lvalue1 ()
@@ -1057,6 +1049,14 @@ lvalue1 = lvalue1 ()
 end; ()))
  in ( LrTable.NT 12, ( result, lvalue1left, RBRACK1right), rest671)
 
+end
+|  ( 58, ( ( _, ( _, _, RBRACK1right)) :: ( _, ( MlyValue.ntVOID exp1,
+ _, _)) :: _ :: ( _, ( MlyValue.ID ID1, ID1left, _)) :: rest671)) =>
+ let val  result = MlyValue.ntVOID (fn _ => ( let val  ID1 = ID1 ()
+ val  exp1 = exp1 ()
+ in ()
+end; ()))
+ in ( LrTable.NT 12, ( result, ID1left, RBRACK1right), rest671)
 end
 | _ => raise (mlyAction i392)
 end
