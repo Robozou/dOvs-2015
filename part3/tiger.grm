@@ -119,6 +119,7 @@ fun makeFieldData (idsym, ty, p) =
        | tyfields of A.fielddata list
        | vardecl of A.vardecldata
        | fundecl of A.fundecldata
+       | fundecls of A.fundecldata list
        | lvalue of A.var
        | lvalue_p of A.exp
 
@@ -174,7 +175,7 @@ exp       : INT                                                (A.IntExp INT)
    |        LET decls IN seqexp END                            (makeLetExp(decls,A.SeqExp(seqexp),LETleft))
    |        LPAREN seqexp RPAREN                               (A.SeqExp(seqexp))
    |        ID LBRACE recfields RBRACE                         ()
-   |        ID LPAREN exps RPAREN                              () (*Rule 15*)
+   |        ID LPAREN exps RPAREN                              (makeCallExp(S.symbol(ID),exps,IDleft)) (*Rule 15 fnc, ags, p*)
    (* Binary operators *)
    |        exp OR exp                                         (makeIf(exp1,A.IntExp(1),SOME exp2,exp1left))
    |        exp AND exp                                        (makeIf(exp1,exp2,SOME (A.IntExp(0)),exp1left))
@@ -202,19 +203,21 @@ seqexp    :                                                    ([])
 
 (* Record fields *)
 recfields :                                                    ([]) 
-   |        ID EQ exp                                          ()
-   |        ID EQ exp COMMA recfields                          ()
+   |        ID EQ exp                                          ([(S.symbol(ID),exp, expleft)]) (* fields: (S.symbol * exp * pos) list, typ: S.symbol , pos: pos} *)
+   |        ID EQ exp COMMA recfields                          (recfields @ [(S.symbol(ID),exp, expleft)])
 
 (* Declarations *)
 decl      : tydecl                                             ()
-   |        vardecl                                            () (*Rule 40*)
-   |        fundecl                                            ()
+   |        vardecl                                            (A.VarDec(vardecl)) (*Rule 40*)
+   |        fundecls                                           (A.FunctionDec(fundecls))
 
 decls     :                                                    (nil)
    |        decl decls                                         (decls @ [decl])
 
 (* Type declarations *)
 tydecl    : TYPE ID EQ ty                                      (makeTyDec(S.symbol(ID),ty,TYPEleft))
+
+
 
 ty        : ID                                                 (A.NameTy(S.symbol(ID),IDleft)) (*Rule 45*)
    |        LBRACE tyfields RBRACE                             (A.RecordTy(tyfields))
@@ -229,8 +232,12 @@ vardecl   : VAR ID ASSIGN exp                                  (makeVarDec(S.sym
    |        VAR ID COLON ID ASSIGN exp                         (makeVarDec(S.symbol(ID1), SOME (S.symbol(ID2),ID2left), exp, VARleft))
 
 (* Function declarations *)
-fundecl   : FUNCTION ID LPAREN tyfields RPAREN EQ exp          ()
-   |        FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp ()
+fundecl   : FUNCTION ID LPAREN tyfields RPAREN EQ exp          (makeFundecl(S.symbol(ID),tyfields,NONE,exp,FUNCTIONleft)) (* (idsym, ps, rty, e, p) *)
+   |        FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp (makeFundecl(S.symbol(ID1),tyfields,SOME (S.symbol(ID2),ID2left),exp,FUNCTIONleft))
+		     
+fundecls  : fundecl                                            ([fundecl])
+   |        fundecls fundecl                                   (fundecls @ [fundecl]) 
+
 
 (* Left values *)
 lvalue    : ID                                                 (A.SimpleVar(S.symbol(ID),IDleft))
