@@ -28,11 +28,11 @@ fun makeIf (et, en, el, p) =
              , pos = p}
 
 fun makeVarDec (idsym, ty, e, p) =
-             { name = idsym
+    A.VarExp { name = idsym
              , escape = ref true
              , typ = ty
              , init = e
-             , pos = p} : A.vardecldata
+             , pos = p} 
 
 fun makeFundecl (idsym, ps, rty, e, p) =
              { name = idsym
@@ -110,8 +110,8 @@ fun makeRecExp (flds, ty, p) =
        | decls of A.decl list
        | tydecl of A.tydecldata
        | ty of A.ty
-       | tyfields of A.fielddata
-       | vardecl of A.vardecldata
+       | tyfields of A.fielddata list
+       | vardecl of A.var
        | fundecl of A.fundecldata
        | lvalue of A.var
        | lvalue_p of A.exp
@@ -165,8 +165,8 @@ exp       : INT                                                (A.IntExp INT)
    |        WHILE exp DO exp                                   (makeWhileExp(exp1,exp2,WHILEleft))
    |        FOR ID ASSIGN exp TO exp DO exp                    (makeForExp(S.symbol(ID),exp1,exp2,exp3,FORleft)) (*Rule 10*)
    |        BREAK                                              (A.BreakExp BREAKleft)
-   |        LET decls IN seqexp END                            ()
-   |        LPAREN seqexp RPAREN                               ()
+   |        LET decls IN seqexp END                            (makeLetExp(decls,A.SeqExp(seqexp),LETleft))
+   |        LPAREN seqexp RPAREN                               (A.SeqExp(seqexp))
    |        ID LBRACE recfields RBRACE                         ()
    |        ID LPAREN exps RPAREN                              () (*Rule 15*)
    (* Binary operators *)
@@ -186,16 +186,16 @@ exp       : INT                                                (A.IntExp INT)
    |        MINUS exp  %prec UMINUS                            (makeBinop(A.IntExp(0),A.MinusOp,exp,MINUSleft))
     (* [..missing rules for exp..] *)
 
-exps      :                                                    (nil) (*Rule 30*)
+exps      :                                                    ([]) (*Rule 30*)
    |        exp                                                (exp :: nil)
    |        exps COMMA exp                                     (exp :: exps)
 
-seqexp    :                                                    ()
+seqexp    :                                                    ([])
    |        exp                                                ()
    |        seqexp SEMICOLON exp                               () (*Rule 35*)
 
 (* Record fields *)
-recfields :                                                    () 
+recfields :                                                    ([]) 
    |        ID EQ exp                                          ()
    |        ID EQ exp COMMA recfields                          ()
 
@@ -204,17 +204,17 @@ decl      : tydecl                                             ()
    |        vardecl                                            () (*Rule 40*)
    |        fundecl                                            ()
 
-decls     : decl                                               ()
-   |        decl decls                                         ()
+decls     :                                                    (nil)
+   |        decl decls                                         (decls @ [decl])
 
 (* Type declarations *)
 tydecl    : TYPE ID EQ ty                                      (makeTyDec(S.symbol(ID),ty,TYPEleft))
 
-ty        : ID                                                 () (*Rule 45*)
-   |        LBRACE tyfields RBRACE                             ()
-   |        ARRAY OF ID                                        ()
+ty        : ID                                                 (A.NameTy(S.symbol(ID),IDleft)) (*Rule 45*)
+   |        LBRACE tyfields RBRACE                             (A.RecordTy(tyfields))
+   |        ARRAY OF ID                                        (A.ArrayTy(S.symbol(ID),IDleft))
 
-tyfields  :                                                    ()
+tyfields  :                                                    (nil)
    |        ID COLON ID                                        ()
    |        ID COLON ID COMMA tyfields                         () (*Rule 50*)
 

@@ -38,11 +38,11 @@ fun makeIf (et, en, el, p) =
              , pos = p}
 
 fun makeVarDec (idsym, ty, e, p) =
-             { name = idsym
+    A.VarExp { name = idsym
              , escape = ref true
              , typ = ty
              , init = e
-             , pos = p} : A.vardecldata
+             , pos = p} 
 
 fun makeFundecl (idsym, ps, rty, e, p) =
              { name = idsym
@@ -225,7 +225,6 @@ val table=let val actionRows =
 \\001\000\029\000\114\000\000\000\
 \\001\000\039\000\067\000\000\000\
 \\001\000\041\000\112\000\000\000\
-\\001\000\044\000\040\000\045\000\039\000\046\000\038\000\000\000\
 \\137\000\015\000\032\000\016\000\031\000\018\000\030\000\019\000\029\000\
 \\020\000\028\000\021\000\027\000\022\000\026\000\023\000\025\000\
 \\024\000\024\000\025\000\023\000\026\000\022\000\027\000\021\000\
@@ -317,40 +316,40 @@ val table=let val actionRows =
 \\197\000\041\000\110\000\000\000\
 \"
 val actionRowNumbers =
-"\012\000\093\000\052\000\048\000\
-\\050\000\054\000\047\000\013\000\
-\\012\000\012\000\012\000\070\000\
-\\051\000\049\000\092\000\014\000\
+"\012\000\092\000\051\000\047\000\
+\\049\000\053\000\078\000\013\000\
+\\012\000\012\000\012\000\069\000\
+\\050\000\048\000\091\000\014\000\
 \\012\000\012\000\012\000\012\000\
 \\012\000\012\000\012\000\012\000\
 \\012\000\012\000\012\000\012\000\
-\\012\000\012\000\012\000\078\000\
-\\077\000\076\000\045\000\079\000\
+\\012\000\012\000\012\000\077\000\
+\\076\000\075\000\045\000\078\000\
 \\015\000\016\000\017\000\043\000\
-\\038\000\036\000\066\000\028\000\
-\\071\000\018\000\073\000\012\000\
-\\067\000\095\000\032\000\001\000\
-\\059\000\060\000\065\000\008\000\
+\\038\000\036\000\065\000\028\000\
+\\070\000\018\000\072\000\012\000\
+\\066\000\094\000\032\000\001\000\
+\\058\000\059\000\064\000\008\000\
 \\010\000\007\000\009\000\011\000\
-\\006\000\063\000\064\000\061\000\
-\\062\000\070\000\080\000\040\000\
+\\006\000\062\000\063\000\060\000\
+\\061\000\069\000\079\000\040\000\
 \\025\000\030\000\012\000\012\000\
-\\012\000\056\000\012\000\094\000\
+\\012\000\055\000\012\000\093\000\
 \\034\000\041\000\033\000\024\000\
-\\068\000\096\000\029\000\019\000\
-\\012\000\020\000\085\000\037\000\
-\\004\000\003\000\072\000\057\000\
-\\012\000\097\000\058\000\012\000\
-\\055\000\081\000\046\000\085\000\
-\\082\000\088\000\044\000\031\000\
-\\026\000\012\000\012\000\074\000\
-\\012\000\069\000\021\000\035\000\
+\\067\000\095\000\029\000\019\000\
+\\012\000\020\000\084\000\037\000\
+\\004\000\003\000\071\000\056\000\
+\\012\000\096\000\057\000\012\000\
+\\054\000\080\000\046\000\084\000\
+\\081\000\087\000\044\000\031\000\
+\\026\000\012\000\012\000\073\000\
+\\012\000\068\000\021\000\035\000\
 \\012\000\027\000\022\000\039\000\
-\\053\000\073\000\002\000\084\000\
-\\083\000\089\000\012\000\023\000\
-\\086\000\012\000\075\000\090\000\
-\\042\000\085\000\005\000\012\000\
-\\087\000\091\000\000\000"
+\\052\000\072\000\002\000\083\000\
+\\082\000\088\000\012\000\023\000\
+\\085\000\012\000\074\000\089\000\
+\\042\000\084\000\005\000\012\000\
+\\086\000\090\000\000\000"
 val gotoT =
 "\
 \\001\000\134\000\002\000\003\000\013\000\002\000\014\000\001\000\000\000\
@@ -558,8 +557,8 @@ datatype svalue = VOID | ntVOID of unit ->  unit
  | STRING of unit ->  (string) | INT of unit ->  (int)
  | ID of unit ->  (string) | lvalue_p of unit ->  (A.exp)
  | lvalue of unit ->  (A.var) | fundecl of unit ->  (A.fundecldata)
- | vardecl of unit ->  (A.vardecldata)
- | tyfields of unit ->  (A.fielddata) | ty of unit ->  (A.ty)
+ | vardecl of unit ->  (A.var)
+ | tyfields of unit ->  (A.fielddata list) | ty of unit ->  (A.ty)
  | tydecl of unit ->  (A.tydecldata) | decls of unit ->  (A.decl list)
  | decl of unit ->  (A.decl)
  | recfields of unit ->  ( ( S.symbol * A.exp * pos )  list)
@@ -762,18 +761,19 @@ A.BreakExp BREAKleft))
  in ( LrTable.NT 1, ( result, BREAK1left, BREAK1right), rest671)
 end
 |  ( 12, ( ( _, ( _, _, END1right)) :: ( _, ( MlyValue.seqexp seqexp1,
- _, _)) :: _ :: ( _, ( MlyValue.decls decls1, _, _)) :: ( _, ( _, 
-LET1left, _)) :: rest671)) => let val  result = MlyValue.exp (fn _ =>
- let val  decls1 = decls1 ()
- val  seqexp1 = seqexp1 ()
- in ()
+ _, _)) :: _ :: ( _, ( MlyValue.decls decls1, _, _)) :: ( _, ( _, (
+LETleft as LET1left), _)) :: rest671)) => let val  result = 
+MlyValue.exp (fn _ => let val  (decls as decls1) = decls1 ()
+ val  (seqexp as seqexp1) = seqexp1 ()
+ in (makeLetExp(decls,A.SeqExp(seqexp),LETleft))
 end)
  in ( LrTable.NT 1, ( result, LET1left, END1right), rest671)
 end
 |  ( 13, ( ( _, ( _, _, RPAREN1right)) :: ( _, ( MlyValue.seqexp 
 seqexp1, _, _)) :: ( _, ( _, LPAREN1left, _)) :: rest671)) => let val 
- result = MlyValue.exp (fn _ => let val  seqexp1 = seqexp1 ()
- in ()
+ result = MlyValue.exp (fn _ => let val  (seqexp as seqexp1) = seqexp1
+ ()
+ in (A.SeqExp(seqexp))
 end)
  in ( LrTable.NT 1, ( result, LPAREN1left, RPAREN1right), rest671)
 end
@@ -905,8 +905,7 @@ MlyValue.exp (fn _ => let val  (exp as exp1) = exp1 ()
 end)
  in ( LrTable.NT 1, ( result, MINUS1left, exp1right), rest671)
 end
-|  ( 30, ( rest671)) => let val  result = MlyValue.exps (fn _ => (nil)
-)
+|  ( 30, ( rest671)) => let val  result = MlyValue.exps (fn _ => ([]))
  in ( LrTable.NT 2, ( result, defaultPos, defaultPos), rest671)
 end
 |  ( 31, ( ( _, ( MlyValue.exp exp1, exp1left, exp1right)) :: rest671)
@@ -924,7 +923,8 @@ MlyValue.exps (fn _ => let val  (exps as exps1) = exps1 ()
 end)
  in ( LrTable.NT 2, ( result, exps1left, exp1right), rest671)
 end
-|  ( 33, ( rest671)) => let val  result = MlyValue.seqexp (fn _ => ())
+|  ( 33, ( rest671)) => let val  result = MlyValue.seqexp (fn _ => ([]
+))
  in ( LrTable.NT 3, ( result, defaultPos, defaultPos), rest671)
 end
 |  ( 34, ( ( _, ( MlyValue.exp exp1, exp1left, exp1right)) :: rest671)
@@ -943,7 +943,7 @@ end)
  in ( LrTable.NT 3, ( result, seqexp1left, exp1right), rest671)
 end
 |  ( 36, ( rest671)) => let val  result = MlyValue.recfields (fn _ =>
- ())
+ ([]))
  in ( LrTable.NT 4, ( result, defaultPos, defaultPos), rest671)
 end
 |  ( 37, ( ( _, ( MlyValue.exp exp1, _, exp1right)) :: _ :: ( _, ( 
@@ -987,18 +987,15 @@ end)
  in ( LrTable.NT 5, ( result, fundecl1left, fundecl1right), rest671)
 
 end
-|  ( 42, ( ( _, ( MlyValue.decl decl1, decl1left, decl1right)) :: 
-rest671)) => let val  result = MlyValue.decls (fn _ => let val  decl1
- = decl1 ()
- in ()
-end)
- in ( LrTable.NT 6, ( result, decl1left, decl1right), rest671)
+|  ( 42, ( rest671)) => let val  result = MlyValue.decls (fn _ => (nil
+))
+ in ( LrTable.NT 6, ( result, defaultPos, defaultPos), rest671)
 end
 |  ( 43, ( ( _, ( MlyValue.decls decls1, _, decls1right)) :: ( _, ( 
 MlyValue.decl decl1, decl1left, _)) :: rest671)) => let val  result = 
-MlyValue.decls (fn _ => let val  decl1 = decl1 ()
- val  decls1 = decls1 ()
- in ()
+MlyValue.decls (fn _ => let val  (decl as decl1) = decl1 ()
+ val  (decls as decls1) = decls1 ()
+ in (decls @ [decl])
 end)
  in ( LrTable.NT 6, ( result, decl1left, decls1right), rest671)
 end
@@ -1011,28 +1008,30 @@ rest671)) => let val  result = MlyValue.tydecl (fn _ => let val  (ID
 end)
  in ( LrTable.NT 7, ( result, TYPE1left, ty1right), rest671)
 end
-|  ( 45, ( ( _, ( MlyValue.ID ID1, ID1left, ID1right)) :: rest671)) =>
- let val  result = MlyValue.ty (fn _ => let val  ID1 = ID1 ()
- in ()
+|  ( 45, ( ( _, ( MlyValue.ID ID1, (IDleft as ID1left), ID1right)) :: 
+rest671)) => let val  result = MlyValue.ty (fn _ => let val  (ID as 
+ID1) = ID1 ()
+ in (A.NameTy(S.symbol(ID),IDleft))
 end)
  in ( LrTable.NT 8, ( result, ID1left, ID1right), rest671)
 end
 |  ( 46, ( ( _, ( _, _, RBRACE1right)) :: ( _, ( MlyValue.tyfields 
 tyfields1, _, _)) :: ( _, ( _, LBRACE1left, _)) :: rest671)) => let
- val  result = MlyValue.ty (fn _ => let val  tyfields1 = tyfields1 ()
- in ()
+ val  result = MlyValue.ty (fn _ => let val  (tyfields as tyfields1) =
+ tyfields1 ()
+ in (A.RecordTy(tyfields))
 end)
  in ( LrTable.NT 8, ( result, LBRACE1left, RBRACE1right), rest671)
 end
-|  ( 47, ( ( _, ( MlyValue.ID ID1, _, ID1right)) :: _ :: ( _, ( _, 
-ARRAY1left, _)) :: rest671)) => let val  result = MlyValue.ty (fn _ =>
- let val  ID1 = ID1 ()
- in ()
+|  ( 47, ( ( _, ( MlyValue.ID ID1, IDleft, ID1right)) :: _ :: ( _, ( _
+, ARRAY1left, _)) :: rest671)) => let val  result = MlyValue.ty (fn _
+ => let val  (ID as ID1) = ID1 ()
+ in (A.ArrayTy(S.symbol(ID),IDleft))
 end)
  in ( LrTable.NT 8, ( result, ARRAY1left, ID1right), rest671)
 end
 |  ( 48, ( rest671)) => let val  result = MlyValue.tyfields (fn _ => (
-))
+nil))
  in ( LrTable.NT 9, ( result, defaultPos, defaultPos), rest671)
 end
 |  ( 49, ( ( _, ( MlyValue.ID ID2, _, ID2right)) :: _ :: ( _, ( 

@@ -114,7 +114,7 @@ state 6:
 	vardecl	goto 32
 	fundecl	goto 31
 
-	.	error
+	.	reduce by rule 42
 
 
 state 7:
@@ -651,7 +651,6 @@ state 34:
 
 state 35:
 
-	decls : decl .  (reduce by rule 42)
 	decls : decl . decls 
 
 	FUNCTION	shift 38
@@ -2799,5 +2798,5 @@ state 134:
 
 	.	error
 
-579 of 1091 action table entries left after compaction
+576 of 1091 action table entries left after compaction
 131 goto table entries
