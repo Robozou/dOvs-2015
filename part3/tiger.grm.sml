@@ -38,11 +38,11 @@ fun makeIf (et, en, el, p) =
              , pos = p}
 
 fun makeVarDec (idsym, ty, e, p) =
-    A.VarExp { name = idsym
+             { name = idsym
              , escape = ref true
              , typ = ty
              , init = e
-             , pos = p} 
+             , pos = p} : A.vardecldata
 
 fun makeFundecl (idsym, ps, rty, e, p) =
              { name = idsym
@@ -557,7 +557,7 @@ datatype svalue = VOID | ntVOID of unit ->  unit
  | STRING of unit ->  (string) | INT of unit ->  (int)
  | ID of unit ->  (string) | lvalue_p of unit ->  (A.exp)
  | lvalue of unit ->  (A.var) | fundecl of unit ->  (A.fundecldata)
- | vardecl of unit ->  (A.var)
+ | vardecl of unit ->  (A.vardecldata)
  | tyfields of unit ->  (A.fielddata list) | ty of unit ->  (A.ty)
  | tydecl of unit ->  (A.tydecldata) | decls of unit ->  (A.decl list)
  | decl of unit ->  (A.decl)
@@ -1115,7 +1115,7 @@ end
 MlyValue.ID ID1, ID1left, _)) :: rest671)) => let val  result = 
 MlyValue.lvalue_p (fn _ => let val  ID1 = ID1 ()
  val  ID2 = ID2 ()
- in (A.FieldVar(lvalue_p,S.symbol(ID1),lvalue_pleft))
+ in ()
 end)
  in ( LrTable.NT 13, ( result, ID1left, ID2right), rest671)
 end

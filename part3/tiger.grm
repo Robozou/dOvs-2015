@@ -28,11 +28,11 @@ fun makeIf (et, en, el, p) =
              , pos = p}
 
 fun makeVarDec (idsym, ty, e, p) =
-    A.VarExp { name = idsym
+             { name = idsym
              , escape = ref true
              , typ = ty
              , init = e
-             , pos = p} 
+             , pos = p} : A.vardecldata
 
 fun makeFundecl (idsym, ps, rty, e, p) =
              { name = idsym
@@ -111,7 +111,7 @@ fun makeRecExp (flds, ty, p) =
        | tydecl of A.tydecldata
        | ty of A.ty
        | tyfields of A.fielddata list
-       | vardecl of A.var
+       | vardecl of A.vardecldata
        | fundecl of A.fundecldata
        | lvalue of A.var
        | lvalue_p of A.exp
