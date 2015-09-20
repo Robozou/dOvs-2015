@@ -115,6 +115,7 @@ fun makeFieldData (idsym, ty, p) =
        | decl of A.decl
        | decls of A.decl list
        | tydecl of A.tydecldata
+       | tydecls of A.tydecldata list
        | ty of A.ty
        | tyfields of A.fielddata list
        | vardecl of A.vardecldata
@@ -174,7 +175,7 @@ exp       : INT                                                (A.IntExp INT)
    |        BREAK                                              (A.BreakExp BREAKleft)
    |        LET decls IN seqexp END                            (makeLetExp(decls,A.SeqExp(seqexp),LETleft))
    |        LPAREN seqexp RPAREN                               (A.SeqExp(seqexp))
-   |        ID LBRACE recfields RBRACE                         ()
+   |        ID LBRACE recfields RBRACE                         (makeRecExp(recfields, S.symbol(ID), IDleft))
    |        ID LPAREN exps RPAREN                              (makeCallExp(S.symbol(ID),exps,IDleft)) (*Rule 15 fnc, ags, p*)
    (* Binary operators *)
    |        exp OR exp                                         (makeIf(exp1,A.IntExp(1),SOME exp2,exp1left))
@@ -207,7 +208,7 @@ recfields :                                                    ([])
    |        ID EQ exp COMMA recfields                          (recfields @ [(S.symbol(ID),exp, expleft)])
 
 (* Declarations *)
-decl      : tydecl                                             ()
+decl      : tydecls                                            (A.TypeDec(tydecls))
    |        vardecl                                            (A.VarDec(vardecl)) (*Rule 40*)
    |        fundecls                                           (A.FunctionDec(fundecls))
 
@@ -217,6 +218,8 @@ decls     :                                                    (nil)
 (* Type declarations *)
 tydecl    : TYPE ID EQ ty                                      (makeTyDec(S.symbol(ID),ty,TYPEleft))
 
+tydecls   : tydecl                                             ([tydecl])
+   |        tydecls tydecl                                     (tydecls @ [tydecl])							       
 
 
 ty        : ID                                                 (A.NameTy(S.symbol(ID),IDleft)) (*Rule 45*)
