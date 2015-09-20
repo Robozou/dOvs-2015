@@ -187,12 +187,12 @@ exp       : INT                                                (A.IntExp INT)
     (* [..missing rules for exp..] *)
 
 exps      :                                                    ([]) (*Rule 30*)
-   |        exp                                                (exp :: nil)
-   |        exps COMMA exp                                     (exp :: exps)
+   |        exp                                                ([exp])
+   |        exps COMMA exp                                     (exps@[exp])
 
 seqexp    :                                                    ([])
-   |        exp                                                ()
-   |        seqexp SEMICOLON exp                               () (*Rule 35*)
+   |        exp                                                ([(exp,expleft)])
+   |        seqexp SEMICOLON exp                               (seqexp@[(exp,expleft)]) (*Rule 35*)
 
 (* Record fields *)
 recfields :                                                    ([]) 
@@ -227,8 +227,8 @@ fundecl   : FUNCTION ID LPAREN tyfields RPAREN EQ exp          ()
    |        FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp ()
 
 (* Left values *)
-lvalue    : ID                                                 ()
-	  | lvalue_p                                           ()
+lvalue    : ID                                                 (A.SimpleVar(S.symbol(ID),IDleft))
+	  | lvalue_p                                           (lvalue_p)
 
 lvalue_p  : ID DOT ID                                          ()
 	  | lvalue_p DOT ID                                    ()
