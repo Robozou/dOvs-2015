@@ -581,7 +581,7 @@ datatype svalue = VOID | ntVOID of unit ->  unit
  | decl of unit ->  (A.decl)
  | recfields of unit ->  ( ( S.symbol * A.exp * pos )  list)
  | seqexp of unit ->  ( ( A.exp * pos )  list)
- | exps of unit ->  (A.exp list) | exp of unit ->  (A.exp)
+ | exps of unit ->  ( ( A.exp * pos )  list) | exp of unit ->  (A.exp)
  | program of unit ->  (A.exp)
 end
 type svalue = MlyValue.svalue
@@ -927,18 +927,18 @@ end
 |  ( 30, ( rest671)) => let val  result = MlyValue.exps (fn _ => ([]))
  in ( LrTable.NT 2, ( result, defaultPos, defaultPos), rest671)
 end
-|  ( 31, ( ( _, ( MlyValue.exp exp1, exp1left, exp1right)) :: rest671)
-) => let val  result = MlyValue.exps (fn _ => let val  (exp as exp1) =
- exp1 ()
- in ([exp])
+|  ( 31, ( ( _, ( MlyValue.exp exp1, (expleft as exp1left), exp1right)
+) :: rest671)) => let val  result = MlyValue.exps (fn _ => let val  (
+exp as exp1) = exp1 ()
+ in ([(exp, expleft)])
 end)
  in ( LrTable.NT 2, ( result, exp1left, exp1right), rest671)
 end
-|  ( 32, ( ( _, ( MlyValue.exp exp1, _, exp1right)) :: _ :: ( _, ( 
-MlyValue.exps exps1, exps1left, _)) :: rest671)) => let val  result = 
-MlyValue.exps (fn _ => let val  (exps as exps1) = exps1 ()
+|  ( 32, ( ( _, ( MlyValue.exp exp1, expleft, exp1right)) :: _ :: ( _,
+ ( MlyValue.exps exps1, exps1left, _)) :: rest671)) => let val  result
+ = MlyValue.exps (fn _ => let val  (exps as exps1) = exps1 ()
  val  (exp as exp1) = exp1 ()
- in (exps@[exp])
+ in (exps@[(exp,expleft)])
 end)
  in ( LrTable.NT 2, ( result, exps1left, exp1right), rest671)
 end

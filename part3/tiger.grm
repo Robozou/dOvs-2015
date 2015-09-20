@@ -109,7 +109,7 @@ fun makeFieldData (idsym, ty, p) =
 
 %nonterm program of A.exp
        | exp of A.exp
-       | exps of A.exp list
+       | exps of (A.exp * pos) list
        | seqexp of (A.exp * pos) list
        | recfields of (S.symbol * A.exp * pos) list
        | decl of A.decl
@@ -195,8 +195,8 @@ exp       : INT                                                (A.IntExp INT)
     (* [..missing rules for exp..] *)
 
 exps      :                                                    ([]) (*Rule 30*)
-   |        exp                                                ([exp])
-   |        exps COMMA exp                                     (exps@[exp])
+   |        exp                                                ([(exp, expleft)])
+   |        exps COMMA exp                                     (exps@[(exp,expleft)])
 
 seqexp    :                                                    ([])
    |        exp                                                ([(exp,expleft)])
