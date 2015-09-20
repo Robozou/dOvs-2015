@@ -95,6 +95,12 @@ fun makeRecExp (flds, ty, p) =
 		, typ = ty
 		, pos = p}
 
+fun makeFieldData (idsym, ty, p) =
+                { name = idsym
+		, escape = ref true
+		, typ = ty
+		, pos = p} : A.fielddata
+
 
 
 end
@@ -1035,21 +1041,24 @@ end
 nil))
  in ( LrTable.NT 9, ( result, defaultPos, defaultPos), rest671)
 end
-|  ( 49, ( ( _, ( MlyValue.ID ID2, _, ID2right)) :: _ :: ( _, ( 
+|  ( 49, ( ( _, ( MlyValue.ID ID2, ID2left, ID2right)) :: _ :: ( _, ( 
 MlyValue.ID ID1, ID1left, _)) :: rest671)) => let val  result = 
 MlyValue.tyfields (fn _ => let val  ID1 = ID1 ()
  val  ID2 = ID2 ()
- in ()
+ in ([makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)])
+
 end)
  in ( LrTable.NT 9, ( result, ID1left, ID2right), rest671)
 end
 |  ( 50, ( ( _, ( MlyValue.tyfields tyfields1, _, tyfields1right)) ::
- _ :: ( _, ( MlyValue.ID ID2, _, _)) :: _ :: ( _, ( MlyValue.ID ID1, 
-ID1left, _)) :: rest671)) => let val  result = MlyValue.tyfields (fn _
- => let val  ID1 = ID1 ()
+ _ :: ( _, ( MlyValue.ID ID2, ID2left, _)) :: _ :: ( _, ( MlyValue.ID 
+ID1, ID1left, _)) :: rest671)) => let val  result = MlyValue.tyfields
+ (fn _ => let val  ID1 = ID1 ()
  val  ID2 = ID2 ()
- val  tyfields1 = tyfields1 ()
- in ()
+ val  (tyfields as tyfields1) = tyfields1 ()
+ in (
+tyfields @ [makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)]
+)
 end)
  in ( LrTable.NT 9, ( result, ID1left, tyfields1right), rest671)
 end

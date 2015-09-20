@@ -85,6 +85,12 @@ fun makeRecExp (flds, ty, p) =
 		, typ = ty
 		, pos = p}
 
+fun makeFieldData (idsym, ty, p) =
+                { name = idsym
+		, escape = ref true
+		, typ = ty
+		, pos = p} : A.fielddata
+
 
 %%
 %term
@@ -215,8 +221,8 @@ ty        : ID                                                 (A.NameTy(S.symbo
    |        ARRAY OF ID                                        (A.ArrayTy(S.symbol(ID),IDleft))
 
 tyfields  :                                                    (nil)
-   |        ID COLON ID                                        ()
-   |        ID COLON ID COMMA tyfields                         () (*Rule 50*)
+   |        ID COLON ID                                        ([makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)])
+   |        ID COLON ID COMMA tyfields                         (tyfields @ [makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)]) (*Rule 50*)
 
 (* Variable declarations *)
 vardecl   : VAR ID ASSIGN exp                                  (makeVarDec(S.symbol(ID),NONE,exp,VARleft))
