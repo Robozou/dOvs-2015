@@ -570,7 +570,7 @@ structure MlyValue =
 struct
 datatype svalue = VOID | ntVOID of unit ->  unit
  | STRING of unit ->  (string) | INT of unit ->  (int)
- | ID of unit ->  (string) | lvalue_p of unit ->  (A.exp)
+ | ID of unit ->  (string) | lvalue_p of unit ->  (A.var)
  | lvalue of unit ->  (A.var)
  | fundecls of unit ->  (A.fundecldata list)
  | fundecl of unit ->  (A.fundecldata)
@@ -724,12 +724,12 @@ end)
  in ( LrTable.NT 1, ( result, lvalue1left, exp1right), rest671)
 end
 |  ( 6, ( ( _, ( MlyValue.exp exp2, _, exp2right)) :: _ :: _ :: ( _, (
- MlyValue.exp exp1, _, _)) :: _ :: ( _, ( MlyValue.ID ID1, ID1left, _)
-) :: rest671)) => let val  result = MlyValue.exp (fn _ => let val  ID1
- = ID1 ()
- val  exp1 = exp1 ()
+ MlyValue.exp exp1, _, _)) :: _ :: ( _, ( MlyValue.ID ID1, (IDleft as 
+ID1left), _)) :: rest671)) => let val  result = MlyValue.exp (fn _ =>
+ let val  (ID as ID1) = ID1 ()
+ val  (exp as exp1) = exp1 ()
  val  exp2 = exp2 ()
- in ()
+ in (makeArExp(S.symbol(ID),exp,exp,IDleft))
 end)
  in ( LrTable.NT 1, ( result, ID1left, exp2right), rest671)
 end
@@ -1176,34 +1176,38 @@ end
 MlyValue.ID ID1, ID1left, _)) :: rest671)) => let val  result = 
 MlyValue.lvalue_p (fn _ => let val  ID1 = ID1 ()
  val  ID2 = ID2 ()
- in ()
+ in (
+A.FieldVar(A.SimpleVar(S.symbol(ID1),ID1left),S.symbol(ID2),ID1left))
+
 end)
  in ( LrTable.NT 15, ( result, ID1left, ID2right), rest671)
 end
-|  ( 62, ( ( _, ( MlyValue.ID ID1, _, ID1right)) :: _ :: ( _, ( 
+|  ( 62, ( ( _, ( MlyValue.ID ID1, IDleft, ID1right)) :: _ :: ( _, ( 
 MlyValue.lvalue_p lvalue_p1, lvalue_p1left, _)) :: rest671)) => let
- val  result = MlyValue.lvalue_p (fn _ => let val  lvalue_p1 = 
-lvalue_p1 ()
- val  ID1 = ID1 ()
- in ()
+ val  result = MlyValue.lvalue_p (fn _ => let val  (lvalue_p as 
+lvalue_p1) = lvalue_p1 ()
+ val  (ID as ID1) = ID1 ()
+ in (A.FieldVar(lvalue_p,S.symbol(ID),IDleft))
 end)
  in ( LrTable.NT 15, ( result, lvalue_p1left, ID1right), rest671)
 end
 |  ( 63, ( ( _, ( _, _, RBRACK1right)) :: ( _, ( MlyValue.exp exp1, _,
- _)) :: _ :: ( _, ( MlyValue.lvalue_p lvalue_p1, lvalue_p1left, _)) ::
- rest671)) => let val  result = MlyValue.lvalue_p (fn _ => let val  
-lvalue_p1 = lvalue_p1 ()
- val  exp1 = exp1 ()
- in ()
+ _)) :: _ :: ( _, ( MlyValue.lvalue_p lvalue_p1, (lvalue_pleft as 
+lvalue_p1left), _)) :: rest671)) => let val  result = 
+MlyValue.lvalue_p (fn _ => let val  (lvalue_p as lvalue_p1) = 
+lvalue_p1 ()
+ val  (exp as exp1) = exp1 ()
+ in (A.SubscriptVar(lvalue_p,exp,lvalue_pleft))
 end)
  in ( LrTable.NT 15, ( result, lvalue_p1left, RBRACK1right), rest671)
 
 end
 |  ( 64, ( ( _, ( _, _, RBRACK1right)) :: ( _, ( MlyValue.exp exp1, _,
- _)) :: _ :: ( _, ( MlyValue.ID ID1, ID1left, _)) :: rest671)) => let
- val  result = MlyValue.lvalue_p (fn _ => let val  ID1 = ID1 ()
- val  exp1 = exp1 ()
- in ()
+ _)) :: _ :: ( _, ( MlyValue.ID ID1, (IDleft as ID1left), _)) :: 
+rest671)) => let val  result = MlyValue.lvalue_p (fn _ => let val  (ID
+ as ID1) = ID1 ()
+ val  (exp as exp1) = exp1 ()
+ in (A.SubscriptVar(A.SimpleVar(S.symbol(ID),IDleft),exp,IDleft))
 end)
  in ( LrTable.NT 15, ( result, ID1left, RBRACK1right), rest671)
 end

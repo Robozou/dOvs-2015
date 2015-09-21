@@ -122,7 +122,7 @@ fun makeFieldData (idsym, ty, p) =
        | fundecl of A.fundecldata
        | fundecls of A.fundecldata list
        | lvalue of A.var
-       | lvalue_p of A.exp
+       | lvalue_p of A.var
 
 %pos int
 %verbose
@@ -167,7 +167,7 @@ exp       : INT                                                (A.IntExp INT)
    |        STRING                                             (A.StringExp (STRING, STRINGleft))
    |        lvalue                                             (A.VarExp(lvalue))
    |        lvalue ASSIGN exp                                  (makeAssign(lvalue,exp,lvalueleft)) (*Rule 5*)
-   |        ID LBRACK exp RBRACK OF exp                        ()
+   |        ID LBRACK exp RBRACK OF exp                        (makeArExp(S.symbol(ID),exp,exp,IDleft))(*ty, sz, ini, p*)
    |        IF exp THEN exp ELSE exp                           (makeIf(exp1,exp2,SOME exp3,IFleft))
    |        IF exp THEN exp                                    (makeIf(exp1,exp2,NONE,IFleft))
    |        WHILE exp DO exp                                   (makeWhileExp(exp1,exp2,WHILEleft))
@@ -246,7 +246,9 @@ fundecls  : fundecl                                            ([fundecl])
 lvalue    : ID                                                 (A.SimpleVar(S.symbol(ID),IDleft))
 	  | lvalue_p                                           (lvalue_p)
 
-lvalue_p  : ID DOT ID                                          ()
-	  | lvalue_p DOT ID                                    ()
-	  | lvalue_p LBRACK exp RBRACK                         ()
-          | ID LBRACK exp RBRACK                               ()
+lvalue_p  : ID DOT ID                                          (A.FieldVar(A.SimpleVar(S.symbol(ID1),ID1left),S.symbol(ID2),ID1left))
+	  | lvalue_p DOT ID                                    (A.FieldVar(lvalue_p,S.symbol(ID),IDleft))
+	  | lvalue_p LBRACK exp RBRACK                         (A.SubscriptVar(lvalue_p,exp,lvalue_pleft)) (*makeLvaluePartSpec(lvalue_p,lvalue_pleft,[Field(lvalue_p),Subscript(exp)]))*)
+          | ID LBRACK exp RBRACK                               (A.SubscriptVar(A.SimpleVar(S.symbol(ID),IDleft),exp,IDleft))
+
+(* makeLvaluePartSpec (v, pos, l::r) *)
