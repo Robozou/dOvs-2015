@@ -19,6 +19,7 @@ fun parse filename =
 	val (parseresult, _) = TigerP.parse (30, lexer, parseerror, ())
     in
         TextIO.closeIn file;
+	PrintAbsyn.print(TextIO.stdOut, parseresult);
 	parseresult
     end 
     handle LrParser.ParseError => raise ErrorMsg.Error

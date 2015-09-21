@@ -1,0 +1,5 @@
+let function fun(x:int,y:int) = x + y 
+    var x := fun(5,6)
+    in
+       print(x)
+    end

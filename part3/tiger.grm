@@ -1,8 +1,7 @@
 structure A = Absyn
 structure S = Symbol
 
-(* [these functions and similar ones may be convenient
- * for the creation of abstract syntax trees] *)
+(* Convenience functions for creating abstract syntax tree *)
 
 datatype lvaluePartSpec = Field of S.symbol
                         | Subscript of A.exp
@@ -103,9 +102,10 @@ fun makeFieldData (idsym, ty, p) =
   | AND | OR | ASSIGN
   | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF
   | BREAK | NIL
-  | FUNCTION | VAR | TYPE
+  | FUNCTION | VAR | TYPE 
+  | DEC 
 
-(* [add missing nonterminals; in second phase: add semantic values] *)
+(* Non-terimnals and their type definitions*)
 
 %nonterm program of A.exp
        | exp of A.exp
@@ -122,7 +122,7 @@ fun makeFieldData (idsym, ty, p) =
        | fundecl of A.fundecldata
        | fundecls of A.fundecldata list
        | lvalue of A.var
-       | lvalue_p of A.var
+       | lvalue_p of lvaluePartSpec list
 
 %pos int
 %verbose
@@ -135,24 +135,24 @@ fun makeFieldData (idsym, ty, p) =
 %keyword WHILE FOR TO BREAK LET IN END FUNCTION
          VAR TYPE ARRAY IF THEN ELSE DO OF NIL
 
-%prefer THEN ELSE LPAREN
+%prefer THEN IF ELSE LPAREN
 
 %value ID ("bogus")
 %value INT (1)
 %value STRING ("")
 
-(* [specify precedence/associativity, least tight binding first] *)
+(* Precedence and associativity specifciation *)
 
 %left       AND OR
 %nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN NEQ GT LT GE LE EQ
-%right      ELSE
+%right      ELSE 
 %left       PLUS MINUS
 %left       TIMES DIVIDE
 %right      CARET
-%right      UMINUS
+%right      UMINUS DEC
 
 
-(* [..more tokens & levels..] *)
+
 
 %%
 
@@ -167,9 +167,9 @@ exp       : INT                                                (A.IntExp INT)
    |        STRING                                             (A.StringExp (STRING, STRINGleft))
    |        lvalue                                             (A.VarExp(lvalue))
    |        lvalue ASSIGN exp                                  (makeAssign(lvalue,exp,lvalueleft)) (*Rule 5*)
-   |        ID LBRACK exp RBRACK OF exp                        (makeArExp(S.symbol(ID),exp,exp,IDleft))(*ty, sz, ini, p*)
-   |        IF exp THEN exp ELSE exp                           (makeIf(exp1,exp2,SOME exp3,IFleft))
+   |        ID LBRACK exp RBRACK OF exp                        (makeArExp(S.symbol(ID),exp1,exp2,IDleft))(*ty, sz, ini, p*)
    |        IF exp THEN exp                                    (makeIf(exp1,exp2,NONE,IFleft))
+   |        IF exp THEN exp ELSE exp                           (makeIf(exp1,exp2,SOME exp3,IFleft))
    |        WHILE exp DO exp                                   (makeWhileExp(exp1,exp2,WHILEleft))
    |        FOR ID ASSIGN exp TO exp DO exp                    (makeForExp(S.symbol(ID),exp1,exp2,exp3,FORleft)) (*Rule 10*)
    |        BREAK                                              (A.BreakExp BREAKleft)
@@ -192,7 +192,7 @@ exp       : INT                                                (A.IntExp INT)
    |        exp TIMES exp                                      (makeBinop(exp1,A.TimesOp,exp2,exp1left))
    |        exp CARET exp                                      (makeBinop(exp1,A.ExponentOp,exp2,exp1left))
    |        MINUS exp  %prec UMINUS                            (makeBinop(A.IntExp(0),A.MinusOp,exp,MINUSleft))
-    (* [..missing rules for exp..] *)
+
 
 exps      :                                                    ([]) (*Rule 30*)
    |        exp                                                ([(exp, expleft)])
@@ -204,22 +204,23 @@ seqexp    :                                                    ([])
 
 (* Record fields *)
 recfields :                                                    ([]) 
-   |        ID EQ exp                                          ([(S.symbol(ID),exp, expleft)]) (* fields: (S.symbol * exp * pos) list, typ: S.symbol , pos: pos} *)
+   |        ID EQ exp                                          ([(S.symbol(ID),exp, expleft)])
    |        ID EQ exp COMMA recfields                          (recfields @ [(S.symbol(ID),exp, expleft)])
 
 (* Declarations *)
-decl      : tydecls                                            (A.TypeDec(tydecls))
+decl      : tydecls  %prec DEC                                 (A.TypeDec(tydecls))
    |        vardecl                                            (A.VarDec(vardecl)) (*Rule 40*)
-   |        fundecls                                           (A.FunctionDec(fundecls))
+   |        fundecls %prec DEC                                 (A.FunctionDec(fundecls))
 
 decls     :                                                    (nil)
-   |        decl decls                                         (decls @ [decl])
+   |        decl decls                                         ([decl] @ decls)
 
 (* Type declarations *)
 tydecl    : TYPE ID EQ ty                                      (makeTyDec(S.symbol(ID),ty,TYPEleft))
 
+
 tydecls   : tydecl                                             ([tydecl])
-   |        tydecls tydecl                                     (tydecls @ [tydecl])							       
+   |        tydecls tydecl                                     ([tydecl] @ tydecls)							       
 
 
 ty        : ID                                                 (A.NameTy(S.symbol(ID),IDleft)) (*Rule 45*)
@@ -228,27 +229,27 @@ ty        : ID                                                 (A.NameTy(S.symbo
 
 tyfields  :                                                    (nil)
    |        ID COLON ID                                        ([makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)])
-   |        ID COLON ID COMMA tyfields                         (tyfields @ [makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)]) (*Rule 50*)
+   |        ID COLON ID COMMA tyfields                         ([makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)] @ tyfields) (*Rule 50*)
 
 (* Variable declarations *)
 vardecl   : VAR ID ASSIGN exp                                  (makeVarDec(S.symbol(ID),NONE,exp,VARleft))
    |        VAR ID COLON ID ASSIGN exp                         (makeVarDec(S.symbol(ID1), SOME (S.symbol(ID2),ID2left), exp, VARleft))
 
 (* Function declarations *)
-fundecl   : FUNCTION ID LPAREN tyfields RPAREN EQ exp          (makeFundecl(S.symbol(ID),tyfields,NONE,exp,FUNCTIONleft)) (* (idsym, ps, rty, e, p) *)
+fundecl   : FUNCTION ID LPAREN tyfields RPAREN EQ exp          (makeFundecl(S.symbol(ID),tyfields,NONE,exp,FUNCTIONleft)) 
    |        FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp (makeFundecl(S.symbol(ID1),tyfields,SOME (S.symbol(ID2),ID2left),exp,FUNCTIONleft))
 		     
 fundecls  : fundecl                                            ([fundecl])
-   |        fundecls fundecl                                   (fundecls @ [fundecl]) 
+   |        fundecls fundecl                                   ([fundecl] @ fundecls) 
 
 
-(* Left values *)
-lvalue    : ID                                                 (A.SimpleVar(S.symbol(ID),IDleft))
-	  | lvalue_p                                           (lvalue_p)
+(* Location values *)
+lvalue    : ID lvalue_p                                        (makeLvaluePartSpec(A.SimpleVar(S.symbol(ID),IDleft),IDleft, lvalue_p))
 
-lvalue_p  : ID DOT ID                                          (A.FieldVar(A.SimpleVar(S.symbol(ID1),ID1left),S.symbol(ID2),ID1left))
-	  | lvalue_p DOT ID                                    (A.FieldVar(lvalue_p,S.symbol(ID),IDleft))
-	  | lvalue_p LBRACK exp RBRACK                         (A.SubscriptVar(lvalue_p,exp,lvalue_pleft)) (*makeLvaluePartSpec(lvalue_p,lvalue_pleft,[Field(lvalue_p),Subscript(exp)]))*)
-          | ID LBRACK exp RBRACK                               (A.SubscriptVar(A.SimpleVar(S.symbol(ID),IDleft),exp,IDleft))
+
+lvalue_p  :                                                    ([])
+   |	    DOT ID lvalue_p                                    (Field(S.symbol(ID))::lvalue_p)
+   |        LBRACK exp RBRACK lvalue_p                         (Subscript(exp)::lvalue_p) 
+
 
 (* makeLvaluePartSpec (v, pos, l::r) *)
