@@ -1,0 +1,2 @@
+/* error: syntax error, subscript expressions cannot end with a dot */
+Q.W.E.R.T.Y.

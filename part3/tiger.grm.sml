@@ -1107,8 +1107,8 @@ ID1, ID1left, _)) :: rest671)) => let val  result = MlyValue.tyfields
  val  (tyfields as tyfields1) = tyfields1 ()
  in (
 [makeFieldData(S.symbol(ID1),
-									       (S.symbol(ID2),ID2left),
-									       ID1left)] @ tyfields
+									                                              (S.symbol(ID2),ID2left),
+									                                              ID1left)] @ tyfields
 )
 end)
  in ( LrTable.NT 11, ( result, ID1left, tyfields1right), rest671)
@@ -1130,9 +1130,9 @@ result = MlyValue.vardecl (fn _ => let val  ID1 = ID1 ()
  val  (exp as exp1) = exp1 ()
  in (
 makeVarDec(S.symbol(ID1),
-									   SOME (S.symbol(ID2),ID2left),
-									   exp,
-									   VARleft)
+   									                                            SOME (S.symbol(ID2),ID2left),
+									                                              exp,
+									                                              VARleft)
 )
 end)
  in ( LrTable.NT 12, ( result, VAR1left, exp1right), rest671)
@@ -1146,10 +1146,10 @@ end
  val  (exp as exp1) = exp1 ()
  in (
 makeFundecl(S.symbol(ID),
-									    tyfields,
-									    NONE,
-									    exp,
-									    FUNCTIONleft)
+									                                              tyfields,
+									                                              NONE,
+									                                              exp,
+							                                                  FUNCTIONleft)
 )
 end)
  in ( LrTable.NT 13, ( result, FUNCTION1left, exp1right), rest671)
@@ -1164,10 +1164,10 @@ tyfields1, _, _)) :: _ :: ( _, ( MlyValue.ID ID1, _, _)) :: ( _, ( _,
  val  (exp as exp1) = exp1 ()
  in (
 makeFundecl(S.symbol(ID1),
-									    tyfields,
-									    SOME (S.symbol(ID2),ID2left),
-									    exp,
-									    FUNCTIONleft)
+									                                              tyfields,
+									                                              SOME (S.symbol(ID2),ID2left),
+									                                              exp,
+									                                              FUNCTIONleft)
 )
 end)
  in ( LrTable.NT 13, ( result, FUNCTION1left, exp1right), rest671)
@@ -1196,8 +1196,8 @@ end
  val  (lvalue_p as lvalue_p1) = lvalue_p1 ()
  in (
 makeLvaluePartSpec(A.SimpleVar(S.symbol(ID),IDleft),
-										   IDleft,
-										   lvalue_p)
+										                                            IDleft,
+										                                            lvalue_p)
 )
 end)
  in ( LrTable.NT 15, ( result, ID1left, lvalue_p1right), rest671)
