@@ -115,6 +115,7 @@ fun makeFieldData (idsym, ty, p) =
        | exp of A.exp
        | exps of (A.exp * pos) list
        | seqexp of (A.exp * pos) list
+       | seqexp_p of (A.exp * pos) list 
        | recfields of (S.symbol * A.exp * pos) list
        | decl of A.decl
        | decls of A.decl list
@@ -178,7 +179,7 @@ exp       : INT                                                (A.IntExp INT)
    |        WHILE exp DO exp                                   (makeWhileExp(exp1,exp2,WHILEleft))
    |        FOR ID ASSIGN exp TO exp DO exp                    (makeForExp(S.symbol(ID),exp1,exp2,exp3,FORleft)) (*Rule 10*)
    |        BREAK                                              (A.BreakExp BREAKleft)
-   |        LET decls IN seqexp END                            (makeLetExp(decls,A.SeqExp(seqexp),LETleft))
+   |        LET decls IN seqexp_p END                          (makeLetExp(decls,A.SeqExp(seqexp_p),LETleft))
    |        LPAREN seqexp RPAREN                               (A.SeqExp(seqexp))
    |        ID LBRACE recfields RBRACE                         (makeRecExp(recfields, S.symbol(ID), IDleft))
    |        ID LPAREN exps RPAREN                              (makeCallExp(S.symbol(ID),exps,IDleft)) (*Rule 15 *)
@@ -203,9 +204,11 @@ exps      :                                                    ([]) (*Rule 30*)
    |        exp                                                ([(exp, expleft)])
    |        exps COMMA exp                                     (exps@[(exp,expleft)])
 
-seqexp    :                                                    ([])
-   |        exp                                                ([(exp,expleft)])
+seqexp    : exp                                                ([(exp,expleft)])
    |        seqexp SEMICOLON exp                               (seqexp@[(exp,expleft)]) (*Rule 35*)
+
+seqexp_p  : ([])
+   |        seqexp                                             (seqexp)
 
 (* Record fields *)
 recfields :                                                    ([]) 
