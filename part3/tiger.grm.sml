@@ -11,8 +11,7 @@ struct
 structure A = Absyn
 structure S = Symbol
 
-(* [these functions and similar ones may be convenient
- * for the creation of abstract syntax trees] *)
+(* Convenience functions for creating abstract syntax tree *)
 
 datatype lvaluePartSpec = Field of S.symbol
                         | Subscript of A.exp
@@ -256,7 +255,7 @@ val table=let val actionRows =
 \\167\000\026\000\019\000\000\000\
 \\168\000\026\000\019\000\000\000\
 \\169\000\026\000\019\000\000\000\
-\\170\000\000\000\
+\\170\000\026\000\019\000\000\000\
 \\171\000\002\000\015\000\003\000\014\000\004\000\013\000\008\000\012\000\
 \\016\000\011\000\031\000\010\000\034\000\009\000\035\000\008\000\
 \\038\000\007\000\042\000\006\000\043\000\005\000\000\000\

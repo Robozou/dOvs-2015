@@ -758,6 +758,7 @@ state 41:
 	exp : exp . CARET exp 
 	exp : MINUS exp .  (reduce by rule 29)
 
+	CARET	shift 17
 
 
 	.	reduce by rule 29
@@ -2808,5 +2809,5 @@ state 138:
 
 	.	error
 
-577 of 1098 action table entries left after compaction
+578 of 1099 action table entries left after compaction
 104 goto table entries

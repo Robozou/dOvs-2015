@@ -1,3 +1,0 @@
-let function (x,y) = x + y
-    in print(function(5,6))
-    end

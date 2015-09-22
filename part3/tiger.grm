@@ -148,9 +148,8 @@ fun makeFieldData (idsym, ty, p) =
 %right      ELSE 
 %left       PLUS MINUS
 %left       TIMES DIVIDE
-%right      CARET
 %right      UMINUS DEC
-
+%right      CARET
 
 
 
@@ -167,7 +166,7 @@ exp       : INT                                                (A.IntExp INT)
    |        STRING                                             (A.StringExp (STRING, STRINGleft))
    |        lvalue                                             (A.VarExp(lvalue))
    |        lvalue ASSIGN exp                                  (makeAssign(lvalue,exp,lvalueleft)) (*Rule 5*)
-   |        ID LBRACK exp RBRACK OF exp                        (makeArExp(S.symbol(ID),exp1,exp2,IDleft))(*ty, sz, ini, p*)
+   |        ID LBRACK exp RBRACK OF exp                        (makeArExp(S.symbol(ID),exp1,exp2,IDleft))
    |        IF exp THEN exp                                    (makeIf(exp1,exp2,NONE,IFleft))
    |        IF exp THEN exp ELSE exp                           (makeIf(exp1,exp2,SOME exp3,IFleft))
    |        WHILE exp DO exp                                   (makeWhileExp(exp1,exp2,WHILEleft))
@@ -176,8 +175,8 @@ exp       : INT                                                (A.IntExp INT)
    |        LET decls IN seqexp END                            (makeLetExp(decls,A.SeqExp(seqexp),LETleft))
    |        LPAREN seqexp RPAREN                               (A.SeqExp(seqexp))
    |        ID LBRACE recfields RBRACE                         (makeRecExp(recfields, S.symbol(ID), IDleft))
-   |        ID LPAREN exps RPAREN                              (makeCallExp(S.symbol(ID),exps,IDleft)) (*Rule 15 fnc, ags, p*)
-   (* Binary operators *)
+   |        ID LPAREN exps RPAREN                              (makeCallExp(S.symbol(ID),exps,IDleft)) (*Rule 15 *)
+(* Binary operators *)
    |        exp OR exp                                         (makeIf(exp1,A.IntExp(1),SOME exp2,exp1left))
    |        exp AND exp                                        (makeIf(exp1,exp2,SOME (A.IntExp(0)),exp1left))
    |        exp EQ exp                                         (makeBinop(exp1,A.EqOp,exp2,exp1left))
@@ -220,7 +219,7 @@ tydecl    : TYPE ID EQ ty                                      (makeTyDec(S.symb
 
 
 tydecls   : tydecl                                             ([tydecl])
-   |        tydecls tydecl                                     ([tydecl] @ tydecls)							       
+   |        tydecls tydecl                                     ([tydecl] @ tydecls)       
 
 
 ty        : ID                                                 (A.NameTy(S.symbol(ID),IDleft)) (*Rule 45*)
