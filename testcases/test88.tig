@@ -1,0 +1,14 @@
+let var x = 5
+    in
+       let function fun (x:int) = print(x)
+           in
+              fun(5)
+	   end
+    end
+
+let function fun (y:int) = print(y)
+
+
+   
+    
+    

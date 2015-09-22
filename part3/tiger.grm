@@ -91,6 +91,7 @@ fun makeFieldData (idsym, ty, p) =
 		, pos = p} : A.fielddata
 
 
+
 %%
 %term
     EOF
@@ -98,12 +99,15 @@ fun makeFieldData (idsym, ty, p) =
   | INT of int | STRING of string
   | COMMA | COLON | SEMICOLON | LPAREN | RPAREN | LBRACK | RBRACK
   | LBRACE | RBRACE | DOT
+  | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF
   | PLUS | MINUS | UMINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE | CARET
   | AND | OR | ASSIGN
-  | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF
   | BREAK | NIL
   | FUNCTION | VAR | TYPE 
   | DEC 
+
+
+
 
 (* Non-terimnals and their type definitions*)
 
@@ -135,7 +139,9 @@ fun makeFieldData (idsym, ty, p) =
 %keyword WHILE FOR TO BREAK LET IN END FUNCTION
          VAR TYPE ARRAY IF THEN ELSE DO OF NIL
 
-%prefer THEN IF ELSE LPAREN
+
+%prefer THEN IF ELSE LPAREN RPAREN
+
 
 %value ID ("bogus")
 %value INT (1)
@@ -144,7 +150,7 @@ fun makeFieldData (idsym, ty, p) =
 (* Precedence and associativity specifciation *)
 
 %left       AND OR
-%nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN NEQ GT LT GE LE EQ
+%nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN NEQ GT LT GE LE EQ 
 %right      ELSE 
 %left       PLUS MINUS
 %left       TIMES DIVIDE
@@ -218,37 +224,52 @@ decls     :                                                    (nil)
 tydecl    : TYPE ID EQ ty                                      (makeTyDec(S.symbol(ID),ty,TYPEleft))
 
 
-tydecls   : tydecl                                             ([tydecl])
+tydecls   : tydecl                                             ([tydecl]) (*Rule 45*)
    |        tydecls tydecl                                     ([tydecl] @ tydecls)       
 
 
-ty        : ID                                                 (A.NameTy(S.symbol(ID),IDleft)) (*Rule 45*)
+ty        : ID                                                 (A.NameTy(S.symbol(ID),IDleft))
    |        LBRACE tyfields RBRACE                             (A.RecordTy(tyfields))
    |        ARRAY OF ID                                        (A.ArrayTy(S.symbol(ID),IDleft))
 
-tyfields  :                                                    (nil)
+tyfields  :                                                    (nil) (*Rule 50*)
    |        ID COLON ID                                        ([makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)])
-   |        ID COLON ID COMMA tyfields                         ([makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)] @ tyfields) (*Rule 50*)
+   |        ID COLON ID COMMA tyfields                         ([makeFieldData(S.symbol(ID1),
+									       (S.symbol(ID2),ID2left),
+									       ID1left)] @ tyfields) 
 
 (* Variable declarations *)
 vardecl   : VAR ID ASSIGN exp                                  (makeVarDec(S.symbol(ID),NONE,exp,VARleft))
-   |        VAR ID COLON ID ASSIGN exp                         (makeVarDec(S.symbol(ID1), SOME (S.symbol(ID2),ID2left), exp, VARleft))
+   |        VAR ID COLON ID ASSIGN exp                         (makeVarDec(S.symbol(ID1),
+									   SOME (S.symbol(ID2),ID2left),
+									   exp,
+									   VARleft))
 
 (* Function declarations *)
-fundecl   : FUNCTION ID LPAREN tyfields RPAREN EQ exp          (makeFundecl(S.symbol(ID),tyfields,NONE,exp,FUNCTIONleft)) 
-   |        FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp (makeFundecl(S.symbol(ID1),tyfields,SOME (S.symbol(ID2),ID2left),exp,FUNCTIONleft))
+fundecl   : FUNCTION ID LPAREN tyfields RPAREN EQ exp          (makeFundecl(S.symbol(ID),
+									    tyfields,
+									    NONE,
+									    exp,
+									    FUNCTIONleft)) (*Rule 55*)
+
+   |        FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp (makeFundecl(S.symbol(ID1),
+									    tyfields,
+									    SOME (S.symbol(ID2),ID2left),
+									    exp,
+									    FUNCTIONleft))
 		     
 fundecls  : fundecl                                            ([fundecl])
    |        fundecls fundecl                                   ([fundecl] @ fundecls) 
 
 
 (* Location values *)
-lvalue    : ID lvalue_p                                        (makeLvaluePartSpec(A.SimpleVar(S.symbol(ID),IDleft),IDleft, lvalue_p))
+lvalue    : ID lvalue_p                                        (makeLvaluePartSpec(A.SimpleVar(S.symbol(ID),IDleft),
+										   IDleft,
+										   lvalue_p))
 
 
-lvalue_p  :                                                    ([])
+lvalue_p  :                                                    ([]) (*Rule 55*)
    |	    DOT ID lvalue_p                                    (Field(S.symbol(ID))::lvalue_p)
    |        LBRACK exp RBRACK lvalue_p                         (Subscript(exp)::lvalue_p) 
 
 
-(* makeLvaluePartSpec (v, pos, l::r) *)

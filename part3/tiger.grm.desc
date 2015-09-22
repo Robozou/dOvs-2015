@@ -7,11 +7,11 @@ state 0:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -88,34 +88,56 @@ state 4:
 
 state 5:
 
-	exp : LET . decls IN seqexp END 
+	exp : MINUS . exp 
 
-	FUNCTION	shift 37
-	VAR	shift 36
-	TYPE	shift 35
+	ID	shift 13
+	INT	shift 12
+	STRING	shift 11
+	LPAREN	shift 10
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
+	BREAK	shift 4
+	NIL	shift 3
 
-	decl	goto 34
-	decls	goto 33
-	tydecl	goto 32
-	tydecls	goto 31
-	vardecl	goto 30
-	fundecl	goto 29
-	fundecls	goto 28
+	exp	goto 28
+	lvalue	goto 1
 
-	.	reduce by rule 42
+	.	error
 
 
 state 6:
 
+	exp : LET . decls IN seqexp END 
+
+	FUNCTION	shift 38
+	VAR	shift 37
+	TYPE	shift 36
+
+	decl	goto 35
+	decls	goto 34
+	tydecl	goto 33
+	tydecls	goto 32
+	vardecl	goto 31
+	fundecl	goto 30
+	fundecls	goto 29
+
+	.	reduce by rule 42
+
+
+state 7:
+
 	exp : FOR . ID ASSIGN exp TO exp DO exp 
 
-	ID	shift 38
+	ID	shift 39
 
 
 	.	error
 
 
-state 7:
+state 8:
 
 	exp : WHILE . exp DO exp 
 
@@ -123,34 +145,11 @@ state 7:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
-	BREAK	shift 4
-	NIL	shift 3
-
-	exp	goto 39
-	lvalue	goto 1
-
-	.	error
-
-
-state 8:
-
-	exp : IF . exp THEN exp 
-	exp : IF . exp THEN exp ELSE exp 
-
-	ID	shift 13
-	INT	shift 12
-	STRING	shift 11
-	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -162,17 +161,18 @@ state 8:
 
 state 9:
 
-	exp : MINUS . exp 
+	exp : IF . exp THEN exp 
+	exp : IF . exp THEN exp ELSE exp 
 
 	ID	shift 13
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -190,11 +190,11 @@ state 10:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -248,11 +248,11 @@ state 14:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -270,11 +270,11 @@ state 15:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -292,11 +292,11 @@ state 16:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -314,11 +314,11 @@ state 17:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -336,11 +336,11 @@ state 18:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -358,11 +358,11 @@ state 19:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -380,11 +380,11 @@ state 20:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -402,11 +402,11 @@ state 21:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -424,11 +424,11 @@ state 22:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -446,11 +446,11 @@ state 23:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -468,11 +468,11 @@ state 24:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -490,11 +490,11 @@ state 25:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -512,11 +512,11 @@ state 26:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -534,11 +534,11 @@ state 27:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -549,199 +549,6 @@ state 27:
 
 
 state 28:
-
-	decl : fundecls .  (reduce by rule 41)
-	fundecls : fundecls . fundecl 
-
-
-	fundecl	goto 63
-
-	.	reduce by rule 41
-
-
-state 29:
-
-	fundecls : fundecl .  (reduce by rule 57)
-
-
-
-	.	reduce by rule 57
-
-
-state 30:
-
-	decl : vardecl .  (reduce by rule 40)
-
-
-
-	.	reduce by rule 40
-
-
-state 31:
-
-	decl : tydecls .  (reduce by rule 39)
-	tydecls : tydecls . tydecl 
-
-
-	tydecl	goto 64
-
-	.	reduce by rule 39
-
-
-state 32:
-
-	tydecls : tydecl .  (reduce by rule 45)
-
-
-
-	.	reduce by rule 45
-
-
-state 33:
-
-	exp : LET decls . IN seqexp END 
-
-	IN	shift 65
-
-
-	.	error
-
-
-state 34:
-
-	decls : decl . decls 
-
-	FUNCTION	shift 37
-	VAR	shift 36
-	TYPE	shift 35
-
-	decl	goto 34
-	decls	goto 66
-	tydecl	goto 32
-	tydecls	goto 31
-	vardecl	goto 30
-	fundecl	goto 29
-	fundecls	goto 28
-
-	.	reduce by rule 42
-
-
-state 35:
-
-	tydecl : TYPE . ID EQ ty 
-
-	ID	shift 67
-
-
-	.	error
-
-
-state 36:
-
-	vardecl : VAR . ID ASSIGN exp 
-	vardecl : VAR . ID COLON ID ASSIGN exp 
-
-	ID	shift 68
-
-
-	.	error
-
-
-state 37:
-
-	fundecl : FUNCTION . ID LPAREN tyfields RPAREN EQ exp 
-	fundecl : FUNCTION . ID LPAREN tyfields RPAREN COLON ID EQ exp 
-
-	ID	shift 69
-
-
-	.	error
-
-
-state 38:
-
-	exp : FOR ID . ASSIGN exp TO exp DO exp 
-
-	ASSIGN	shift 70
-
-
-	.	error
-
-
-state 39:
-
-	exp : WHILE exp . DO exp 
-	exp : exp . OR exp 
-	exp : exp . AND exp 
-	exp : exp . EQ exp 
-	exp : exp . LE exp 
-	exp : exp . GE exp 
-	exp : exp . LT exp 
-	exp : exp . GT exp 
-	exp : exp . NEQ exp 
-	exp : exp . MINUS exp 
-	exp : exp . PLUS exp 
-	exp : exp . DIVIDE exp 
-	exp : exp . TIMES exp 
-	exp : exp . CARET exp 
-
-	PLUS	shift 27
-	MINUS	shift 26
-	TIMES	shift 25
-	DIVIDE	shift 24
-	EQ	shift 23
-	NEQ	shift 22
-	LT	shift 21
-	LE	shift 20
-	GT	shift 19
-	GE	shift 18
-	CARET	shift 17
-	AND	shift 16
-	OR	shift 15
-	DO	shift 71
-
-
-	.	error
-
-
-state 40:
-
-	exp : IF exp . THEN exp 
-	exp : IF exp . THEN exp ELSE exp 
-	exp : exp . OR exp 
-	exp : exp . AND exp 
-	exp : exp . EQ exp 
-	exp : exp . LE exp 
-	exp : exp . GE exp 
-	exp : exp . LT exp 
-	exp : exp . GT exp 
-	exp : exp . NEQ exp 
-	exp : exp . MINUS exp 
-	exp : exp . PLUS exp 
-	exp : exp . DIVIDE exp 
-	exp : exp . TIMES exp 
-	exp : exp . CARET exp 
-
-	PLUS	shift 27
-	MINUS	shift 26
-	TIMES	shift 25
-	DIVIDE	shift 24
-	EQ	shift 23
-	NEQ	shift 22
-	LT	shift 21
-	LE	shift 20
-	GT	shift 19
-	GE	shift 18
-	CARET	shift 17
-	AND	shift 16
-	OR	shift 15
-	THEN	shift 72
-
-
-	.	error
-
-
-state 41:
 
 	exp : exp . OR exp 
 	exp : exp . AND exp 
@@ -762,6 +569,199 @@ state 41:
 
 
 	.	reduce by rule 29
+
+
+state 29:
+
+	decl : fundecls .  (reduce by rule 41)
+	fundecls : fundecls . fundecl 
+
+
+	fundecl	goto 63
+
+	.	reduce by rule 41
+
+
+state 30:
+
+	fundecls : fundecl .  (reduce by rule 57)
+
+
+
+	.	reduce by rule 57
+
+
+state 31:
+
+	decl : vardecl .  (reduce by rule 40)
+
+
+
+	.	reduce by rule 40
+
+
+state 32:
+
+	decl : tydecls .  (reduce by rule 39)
+	tydecls : tydecls . tydecl 
+
+
+	tydecl	goto 64
+
+	.	reduce by rule 39
+
+
+state 33:
+
+	tydecls : tydecl .  (reduce by rule 45)
+
+
+
+	.	reduce by rule 45
+
+
+state 34:
+
+	exp : LET decls . IN seqexp END 
+
+	IN	shift 65
+
+
+	.	error
+
+
+state 35:
+
+	decls : decl . decls 
+
+	FUNCTION	shift 38
+	VAR	shift 37
+	TYPE	shift 36
+
+	decl	goto 35
+	decls	goto 66
+	tydecl	goto 33
+	tydecls	goto 32
+	vardecl	goto 31
+	fundecl	goto 30
+	fundecls	goto 29
+
+	.	reduce by rule 42
+
+
+state 36:
+
+	tydecl : TYPE . ID EQ ty 
+
+	ID	shift 67
+
+
+	.	error
+
+
+state 37:
+
+	vardecl : VAR . ID ASSIGN exp 
+	vardecl : VAR . ID COLON ID ASSIGN exp 
+
+	ID	shift 68
+
+
+	.	error
+
+
+state 38:
+
+	fundecl : FUNCTION . ID LPAREN tyfields RPAREN EQ exp 
+	fundecl : FUNCTION . ID LPAREN tyfields RPAREN COLON ID EQ exp 
+
+	ID	shift 69
+
+
+	.	error
+
+
+state 39:
+
+	exp : FOR ID . ASSIGN exp TO exp DO exp 
+
+	ASSIGN	shift 70
+
+
+	.	error
+
+
+state 40:
+
+	exp : WHILE exp . DO exp 
+	exp : exp . OR exp 
+	exp : exp . AND exp 
+	exp : exp . EQ exp 
+	exp : exp . LE exp 
+	exp : exp . GE exp 
+	exp : exp . LT exp 
+	exp : exp . GT exp 
+	exp : exp . NEQ exp 
+	exp : exp . MINUS exp 
+	exp : exp . PLUS exp 
+	exp : exp . DIVIDE exp 
+	exp : exp . TIMES exp 
+	exp : exp . CARET exp 
+
+	DO	shift 71
+	PLUS	shift 27
+	MINUS	shift 26
+	TIMES	shift 25
+	DIVIDE	shift 24
+	EQ	shift 23
+	NEQ	shift 22
+	LT	shift 21
+	LE	shift 20
+	GT	shift 19
+	GE	shift 18
+	CARET	shift 17
+	AND	shift 16
+	OR	shift 15
+
+
+	.	error
+
+
+state 41:
+
+	exp : IF exp . THEN exp 
+	exp : IF exp . THEN exp ELSE exp 
+	exp : exp . OR exp 
+	exp : exp . AND exp 
+	exp : exp . EQ exp 
+	exp : exp . LE exp 
+	exp : exp . GE exp 
+	exp : exp . LT exp 
+	exp : exp . GT exp 
+	exp : exp . NEQ exp 
+	exp : exp . MINUS exp 
+	exp : exp . PLUS exp 
+	exp : exp . DIVIDE exp 
+	exp : exp . TIMES exp 
+	exp : exp . CARET exp 
+
+	THEN	shift 72
+	PLUS	shift 27
+	MINUS	shift 26
+	TIMES	shift 25
+	DIVIDE	shift 24
+	EQ	shift 23
+	NEQ	shift 22
+	LT	shift 21
+	LE	shift 20
+	GT	shift 19
+	GE	shift 18
+	CARET	shift 17
+	AND	shift 16
+	OR	shift 15
+
+
+	.	error
 
 
 state 42:
@@ -850,11 +850,11 @@ state 47:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -872,11 +872,11 @@ state 48:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -910,6 +910,12 @@ state 49:
 	RPAREN	reduce by rule 5
 	RBRACK	reduce by rule 5
 	RBRACE	reduce by rule 5
+	THEN	reduce by rule 5
+	ELSE	reduce by rule 5
+	TO	reduce by rule 5
+	DO	reduce by rule 5
+	IN	reduce by rule 5
+	END	reduce by rule 5
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -917,12 +923,6 @@ state 49:
 	CARET	shift 17
 	AND	reduce by rule 5
 	OR	reduce by rule 5
-	THEN	reduce by rule 5
-	ELSE	reduce by rule 5
-	TO	reduce by rule 5
-	DO	reduce by rule 5
-	IN	reduce by rule 5
-	END	reduce by rule 5
 	FUNCTION	reduce by rule 5
 	VAR	reduce by rule 5
 	TYPE	reduce by rule 5
@@ -1043,6 +1043,12 @@ state 53:
 	RPAREN	reduce by rule 20
 	RBRACK	reduce by rule 20
 	RBRACE	reduce by rule 20
+	THEN	reduce by rule 20
+	ELSE	reduce by rule 20
+	TO	reduce by rule 20
+	DO	reduce by rule 20
+	IN	reduce by rule 20
+	END	reduce by rule 20
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -1050,12 +1056,6 @@ state 53:
 	CARET	shift 17
 	AND	reduce by rule 20
 	OR	reduce by rule 20
-	THEN	reduce by rule 20
-	ELSE	reduce by rule 20
-	TO	reduce by rule 20
-	DO	reduce by rule 20
-	IN	reduce by rule 20
-	END	reduce by rule 20
 	FUNCTION	reduce by rule 20
 	VAR	reduce by rule 20
 	TYPE	reduce by rule 20
@@ -1087,6 +1087,12 @@ state 54:
 	RPAREN	reduce by rule 22
 	RBRACK	reduce by rule 22
 	RBRACE	reduce by rule 22
+	THEN	reduce by rule 22
+	ELSE	reduce by rule 22
+	TO	reduce by rule 22
+	DO	reduce by rule 22
+	IN	reduce by rule 22
+	END	reduce by rule 22
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -1094,12 +1100,6 @@ state 54:
 	CARET	shift 17
 	AND	reduce by rule 22
 	OR	reduce by rule 22
-	THEN	reduce by rule 22
-	ELSE	reduce by rule 22
-	TO	reduce by rule 22
-	DO	reduce by rule 22
-	IN	reduce by rule 22
-	END	reduce by rule 22
 	FUNCTION	reduce by rule 22
 	VAR	reduce by rule 22
 	TYPE	reduce by rule 22
@@ -1131,6 +1131,12 @@ state 55:
 	RPAREN	reduce by rule 19
 	RBRACK	reduce by rule 19
 	RBRACE	reduce by rule 19
+	THEN	reduce by rule 19
+	ELSE	reduce by rule 19
+	TO	reduce by rule 19
+	DO	reduce by rule 19
+	IN	reduce by rule 19
+	END	reduce by rule 19
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -1138,12 +1144,6 @@ state 55:
 	CARET	shift 17
 	AND	reduce by rule 19
 	OR	reduce by rule 19
-	THEN	reduce by rule 19
-	ELSE	reduce by rule 19
-	TO	reduce by rule 19
-	DO	reduce by rule 19
-	IN	reduce by rule 19
-	END	reduce by rule 19
 	FUNCTION	reduce by rule 19
 	VAR	reduce by rule 19
 	TYPE	reduce by rule 19
@@ -1175,6 +1175,12 @@ state 56:
 	RPAREN	reduce by rule 21
 	RBRACK	reduce by rule 21
 	RBRACE	reduce by rule 21
+	THEN	reduce by rule 21
+	ELSE	reduce by rule 21
+	TO	reduce by rule 21
+	DO	reduce by rule 21
+	IN	reduce by rule 21
+	END	reduce by rule 21
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -1182,12 +1188,6 @@ state 56:
 	CARET	shift 17
 	AND	reduce by rule 21
 	OR	reduce by rule 21
-	THEN	reduce by rule 21
-	ELSE	reduce by rule 21
-	TO	reduce by rule 21
-	DO	reduce by rule 21
-	IN	reduce by rule 21
-	END	reduce by rule 21
 	FUNCTION	reduce by rule 21
 	VAR	reduce by rule 21
 	TYPE	reduce by rule 21
@@ -1219,6 +1219,12 @@ state 57:
 	RPAREN	reduce by rule 23
 	RBRACK	reduce by rule 23
 	RBRACE	reduce by rule 23
+	THEN	reduce by rule 23
+	ELSE	reduce by rule 23
+	TO	reduce by rule 23
+	DO	reduce by rule 23
+	IN	reduce by rule 23
+	END	reduce by rule 23
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -1226,12 +1232,6 @@ state 57:
 	CARET	shift 17
 	AND	reduce by rule 23
 	OR	reduce by rule 23
-	THEN	reduce by rule 23
-	ELSE	reduce by rule 23
-	TO	reduce by rule 23
-	DO	reduce by rule 23
-	IN	reduce by rule 23
-	END	reduce by rule 23
 	FUNCTION	reduce by rule 23
 	VAR	reduce by rule 23
 	TYPE	reduce by rule 23
@@ -1263,6 +1263,12 @@ state 58:
 	RPAREN	reduce by rule 18
 	RBRACK	reduce by rule 18
 	RBRACE	reduce by rule 18
+	THEN	reduce by rule 18
+	ELSE	reduce by rule 18
+	TO	reduce by rule 18
+	DO	reduce by rule 18
+	IN	reduce by rule 18
+	END	reduce by rule 18
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -1270,12 +1276,6 @@ state 58:
 	CARET	shift 17
 	AND	reduce by rule 18
 	OR	reduce by rule 18
-	THEN	reduce by rule 18
-	ELSE	reduce by rule 18
-	TO	reduce by rule 18
-	DO	reduce by rule 18
-	IN	reduce by rule 18
-	END	reduce by rule 18
 	FUNCTION	reduce by rule 18
 	VAR	reduce by rule 18
 	TYPE	reduce by rule 18
@@ -1406,11 +1406,11 @@ state 65:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -1471,11 +1471,11 @@ state 70:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -1493,11 +1493,11 @@ state 71:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -1516,11 +1516,11 @@ state 72:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -1547,11 +1547,11 @@ state 74:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -1711,11 +1711,11 @@ state 83:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -1764,6 +1764,7 @@ state 86:
 	exp : exp . TIMES exp 
 	exp : exp . CARET exp 
 
+	TO	shift 106
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -1777,7 +1778,6 @@ state 86:
 	CARET	shift 17
 	AND	shift 16
 	OR	shift 15
-	TO	shift 106
 
 
 	.	error
@@ -1806,6 +1806,12 @@ state 87:
 	RPAREN	reduce by rule 9
 	RBRACK	reduce by rule 9
 	RBRACE	reduce by rule 9
+	THEN	reduce by rule 9
+	ELSE	reduce by rule 9
+	TO	reduce by rule 9
+	DO	reduce by rule 9
+	IN	reduce by rule 9
+	END	reduce by rule 9
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -1813,12 +1819,6 @@ state 87:
 	CARET	shift 17
 	AND	reduce by rule 9
 	OR	reduce by rule 9
-	THEN	reduce by rule 9
-	ELSE	reduce by rule 9
-	TO	reduce by rule 9
-	DO	reduce by rule 9
-	IN	reduce by rule 9
-	END	reduce by rule 9
 	FUNCTION	reduce by rule 9
 	VAR	reduce by rule 9
 	TYPE	reduce by rule 9
@@ -1851,6 +1851,12 @@ state 88:
 	RPAREN	reduce by rule 7
 	RBRACK	reduce by rule 7
 	RBRACE	reduce by rule 7
+	THEN	reduce by rule 7
+	ELSE	shift 107
+	TO	reduce by rule 7
+	DO	reduce by rule 7
+	IN	reduce by rule 7
+	END	reduce by rule 7
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -1858,12 +1864,6 @@ state 88:
 	CARET	shift 17
 	AND	reduce by rule 7
 	OR	reduce by rule 7
-	THEN	reduce by rule 7
-	ELSE	shift 107
-	TO	reduce by rule 7
-	DO	reduce by rule 7
-	IN	reduce by rule 7
-	END	reduce by rule 7
 	FUNCTION	reduce by rule 7
 	VAR	reduce by rule 7
 	TYPE	reduce by rule 7
@@ -1924,11 +1924,11 @@ state 91:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -1956,11 +1956,11 @@ state 93:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -2001,11 +2001,11 @@ state 96:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -2138,11 +2138,11 @@ state 106:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -2160,11 +2160,11 @@ state 107:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -2264,11 +2264,11 @@ state 111:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -2341,11 +2341,11 @@ state 115:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -2395,6 +2395,7 @@ state 118:
 	exp : exp . TIMES exp 
 	exp : exp . CARET exp 
 
+	DO	shift 129
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -2408,7 +2409,6 @@ state 118:
 	CARET	shift 17
 	AND	shift 16
 	OR	shift 15
-	DO	shift 129
 
 
 	.	error
@@ -2487,6 +2487,12 @@ state 122:
 	RPAREN	reduce by rule 6
 	RBRACK	reduce by rule 6
 	RBRACE	reduce by rule 6
+	THEN	reduce by rule 6
+	ELSE	reduce by rule 6
+	TO	reduce by rule 6
+	DO	reduce by rule 6
+	IN	reduce by rule 6
+	END	reduce by rule 6
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -2494,12 +2500,6 @@ state 122:
 	CARET	shift 17
 	AND	reduce by rule 6
 	OR	reduce by rule 6
-	THEN	reduce by rule 6
-	ELSE	reduce by rule 6
-	TO	reduce by rule 6
-	DO	reduce by rule 6
-	IN	reduce by rule 6
-	END	reduce by rule 6
 	FUNCTION	reduce by rule 6
 	VAR	reduce by rule 6
 	TYPE	reduce by rule 6
@@ -2569,11 +2569,11 @@ state 126:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -2612,11 +2612,11 @@ state 129:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
@@ -2714,6 +2714,12 @@ state 134:
 	RPAREN	reduce by rule 10
 	RBRACK	reduce by rule 10
 	RBRACE	reduce by rule 10
+	THEN	reduce by rule 10
+	ELSE	reduce by rule 10
+	TO	reduce by rule 10
+	DO	reduce by rule 10
+	IN	reduce by rule 10
+	END	reduce by rule 10
 	PLUS	shift 27
 	MINUS	shift 26
 	TIMES	shift 25
@@ -2721,12 +2727,6 @@ state 134:
 	CARET	shift 17
 	AND	reduce by rule 10
 	OR	reduce by rule 10
-	THEN	reduce by rule 10
-	ELSE	reduce by rule 10
-	TO	reduce by rule 10
-	DO	reduce by rule 10
-	IN	reduce by rule 10
-	END	reduce by rule 10
 	FUNCTION	reduce by rule 10
 	VAR	reduce by rule 10
 	TYPE	reduce by rule 10
@@ -2743,11 +2743,11 @@ state 135:
 	INT	shift 12
 	STRING	shift 11
 	LPAREN	shift 10
-	MINUS	shift 9
-	IF	shift 8
-	WHILE	shift 7
-	FOR	shift 6
-	LET	shift 5
+	IF	shift 9
+	WHILE	shift 8
+	FOR	shift 7
+	LET	shift 6
+	MINUS	shift 5
 	BREAK	shift 4
 	NIL	shift 3
 
