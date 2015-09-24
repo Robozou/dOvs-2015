@@ -48,8 +48,11 @@ fun errorUnit (pos, ty) =
 fun errorNil (pos, id) =
     err pos ("need to give " ^ S.name id ^ " a type when assigning the value nil")
 
-fun errorTyp (pos, ty) =
+fun errorTypUnd (pos, ty) =
     err pos ("type  " ^ S.name ty ^ " undefined")
+
+fun errorTypMis (pos, exp, act) =
+    err pos ("type mismatch, expected " ^ exp ^ " but found " ^ act)
 
 (* Write additional error messages here *)
 
@@ -101,8 +104,28 @@ fun checkAssignable (declared: Ty.ty, assigned: Ty.ty, pos, msg) =
         () (* TODO *)
     end
 
+
+fun tyToString(ty) =
+   case ty of
+	Ty.NIL => "nil"
+      | Ty.INT => "int"
+      | Ty.STRING => "string"
+      | Ty.RECORD(_,_) => "record"
+      | Ty.ARRAY(t,_) => "array of " ^ tyToString(t)
+      | Ty.UNIT => "unit"
+      | Ty.NAME(s,t) => "name of " ^ S.name(s)
+      | Ty.ERROR => "error" 					   
+
 fun compareTypes(t1,t2, pos) =
-   ()
+  if(t1 <> t2) then
+      case (t1,t2) of
+	  (Ty.RECORD(_,_),Ty.NIL) => ()
+       |  (Ty.NIL,Ty.RECORD(_,_))  => ()
+       |  (_,_) => (errorTypMis(pos,tyToString(t1),tyToString(t2));())
+  else ()				 
+					   
+
+       
 
 fun transTy (tenv, t) = Ty.ERROR (* TODO *)
 
@@ -154,12 +177,12 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
 		 val {exp, ty} = transExp(venv, tenv, {}) init
 	     in
 		 case S.look(tenv,s) of
-		     NONE =>     (errorTyp(pos,s); {decl = TAbs.VarDec {name = name, escape = escape, ty = ty, init = {exp = exp, ty = ty}}, tenv = tenv, venv = S.enter(venv, name, E.VarEntry{ty = ty})}) (* TODO *)
+		     NONE =>     (errorTypUnd(pos,s); {decl = TAbs.VarDec {name = name, escape = escape, ty = ty, init = {exp = exp, ty = ty}}, tenv = tenv, venv = S.enter(venv, name, E.VarEntry{ty = ty})}) (* TODO *)
                   |  SOME(typ) =>    
 	              (* 1. Check actual type
 		         2. Compare init type to dec type*)
 		       let val acttyp = actualTy typ pos (* TODO: Implement actualTy*)
-                         in
+                         in			     
 			   {decl = TODO_DECL, tenv = tenv, venv = venv}
 		       end
              end
