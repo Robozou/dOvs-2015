@@ -57,3 +57,6 @@ clean:
 	rm -f tiger.lex.* tiger.grm.*
 	rm -f tigerc.x86-linux
 	rm -f tigerc.x86-darwin
+
+ctest: clean sa
+	./compiletests

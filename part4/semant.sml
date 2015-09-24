@@ -105,9 +105,22 @@ fun transExp (venv, tenv, extra : extra) =
         (* this is a placeholder value to get started *)
         val TODO = {exp = TAbs.ErrorExp, ty = Ty.ERROR}
 
-        fun trexp (A.NilExp) = TODO
-          | trexp (A.VarExp var) = TODO
-          | trexp _ = TODO
+        fun trexp (A.NilExp) = {exp = TAbs.NilExp, ty = Ty.NIL}
+          | trexp (A.VarExp var) = trvar var
+          | trexp (A.IntExp int) = {exp = TAbs.IntExp int, ty = Ty.INT}
+          | trexp (A.StringExp (s,_)) = {exp = TAbs.StringExp s, ty = Ty.STRING}
+          (*)| trexp (A.BreakExp b) = {exp = TAbs.BreakExp , ty = Ty.UNIT}*)
+          | trexp (A.CallExp _) = TODO
+          | trexp (A.OpExp _) = TODO
+          | trexp (A.RecordExp _) = TODO
+          | trexp (A.SeqExp _) = TODO
+          | trexp (A.AssignExp _) = TODO
+          | trexp (A.IfExp _) = TODO
+          | trexp (A.WhileExp _) = TODO
+          | trexp (A.ForExp _) = TODO
+          | trexp (A.LetExp _) = TODO
+          | trexp (A.ArrayExp _) = TODO
+          | trexp _ = {exp = TAbsyn.ErrorExp, ty = Ty.ERROR}
 
         and trvar (A.SimpleVar (id, pos)) = TODO
           | trvar (A.FieldVar (var, id, pos)) = TODO
@@ -116,10 +129,13 @@ fun transExp (venv, tenv, extra : extra) =
         trexp
     end
 
-and transDec ( venv, tenv
-             , A.VarDec {name, escape, typ = NONE, init, pos}, extra : extra) =
-    {decl = TODO_DECL, tenv = tenv, venv = venv} (* TODO *)
-
+and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra : extra) =
+             let
+                val {exp, ty} = transExp(venv, tenv, {}) init
+              in
+                (if (ty = Ty.NIL) then errorNil(pos,name) else ();
+                  {decl = TAbsyn.VarDec {name = name, escape = escape, ty = ty, init = {exp = exp,ty = ty}}, tenv = tenv, venv = S.enter(venv, name, E.VarEntry{ty = ty})}) (* TODO *)
+             end
   | transDec ( venv, tenv
              , A.VarDec {name, escape, typ = SOME (s, pos), init, pos=pos1}, extra) =
     {decl = TODO_DECL, tenv = tenv, venv = venv} (* TODO *)
