@@ -54,6 +54,17 @@ fun errorTypUnd (pos, ty) =
 fun errorTypMis (pos, exp, act) =
     err pos ("type mismatch, expected " ^ exp ^ " but found " ^ act)
 
+fun errorFunUnd (pos, func) =
+    err pos ("function " ^ S.name func ^ " is undefined")
+
+fun errorVarFun (pos, found) =
+    err pos ("found var " ^ S.name found ^ " should have been function")
+
+fun errorFormalMismatch (pos, lenf, lenga) =
+    err pos ("found argument list of length " ^
+	     Int.toString(lenf) ^ " but should have been " ^
+	     Int.toString(lenga))
+
 (* Write additional error messages here *)
 
 
@@ -156,7 +167,23 @@ fun transExp (venv, tenv, extra : extra) =
           | trexp (A.IntExp int) = {exp = TAbs.IntExp int, ty = Ty.INT}
           | trexp (A.StringExp (s,_)) = {exp = TAbs.StringExp s, ty = Ty.STRING}
           (*| trexp (A.BreakExp(_)) = {exp = TAbs.BreakExp , ty = Ty.UNIT}*)
-          | trexp (A.CallExp _) = TODO
+          | trexp (A.CallExp {func, args, pos}) =
+	    (case S.look(venv,func) of
+		NONE => (errorFunUnd(pos,func);TODO)
+	      | SOME (E.VarEntry{ty}) => (errorVarFun(pos, func); TODO)
+	      | SOME (E.FunEntry{formals,result}) =>
+		     let (* 1. Go through formals and create a list of types expressions
+			    2. Return TAbs.CallExp with call data of function symb and typed exps
+			 Going through the formal list:
+			    1. Create a function that takes the value env, typ env, exps, accumulator
+			    2. This function should pattern match on A.CallExp formals
+			    3. If empty list return accumulator
+			    4. If 1 element return typed version of expression and put into a list
+			    5. If multiple elements: concat typed version of new exp and call recursively
+			 *)
+			 val typexps = getTypExps(venv, tenv, args, [])
+		     in (checkformals(formals,typexps,pos);
+			 {exp = TAbs.CallExp {func = func, args = typexps}, ty = result}) end)
           | trexp (A.OpExp {left,oper,right,pos}) = (* Missing actual typing at the bottom *)
 	    let val lexp as {exp = _, ty = lty} = trexp left
 		val rexp as {exp = _, ty = rty} = trexp right
@@ -178,7 +205,7 @@ fun transExp (venv, tenv, extra : extra) =
 	    end
           | trexp (A.RecordExp _) = TODO
           | trexp (A.SeqExp (exps)) = 
-	    let val texp = getTypFromExps(venv, tenv, exps, [])
+	    let val texp = getSeqFromExps(venv, tenv, exps, [])
             in
 		texp
 	    end
@@ -229,7 +256,25 @@ fun transExp (venv, tenv, extra : extra) =
     in
         trexp
     end
-and getTypFromExps (venv, tenv, exps, inp) =
+and checkformals (forms, args, pos) = (* TODO *)
+    let val lenf = length forms
+	val lena = length args
+	in if (lenf <> lena)
+	   then (errorFormalMismatch(pos, lenf, lena); ())
+	   else () (* TODO *)
+    end
+and getTypExps (venv, tenv, exps, inp) =
+    case exps of
+	[]          => []
+     |  [(x,p)]     => let val texp = transExp(venv, tenv, {}) x
+		       in
+			   inp @ [texp]
+		       end
+     |  ((x,p)::xs) => let val texp = transExp(venv, tenv, {}) x
+		       in
+			   getTypExps(venv, tenv, xs, inp @ [texp])
+		       end
+and getSeqFromExps (venv, tenv, exps, inp) =
     case exps of
         []      => {exp = TAbs.SeqExp(inp), ty = Ty.UNIT}
      |  [(x,p)] => let val texp as {exp = _, ty = typ} = transExp(venv, tenv, {}) x
@@ -238,7 +283,7 @@ and getTypFromExps (venv, tenv, exps, inp) =
 	       end
      |  ((x,p)::xs) => let val texp as {exp = _, ty = typ} = transExp(venv,tenv, {}) x
 	       in
-		   getTypFromExps(venv, tenv, xs, inp @ [texp])
+		   getSeqFromExps(venv, tenv, xs, inp @ [texp])
 	       end
 and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra : extra) =
              let
