@@ -81,8 +81,11 @@ fun lookupTy tenv sym pos =
     end
 
 fun actualTy (Ty.NAME (s, ty)) pos =
-    Ty.ERROR (* TODO *)
+    let in case !ty of
+	NONE =>  Ty.ERROR
+     |  SOME ty => actualTy ty pos end
   | actualTy t _ = t
+
 
 fun checkInt (ty, pos) =
     case ty
@@ -105,15 +108,6 @@ fun checkAssignable (declared: Ty.ty, assigned: Ty.ty, pos, msg) =
     end
 
 
-fun makeTypedVarDec (idsym, ty, e, esc) =
-                  { name = idsym
-		  , escape = esc
-	          , ty = ty
-	          , init = e} : TAbsyn.vardecldata
-
-  
-
-
 fun tyToString(ty) =
    case ty of
 	Ty.NIL => "nil"
@@ -134,7 +128,6 @@ fun compareTypes(t1,t2, pos) =
        |  (_,_) => (errorTypMis(pos,tyToString(t1),tyToString(t2));())
   else ()				 
 					   
-
        
 
 fun transTy (tenv, t) = Ty.ERROR (* TODO *)
@@ -143,6 +136,7 @@ fun transExp (venv, tenv, extra : extra) =
     let
         (* this is a placeholder value to get started *)
         val TODO = {exp = TAbs.ErrorExp, ty = Ty.ERROR}
+        val TODO_NIL = {exp = TAbs.NilExp, ty = Ty.NIL}		       
 
         fun trexp (A.NilExp) = {exp = TAbs.NilExp, ty = Ty.NIL}
           | trexp (A.VarExp var) = trvar var
@@ -152,17 +146,22 @@ fun transExp (venv, tenv, extra : extra) =
           | trexp (A.CallExp _) = TODO
           | trexp (A.OpExp _) = TODO
           | trexp (A.RecordExp _) = TODO
-          | trexp (A.SeqExp _) = TODO
-          | trexp (A.AssignExp _) = TODO
+          | trexp (A.SeqExp (exps)) = 
+	    let val texp = getTypFromExps(venv, tenv, exps, [])
+            in
+		texp
+	    end
+          | trexp (A.AssignExp {var = v,exp = e, pos = _}) = TODO 
           | trexp (A.IfExp _) = TODO
           | trexp (A.WhileExp _) = TODO
           | trexp (A.ForExp _) = TODO
-          | trexp (A.LetExp {decls,body,pos}) = 
+          | trexp (A.LetExp {decls,body,pos = _}) = 
 	    let
 		val {decls=decls', tenv=tenv', venv=venv'} = transDecs(venv, tenv, decls, {})
-		val {exp,ty} = transExp(venv',tenv', {}) body
+		val bexp as {exp = _, ty = bty} = transExp(venv',tenv', {}) body
                 in
-		    (*{exp = TAbs.LetExp {decls = decls', body = exp}, ty = ty}*) TODO
+		    {exp = TAbs.LetExp {decls = decls', body = bexp},
+					      ty = bty} 
 	        end 
           | trexp (A.ArrayExp _) = TODO
           | trexp _ = {exp = TAbs.ErrorExp, ty = Ty.ERROR}
@@ -173,13 +172,23 @@ fun transExp (venv, tenv, extra : extra) =
     in
         trexp
     end
-
+and getTypFromExps (venv, tenv, exps, inp) =
+    case exps of
+        []      => {exp = TAbs.SeqExp(inp), ty = Ty.UNIT}
+     |  [(x,p)] => let val texp as {exp = _, ty = typ} = transExp(venv,tenv, {}) x
+	       in
+		   {exp = TAbs.SeqExp(inp @ [texp]), ty = typ}
+	       end
+     |  ((x,p)::xs) => let val texp as {exp = _, ty = typ} = transExp(venv,tenv, {}) x
+	       in
+		   getTypFromExps(venv, tenv, xs, inp @ [texp])
+	       end
 and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra : extra) =
              let
                 val {exp, ty} = transExp(venv, tenv, {}) init
               in
                 (if (ty = Ty.NIL) then errorNil(pos,name) else ();
-                  {decl = TAbs.VarDec {name = name, escape = escape, ty = ty, init = {exp = exp,ty = ty}} , tenv = tenv, venv = S.enter(venv, name, E.VarEntry{ty = ty})}) (* TODO *)
+                  {decl = TAbs.VarDec {name = name, escape = escape, ty = ty, init = {exp = exp,ty = ty}} , tenv = tenv, venv = S.enter(venv, name, E.VarEntry{ty = ty})}) 
              end
   | transDec ( venv, tenv
              , A.VarDec {name, escape, typ = SOME (s, pos), init, pos=pos1}, extra) =
@@ -187,11 +196,12 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
 		 val {exp, ty} = transExp(venv, tenv, {}) init
 	     in
 		 case S.look(tenv,s) of
-		     NONE =>     (errorTypUnd(pos,s); {decl = TAbs.VarDec {name = name, escape = escape, ty = ty, init = {exp = exp, ty = ty}}, tenv = tenv, venv = S.enter(venv, name, E.VarEntry{ty = ty})}) (* TODO *)
+		     NONE =>     (errorTypUnd(pos,s);
+				  {decl = TAbs.VarDec {name = name, escape = escape, ty = ty, init = {exp = exp, ty = ty}}, tenv = tenv, venv = S.enter(venv, name, E.VarEntry{ty = ty})}) (* TODO *)
                   |  SOME(typ) =>    
 	              (* 1. Check actual type
 		         2. Compare init type to dec type*)
-		       let val acttyp = actualTy typ pos (* TODO: Implement actualTy*)
+		       let val acttyp = actualTy typ pos 
                          in
 			   (compareTypes(typ,ty,pos);
 			   {decl = TAbs.VarDec{name = name, escape = escape, ty = acttyp, init = {exp = exp, ty = acttyp}}, tenv = tenv, venv = S.enter(venv, name, E.VarEntry{ty = acttyp})})
