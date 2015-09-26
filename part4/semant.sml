@@ -147,9 +147,9 @@ fun compareTypes(t1,t2, pos) =
 					   
 fun typEq(t1,t2,ty,pos) =
   if (t1 <> ty) then
-      (errorTypMis(pos,tyToString(t1),tyToString(ty));())
+      (errorTypMis(pos,tyToString(ty),tyToString(t1));())
   else if (t2 <> ty) then
-      (errorTypMis(pos,tyToString(t2),tyToString(ty));())
+      (errorTypMis(pos,tyToString(ty),tyToString(t2));())
   else ()
       
 
@@ -188,7 +188,7 @@ fun transExp (venv, tenv, extra : extra) =
 	    let val lexp as {exp = _, ty = lty} = trexp left
 		val rexp as {exp = _, ty = rty} = trexp right
   		val bop = case oper of
-			      A.EqOp  => TAbs.EqOp
+			      A.EqOp  => TAbs.EqOp (* TODO: Needs to be able to check types for these *)
 		            | A.NeqOp => TAbs.NeqOp
  		            | A.LtOp => TAbs.LtOp
  			    | A.LeOp => TAbs.LeOp
@@ -199,9 +199,9 @@ fun transExp (venv, tenv, extra : extra) =
 			    | A.TimesOp => TAbs.TimesOp
 			    | A.DivideOp => TAbs.DivideOp
 			    | A.ExponentOp => TAbs.ExponentOp
-	    in (typEq(lty,rty,Ty.INT,pos);
+	    in (typEq(lty,rty,Ty.INT,pos); (* TODO: This only works for all but NEQ and EQ opers*)
 		{exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
-		 ty = lty}) (* <= TODO: Missing actual typing *)
+		 ty = Ty.INT}) (* Int because bool is 0/1 *)
 	    end
           | trexp (A.RecordExp _) = TODO
           | trexp (A.SeqExp (exps)) = 
@@ -221,7 +221,7 @@ fun transExp (venv, tenv, extra : extra) =
 			   | SOME e =>
 			     let val elexp as {exp = exp, ty = ety} = trexp e
 			     in
-				 (compareTypes(ety,thty, pos); SOME elexp)
+				 (compareTypes(thty,ety, pos); SOME elexp)
 			     end
 		 in
 		     {exp = TAbs.IfExp {test = test', thn = thn', els = els'}, ty = thty} 
@@ -231,8 +231,8 @@ fun transExp (venv, tenv, extra : extra) =
 	    let val test' as {exp = _, ty = tty} = trexp test
                 val body' as {exp = _, ty = bty} = trexp body
 	    in
-		(compareTypes(tty, Ty.INT, pos);
-		 compareTypes(bty, Ty.UNIT, pos);
+		(compareTypes(Ty.INT, tty, pos);
+		 compareTypes(Ty.UNIT, bty, pos);
 		 {exp = TAbs.WhileExp {test = test', body = body'}, ty = Ty.UNIT})
 	    end
           | trexp (A.ForExp {var, escape, lo, hi, body, pos}) = TODO
