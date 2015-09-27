@@ -60,10 +60,16 @@ fun errorFunUnd (pos, func) =
 fun errorVarFun (pos, found) =
     err pos ("found var " ^ S.name found ^ " should have been function")
 
+fun errorFoundNeed (pos, found, need, name) =
+    err pos ("found " ^ found ^ " " ^ S.name name ^ " should have been " ^ need)
+
 fun errorFormalMismatch (pos, lenf, lenga) =
     err pos ("found argument list of length " ^
 	     Int.toString(lenf) ^ " but should have been " ^
 	     Int.toString(lenga))
+
+fun errorVarUndef (pos, var) =
+    err pos ("var " ^ S.name var ^ " is undefined")
 
 (* Write additional error messages here *)
 
@@ -170,7 +176,7 @@ fun transExp (venv, tenv, extra : extra) =
           | trexp (A.CallExp {func, args, pos}) =
 	    (case S.look(venv,func) of
 		NONE => (errorFunUnd(pos,func);TODO)
-	      | SOME (E.VarEntry{ty}) => (errorVarFun(pos, func); TODO)
+	      | SOME (E.VarEntry{ty}) => (errorFoundNeed(pos, "function" , "var", func); TODO)
 	      | SOME (E.FunEntry{formals,result}) =>
 		     let (* 1. Go through formals and create a list of types expressions
 			    2. Return TAbs.CallExp with call data of function symb and typed exps
@@ -250,7 +256,14 @@ fun transExp (venv, tenv, extra : extra) =
 	     |  SOME typ => let val act = actualTy(typ) in TODO end )
           | trexp _ = TODO
 
-        and trvar (A.SimpleVar (id, pos)) = TODO
+        and trvar (A.SimpleVar (id, pos)) =
+	    (case S.look(venv, id) of
+		NONE =>
+		(errorVarUndef(pos,id); TODO)
+	      | SOME (E.FunEntry{formals,result}) =>
+		(errorFoundNeed(pos, "function", "var", id);TODO)
+	      | SOME (E.VarEntry{ty}) =>
+		{exp = TAbs.VarExp {var = TAbs.SimpleVar(id), ty = ty}, ty = ty})
           | trvar (A.FieldVar (var, id, pos)) = TODO
           | trvar (A.SubscriptVar (var, exp, pos)) = TODO
     in
@@ -316,6 +329,11 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
 		       end
              end
   | transDec (venv, tenv, A.TypeDec tydecls, extra) =
+    (* Type Declarations:
+      1. 
+
+
+    *)
     {decl = TODO_DECL, tenv = tenv, venv = venv} (* TODO *)
 
   | transDec (venv, tenv, A.FunctionDec fundecls, extra) =
