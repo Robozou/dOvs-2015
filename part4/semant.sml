@@ -142,34 +142,19 @@ fun checkAssignable (declared: Ty.ty, assigned: Ty.ty, pos, msg) =
         () (* TODO *)
     end
 
-
-
-fun tyToString (ty) =
-   case ty of
-	Ty.NIL => "nil"
-      | Ty.INT => "int"
-      | Ty.STRING => "string"
-      | Ty.RECORD(_,_) => "record"
-      | Ty.ARRAY(t,_) => "array of " ^ tyToString(t)
-      | Ty.UNIT => "unit"
-      | Ty.NAME(s,t) => "name of " ^ S.name(s)
-      | Ty.ERROR => "error" 					   
-
-
-
 fun compareTypes(t1,t2, pos) =
   if(t1 <> t2) then
       case (t1,t2) of
 	  (Ty.RECORD(_,_),Ty.NIL) => ()
        |  (Ty.NIL,Ty.RECORD(_,_))  => ()
-       |  (_,_) => (errorTypMis(pos,tyToString(t1),tyToString(t2));())
+       |  (_,_) => (errorTypMis(pos,PT.asString(t1),PT.asString(t2));())
   else ()				 
 					   
 fun typEq(t1,t2,ty,pos) =
   if (t1 <> ty) then
-      (errorTypMis(pos,tyToString(ty),tyToString(t1));())
+      (errorTypMis(pos,PT.asString(ty),PT.asString(t1));())
   else if (t2 <> ty) then
-      (errorTypMis(pos,tyToString(ty),tyToString(t2));())
+      (errorTypMis(pos,PT.asString(ty),PT.asString(t2));())
   else ()
       
 
