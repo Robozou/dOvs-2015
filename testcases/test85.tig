@@ -1,2 +1,3 @@
-let x := 5
-    in end
+let var x := 5
+in
+end

@@ -57,8 +57,6 @@ fun errorTypMis (pos, exp, act) =
 fun errorFunUnd (pos, func) =
     err pos ("function " ^ S.name func ^ " is undefined")
 
-fun errorVarFun (pos, found) =
-    err pos ("found var " ^ S.name found ^ " should have been function")
 
 fun errorFoundNeed (pos, found, need, name) =
     err pos ("found " ^ found ^ " " ^ S.name name ^ " should have been " ^ need)
@@ -93,6 +91,22 @@ fun throw err args testFun test  = testFun test err args
 
 fun makeVarDec (name, escape, ty, init) =
   TAbs.VarDec {name = name, escape = escape, ty = ty, init = init}
+
+fun makeTypDecData (name, ty) =
+  {name = name, ty = ty} : TAbs.tydecldata
+
+fun makeTypDec (decls, init) =
+  case decls of
+      []            =>     TAbs.TypeDec init
+   |  [(n,t,p)]     =>     let val newData = makeTypDecData(n,t)
+			   in
+			       TAbs.TypeDec (init @ [newData])
+			   end
+   | ((n,t,p)::xs)  =>     let val newData = makeTypDecData(n,t)
+			   in
+			       makeTypDec(xs, init @ [newData])
+			   end  
+
 
 fun lookupTy tenv sym pos =
     let
@@ -215,7 +229,13 @@ fun transExp (venv, tenv, extra : extra) =
             in
 		texp
 	    end
-          | trexp (A.AssignExp {var = v,exp = e, pos = _}) = TODO
+          | trexp (A.AssignExp {var = v,exp = e, pos}) =
+	    let val tvar as {exp = tyvar, ty = varty} = trvar v
+		val texp as {exp = tyexp, ty = expty} = trexp e
+            in		    
+		(compareTypes(varty, expty, pos);
+		 TODO)
+	    end
           | trexp (A.IfExp {test,thn,els,pos}) =
 	    let val test' as {exp = testexp, ty = tty} = trexp test
 	        val thn'  as {exp = thenexp, ty = thty} = trexp thn
@@ -241,7 +261,17 @@ fun transExp (venv, tenv, extra : extra) =
 		 compareTypes(Ty.UNIT, bty, pos);
 		 {exp = TAbs.WhileExp {test = test', body = body'}, ty = Ty.UNIT})
 	    end
-          | trexp (A.ForExp {var, escape, lo, hi, body, pos}) = TODO
+          | trexp (A.ForExp {var, escape, lo, hi, body, pos}) =
+	    (* Implicit declaration: HOW?! *)
+	    let val tlo as {exp = _, ty = tylo} = trexp lo
+		val thi as {exp = _, ty = tyhi} = trexp hi
+		val venv' = S.enter(venv, var, E.VarEntry{ty = Ty.INT})
+		val tbody as {exp = _, ty = tybody}  = transExp(venv', tenv, {}) body
+	    in
+		(typEq(tylo,tyhi,Ty.INT,pos);
+		 compareTypes(Ty.UNIT,tybody, pos);
+		 {exp = TAbs.ForExp {var = var, escape = escape, lo = tlo, hi = thi, body = tbody}, ty = Ty.UNIT})
+	    end
           | trexp (A.LetExp {decls,body,pos = _}) = 
 	    let
 		val {decls=decls', tenv=tenv', venv=venv'} = transDecs(venv, tenv, decls, {})
@@ -253,7 +283,10 @@ fun transExp (venv, tenv, extra : extra) =
           | trexp (A.ArrayExp {typ, size, init, pos}) =
 	    (case S.look(tenv,typ) of
 		NONE => (errorTypUnd (pos, typ); TODO)
-	     |  SOME typ => let val act = actualTy(typ) in TODO end )
+	     |  SOME typ => let val act = actualTy(typ)
+			    in
+				TODO
+			    end )
           | trexp _ = TODO
 
         and trvar (A.SimpleVar (id, pos)) =
@@ -275,7 +308,7 @@ and checkformals (forms, args, pos) = (* TODO *)
 	in if (lenf <> lena)
 	   then (errorFormalMismatch(pos, lenf, lena); ())
 	   else () (* TODO *)
-    end
+    end	
 and getTypExps (venv, tenv, exps, inp) =
     case exps of
 	[]          => []
@@ -320,21 +353,28 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
                   |  SOME(typ) =>    
 	              (* 1. Check actual type
 		         2. Compare init type to dec type*)
-		       let val acttyp = actualTy typ pos 
-                         in
-			   (compareTypes(typ,ty,pos);
-			   {decl = makeVarDec(name,escape,ty,{exp = exp, ty = acttyp}),
-			    tenv = tenv,
-			    venv = S.enter(venv, name, E.VarEntry{ty = acttyp})})
-		       end
+		     let val acttyp = actualTy typ pos 
+                     in
+			 (case ty of
+			      Ty.NIL => {decl = makeVarDec(name,escape,ty,{exp = exp, ty = acttyp}),
+					 tenv = tenv,
+					 venv = S.enter(venv, name, E.VarEntry{ty = acttyp})}
+			   |  _  => (compareTypes(typ,ty,pos);
+				     {decl = makeVarDec(name,escape,ty,{exp = exp, ty = acttyp}),
+				      tenv = tenv,
+				      venv = S.enter(venv, name, E.VarEntry{ty = acttyp})}))			     
+		     end
              end
   | transDec (venv, tenv, A.TypeDec tydecls, extra) =
     (* Type Declarations:
-      1. 
-
-
+      1. Function that takes a list of tydecls from absyn.sml
+      2. For each entry in the tydecl list create a TAbs.tydecldata and concat to list
+    
     *)
-    {decl = TODO_DECL, tenv = tenv, venv = venv} (* TODO *)
+    let (*val test = makeTypDec(tydecls,[])*)
+    in
+	{decl = TODO_DECL, tenv = tenv, venv = venv}
+    end(* TODO *)
 
   | transDec (venv, tenv, A.FunctionDec fundecls, extra) =
     {decl = TODO_DECL, tenv = tenv, venv = venv} (* TODO *)

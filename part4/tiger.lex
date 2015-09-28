@@ -43,7 +43,7 @@ fun dopos3 token value yypos yylen = token (value, yypos, yypos + yylen)
 
 letter=[a-zA-Z];
 digits=[0-9]+;
-idchars=[a-zA-Z0-9_]*;
+idchars=[a-zA-Z][a-zA-Z0-9_]*;
 ignore=[\t\ \n]+;
 control=\^[@A-Z\\_\^];
 ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
@@ -76,8 +76,8 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 <INITIAL>"array"                    => (dopos Tokens.ARRAY yypos 5);
 <INITIAL>"type"                     => (dopos Tokens.TYPE yypos 4);
 <INITIAL>":="                       => (dopos Tokens.ASSIGN yypos 2);
-<INITIAL>"or"                       => (dopos Tokens.OR yypos 2);
-<INITIAL>"and"                      => (dopos Tokens.AND yypos 3);
+<INITIAL>"|"                       => (dopos Tokens.OR yypos 2);
+<INITIAL>"&"                      => (dopos Tokens.AND yypos 3);
 <INITIAL>">"                        => (dopos Tokens.GT yypos 1);
 <INITIAL>">="                       => (dopos Tokens.GE yypos 2);
 <INITIAL>"<="                       => (dopos Tokens.LE yypos 2);
@@ -121,17 +121,24 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 <STRING>\n                          => (ErrorMsg.error yypos ("Newlines should be put into ignore escape sequence in string"); continue());
 <STRING>.                           => (currentString := !currentString ^ yytext; continue());
 
-<ESCAPE>"n"                         => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>"n"                         => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING;
+					lineNum := !lineNum+1;
+                                        linePos := yypos :: !linePos;  (* After feedback *)
+                                        continue());
 <ESCAPE>"t"                         => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>"\""                        => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>"\\"                        => (currentString := !currentString ^ "\\" ^ "\\"; YYBEGIN STRING; continue());
 <ESCAPE>{ascii}                     => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>{control}                   => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>{ignore}                    => (YYBEGIN IGNORE; continue());
-<ESCAPE>.                           => (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); continue());
+<ESCAPE>.                           => (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); YYBEGIN STRING; continue());
 
 
-<IGNORE>{ignore}                    => (continue());
+<IGNORE>"\\n"                       => (lineNum := !lineNum+1;
+					linePos := yypos :: !linePos;
+					continue());
+<IGNORE>"\\t"                       => (continue());
+<IGNORE>"\\"{control}               => (continue()); (* After feedback *)
 <IGNORE>"\\"                        => (YYBEGIN STRING; continue());
 <IGNORE>.                           => (ErrorMsg.error yypos ("Invalid character in ignore. No support for " ^ yytext); continue());
 
