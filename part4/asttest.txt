@@ -1,0 +1,679 @@
+../testcases/merge.tig:60.18:function readlist is undefined
+../testcases/merge.tig:61.38:function readlist is undefined
+../testcases/merge.tig:63.5:function printlist is undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | VarDec(buffer,true,STRING,
+  |   (STRING, CallExp(getchar,[]))),
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | VarDec(list1,true,ERROR,
+  |   (ERROR, ErrorExp)),
+  | VarDec(list2,true,ERROR,
+  |   (ERROR, SeqExp[
+  |   |   (UNIT, ErrorExp),
+  |   |   (ERROR, ErrorExp)]))],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/queens.tig:7.16:type  intArray undefined
+../testcases/queens.tig:8.16:type  intArray undefined
+../testcases/queens.tig:9.18:type  intArray undefined
+../testcases/queens.tig:10.18:type  intArray undefined
+../testcases/queens.tig:31.5:function try is undefined
+(ERROR, LetExp([
+  | VarDec(N,true,INT,
+  |   (INT, IntExp(8))),
+  | TypeDec[],
+  | VarDec(row,true,ERROR,
+  |   (ERROR, ErrorExp)),
+  | VarDec(col,true,ERROR,
+  |   (ERROR, ErrorExp)),
+  | VarDec(diag1,true,ERROR,
+  |   (ERROR, ErrorExp)),
+  | VarDec(diag2,true,ERROR,
+  |   (ERROR, ErrorExp)),
+  | TypeDec[],
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test01.tig:4.26:type  arrtype undefined
+../testcases/test01.tig:4.15:type  arrtype undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | VarDec(arr1,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (ERROR, SeqExp[
+  |   | (ERROR, VarExp(
+  |   |   | SimpleVar(arr1, ERROR)))])))
+../testcases/test02.tig:6.26:type  arrtype undefined
+../testcases/test02.tig:6.15:type  arrtype undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | TypeDec[],
+  | VarDec(arr1,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (ERROR, SeqExp[
+  |   | (ERROR, VarExp(
+  |   |   | SimpleVar(arr1, ERROR)))])))
+../testcases/test03.tig:4.15:type  rectype undefined
+../testcases/test03.tig:6.5:type mismatch, expected ERROR but found STRING
+(ERROR, LetExp([
+  | TypeDec[],
+  | VarDec(rec1,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (ERROR, SeqExp[
+  |   | (UNIT, ErrorExp),
+  |   | (ERROR, VarExp(
+  |   |   | SimpleVar(rec1, ERROR)))])))
+../testcases/test04.tig:7.5:function nfactor is undefined
+(ERROR, LetExp([
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test05.tig:10.14:type  intlist undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | VarDec(lis,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (ERROR, SeqExp[
+  |   | (ERROR, VarExp(
+  |   |   | SimpleVar(lis, ERROR)))])))
+../testcases/test06.tig:9.5:function do_nothing1 is undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test07.tig:9.5:function do_nothing1 is undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+(INT, IfExp(
+  | (INT, SeqExp[
+  |   | (INT, OpExp(GtOp,
+  |   |   | (INT, IntExp(10)),
+  |   |   | (INT, IntExp(20))))]),
+  | (INT, IntExp(30)),
+  | (INT, IntExp(40))))
+../testcases/test09.tig:2.1:type mismatch, expected INT but found STRING
+(INT, IfExp(
+  | (INT, SeqExp[
+  |   | (INT, OpExp(GtOp,
+  |   |   | (INT, IntExp(5)),
+  |   |   | (INT, IntExp(4))))]),
+  | (INT, IntExp(13)),
+  | (STRING, StringExp(" "))))
+../testcases/test10.tig:2.1:type mismatch, expected UNIT but found INT
+(UNIT, WhileExp(
+  | (INT, SeqExp[
+  |   | (INT, OpExp(GtOp,
+  |   |   | (INT, IntExp(10)),
+  |   |   | (INT, IntExp(5))))]),
+  | (INT, OpExp(PlusOp,
+  |   | (INT, IntExp(5)),
+  |   | (INT, IntExp(6))))))
+../testcases/test11.tig:2.1:type mismatch, expected INT but found STRING
+(UNIT, ForExp(i,true,
+  | (INT, IntExp(10)),
+  | (STRING, StringExp(" ")),
+  | (UNIT, ErrorExp)))
+(UNIT, LetExp([
+  | VarDec(a,true,INT,
+  |   (INT, IntExp(0)))],
+  | (UNIT, SeqExp[
+  |   | (UNIT, ForExp(i,true,
+  |   |   | (INT, IntExp(0)),
+  |   |   | (INT, IntExp(100)),
+  |   |   | (UNIT, SeqExp[
+  |   |   |   | (UNIT, ErrorExp),
+  |   |   |   | (UNIT, SeqExp[])])))])))
+../testcases/test13.tig:2.1:type mismatch, expected INT but found STRING
+(INT, OpExp(GtOp,
+  | (INT, IntExp(3)),
+  | (STRING, StringExp("df"))))
+../testcases/test14.tig:7.16:type  arrtype undefined
+../testcases/test14.tig:9.8:type mismatch, expected INT but found ERROR
+(INT, LetExp([
+  | TypeDec[],
+  | TypeDec[],
+  | VarDec(rec,true,ERROR,
+  |   (ERROR, ErrorExp)),
+  | VarDec(arr,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (INT, SeqExp[
+  |   | (INT, IfExp(
+  |   |   | (INT, OpExp(NeqOp,
+  |   |   |   | (ERROR, VarExp(
+  |   |   |   |   | SimpleVar(rec, ERROR))),
+  |   |   |   | (ERROR, VarExp(
+  |   |   |   |   | SimpleVar(arr, ERROR))))),
+  |   |   | (INT, IntExp(3)),
+  |   |   | (INT, IntExp(4))))])))
+../testcases/test15.tig:2.1:type mismatch, expected UNIT but found INT
+(INT, IfExp(
+  | (INT, IntExp(20)),
+  | (INT, IntExp(3))))
+(STRING, LetExp([
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[]],
+  | (STRING, SeqExp[
+  |   | (STRING, StringExp(""))])))
+(INT, LetExp([
+  | TypeDec[],
+  | VarDec(d,true,INT,
+  |   (INT, IntExp(0))),
+  | TypeDec[]],
+  | (INT, SeqExp[
+  |   | (INT, VarExp(
+  |   |   | SimpleVar(d, INT)))])))
+../testcases/test18.tig:11.5:function do_nothing1 is undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | VarDec(d,true,INT,
+  |   (INT, IntExp(0))),
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test19.tig:10.5:function do_nothing1 is undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test20.tig:2.18:var i is undefined
+../testcases/test20.tig:2.18:type mismatch, expected INT but found ERROR
+(UNIT, WhileExp(
+  | (INT, OpExp(GtOp,
+  |   | (INT, IntExp(10)),
+  |   | (INT, IntExp(5)))),
+  | (UNIT, SeqExp[
+  |   | (INT, OpExp(PlusOp,
+  |   |   | (ERROR, ErrorExp),
+  |   |   | (INT, IntExp(1)))),
+  |   | (UNIT, SeqExp[])])))
+../testcases/test21.tig:7.5:function nfactor is undefined
+(ERROR, LetExp([
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test22.tig:6.5:type mismatch, expected ERROR but found STRING
+(UNIT, LetExp([
+  | TypeDec[],
+  | VarDec(rec1,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (UNIT, SeqExp[
+  |   | (UNIT, ErrorExp)])))
+../testcases/test23.tig:6.5:type mismatch, expected ERROR but found INT
+../testcases/test23.tig:7.5:type mismatch, expected ERROR but found STRING
+(UNIT, LetExp([
+  | TypeDec[],
+  | VarDec(rec1,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (UNIT, SeqExp[
+  |   | (UNIT, ErrorExp),
+  |   | (UNIT, ErrorExp)])))
+(ERROR, LetExp([
+  | VarDec(d,true,INT,
+  |   (INT, IntExp(0)))],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+(ERROR, LetExp([
+  | VarDec(d,true,INT,
+  |   (INT, IntExp(0)))],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test26.tig:2.1:type mismatch, expected INT but found STRING
+(INT, OpExp(PlusOp,
+  | (INT, IntExp(3)),
+  | (STRING, StringExp("whatever"))))
+../testcases/test27.tig:7.5:function g is undefined
+(ERROR, LetExp([
+  | VarDec(a,true,INT,
+  |   (INT, IntExp(0))),
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test28.tig:6.15:type  rectype1 undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | TypeDec[],
+  | VarDec(rec1,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (ERROR, SeqExp[
+  |   | (ERROR, VarExp(
+  |   |   | SimpleVar(rec1, ERROR)))])))
+../testcases/test29.tig:6.27:type  arrtype2 undefined
+../testcases/test29.tig:6.15:type  arrtype1 undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | TypeDec[],
+  | VarDec(arr1,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (ERROR, SeqExp[
+  |   | (ERROR, VarExp(
+  |   |   | SimpleVar(arr1, ERROR)))])))
+../testcases/test30.tig:6.20:type  b undefined
+../testcases/test30.tig:6.15:type  a undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | TypeDec[],
+  | VarDec(arr1,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test31.tig:3.12:type mismatch, expected INT but found STRING
+(INT, LetExp([
+  | VarDec(a,true,STRING,
+  |   (INT, StringExp(" ")))],
+  | (INT, SeqExp[
+  |   | (INT, VarExp(
+  |   |   | SimpleVar(a, INT)))])))
+../testcases/test32.tig:4.14:type  arrayty undefined
+(INT, LetExp([
+  | TypeDec[],
+  | VarDec(a,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (INT, SeqExp[
+  |   | (INT, IntExp(0))])))
+(INT, LetExp([
+  | VarDec(a,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (INT, SeqExp[
+  |   | (INT, IntExp(0))])))
+../testcases/test34.tig:5.5:function g is undefined
+(ERROR, LetExp([
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test35.tig:5.5:function g is undefined
+(ERROR, LetExp([
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test36.tig:5.5:function g is undefined
+(ERROR, LetExp([
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+(STRING, LetExp([
+  | VarDec(a,true,INT,
+  |   (INT, IntExp(0))),
+  | VarDec(a,true,STRING,
+  |   (STRING, StringExp(" ")))],
+  | (STRING, SeqExp[
+  |   | (STRING, VarExp(
+  |   |   | SimpleVar(a, STRING)))])))
+(INT, LetExp([
+  | TypeDec[],
+  | TypeDec[]],
+  | (INT, SeqExp[
+  |   | (INT, IntExp(0))])))
+(INT, LetExp([
+  | TypeDec[],
+  | TypeDec[]],
+  | (INT, SeqExp[
+  |   | (INT, IntExp(0))])))
+../testcases/test40.tig:5.5:function g is undefined
+(ERROR, LetExp([
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+(INT, LetExp([
+  | TypeDec[]],
+  | (INT, SeqExp[
+  |   | (INT, LetExp([
+  |   |   | TypeDec[]],
+  |   |   | (INT, SeqExp[
+  |   |   |   | (INT, IntExp(0))])))])))
+../testcases/test42.tig:9.17:type  arrtype1 undefined
+../testcases/test42.tig:10.17:type  arrtype2 undefined
+../testcases/test42.tig:12.27:type  arrtype3 undefined
+../testcases/test42.tig:12.15:type  arrtype3 undefined
+../testcases/test42.tig:17.5:type mismatch, expected ERROR but found INT
+../testcases/test42.tig:18.5:type mismatch, expected ERROR but found INT
+../testcases/test42.tig:19.5:type mismatch, expected ERROR but found STRING
+../testcases/test42.tig:20.5:type mismatch, expected ERROR but found INT
+../testcases/test42.tig:21.5:type mismatch, expected ERROR but found STRING
+../testcases/test42.tig:23.5:type mismatch, expected ERROR but found STRING
+../testcases/test42.tig:24.5:type mismatch, expected ERROR but found INT
+../testcases/test42.tig:25.5:type mismatch, expected ERROR but found INT
+(UNIT, LetExp([
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | VarDec(arr1,true,ERROR,
+  |   (ERROR, ErrorExp)),
+  | VarDec(arr2,true,ERROR,
+  |   (ERROR, ErrorExp)),
+  | VarDec(arr3,true,ERROR,
+  |   (ERROR, ErrorExp)),
+  | VarDec(rec1,true,ERROR,
+  |   (ERROR, ErrorExp)),
+  | VarDec(rec2,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (UNIT, SeqExp[
+  |   | (UNIT, ErrorExp),
+  |   | (UNIT, ErrorExp),
+  |   | (UNIT, ErrorExp),
+  |   | (UNIT, ErrorExp),
+  |   | (UNIT, ErrorExp),
+  |   | (UNIT, ErrorExp),
+  |   | (UNIT, ErrorExp),
+  |   | (UNIT, ErrorExp)])))
+../testcases/test43.tig:5.5:type mismatch, expected INT but found UNIT
+(INT, LetExp([
+  | VarDec(a,true,UNIT,
+  |   (UNIT, SeqExp[]))],
+  | (INT, SeqExp[
+  |   | (INT, OpExp(PlusOp,
+  |   |   | (UNIT, VarExp(
+  |   |   |   | SimpleVar(a, UNIT))),
+  |   |   | (INT, IntExp(3))))])))
+../testcases/test44.tig:4.12:type  rectype undefined
+(UNIT, LetExp([
+  | TypeDec[],
+  | VarDec(b,true,NIL,
+  |   (NIL, NilExp))],
+  | (UNIT, SeqExp[
+  |   | (UNIT, ErrorExp)])))
+../testcases/test45.tig:5.5:need to give a a type when assigning the value nil
+(NIL, LetExp([
+  | TypeDec[],
+  | VarDec(a,true,NIL,
+  |   (NIL, NilExp))],
+  | (NIL, SeqExp[
+  |   | (NIL, VarExp(
+  |   |   | SimpleVar(a, NIL)))])))
+../testcases/test46.tig:4.12:type  rectype undefined
+../testcases/test46.tig:6.5:type mismatch, expected INT but found NIL
+../testcases/test46.tig:7.5:type mismatch, expected INT but found NIL
+(INT, LetExp([
+  | TypeDec[],
+  | VarDec(b,true,NIL,
+  |   (NIL, NilExp))],
+  | (INT, SeqExp[
+  |   | (INT, OpExp(EqOp,
+  |   |   | (NIL, VarExp(
+  |   |   |   | SimpleVar(b, NIL))),
+  |   |   | (NIL, NilExp))),
+  |   | (INT, OpExp(NeqOp,
+  |   |   | (NIL, VarExp(
+  |   |   |   | SimpleVar(b, NIL))),
+  |   |   | (NIL, NilExp)))])))
+(INT, LetExp([
+  | TypeDec[],
+  | VarDec(b,true,INT,
+  |   (INT, IntExp(4))),
+  | TypeDec[]],
+  | (INT, SeqExp[
+  |   | (INT, IntExp(0))])))
+(INT, LetExp([
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[]],
+  | (INT, SeqExp[
+  |   | (INT, IntExp(0))])))
+../testcases/test49.tig:5.22:syntax error: inserting  PLUS
+../testcases/test49.tig:5.14:var rectype is undefined
+../testcases/test49.tig:5.14:type mismatch, expected INT but found ERROR
+(INT, LetExp([
+  | TypeDec[],
+  | VarDec(a,true,INT,
+  |   (INT, OpExp(PlusOp,
+  |   |   (ERROR, ErrorExp),
+  |   |   (NIL, NilExp))))],
+  | (INT, SeqExp[
+  |   | (INT, VarExp(
+  |   |   | SimpleVar(a, INT)))])))
+(UNIT, ForExp(i,true,
+  | (INT, IntExp(0)),
+  | (INT, IntExp(100)),
+  | (UNIT, SeqExp[
+  |   | (UNIT, ErrorExp),
+  |   | (UNIT, SeqExp[])])))
+../testcases/test51.tig:4.15:type  rectype undefined
+../testcases/test51.tig:6.5:type mismatch, expected ERROR but found STRING
+(ERROR, LetExp([
+  | TypeDec[],
+  | VarDec(rec1,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (ERROR, SeqExp[
+  |   | (UNIT, ErrorExp),
+  |   | (ERROR, VarExp(
+  |   |   | SimpleVar(rec1, ERROR)))])))
+../testcases/test52.tig:4.26:type  arrtype undefined
+../testcases/test52.tig:4.15:type  arrtype undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | VarDec(arr1,true,ERROR,
+  |   (ERROR, ErrorExp))],
+  | (ERROR, SeqExp[
+  |   | (ERROR, VarExp(
+  |   |   | SimpleVar(arr1, ERROR)))])))
+../testcases/test53.tig:5.5:function f is undefined
+(ERROR, LetExp([
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+(INT, OpExp(PlusOp,
+  | (INT, IntExp(2)),
+  | (INT, IntExp(2))))
+(INT, OpExp(TimesOp,
+  | (INT, IntExp(3)),
+  | (INT, IntExp(3))))
+(INT, OpExp(PlusOp,
+  | (INT, OpExp(PlusOp,
+  |   | (INT, IntExp(2)),
+  |   | (INT, IntExp(3)))),
+  | (INT, IntExp(4))))
+../testcases/test57.tig:6.21:function f is undefined
+../testcases/test57.tig:6.14:type mismatch, expected INT but found ERROR
+../testcases/test57.tig:7.20:function f is undefined
+../testcases/test57.tig:7.13:type mismatch, expected INT but found ERROR
+(INT, LetExp([
+  | TypeDec[],
+  | VarDec(f10,true,ERROR,
+  |   (INT, ErrorExp)),
+  | VarDec(f0,true,ERROR,
+  |   (INT, ErrorExp))],
+  | (INT, SeqExp[
+  |   | (INT, OpExp(PlusOp,
+  |   |   | (INT, VarExp(
+  |   |   |   | SimpleVar(f10, INT))),
+  |   |   | (INT, VarExp(
+  |   |   |   | SimpleVar(f0, INT)))))])))
+(UNIT, CallExp(print,[
+  | (STRING, StringExp("."))]))
+../testcases/test59.tig:6.5:function f is undefined
+(INT, LetExp([
+  | VarDec(x,true,INT,
+  |   (INT, IntExp(0))),
+  | TypeDec[]],
+  | (INT, SeqExp[
+  |   | (ERROR, ErrorExp),
+  |   | (INT, VarExp(
+  |   |   | SimpleVar(x, INT)))])))
+../testcases/test60.tig:2.10:type mismatch, expected INT but found STRING
+(INT, OpExp(NeqOp,
+  | (STRING, StringExp("whatever")),
+  | (STRING, StringExp("whateverelse"))))
+../testcases/test61.tig:5.5:type mismatch, expected INT but found STRING
+(INT, LetExp([
+  | VarDec(s,true,STRING,
+  |   (STRING, StringExp("whatever")))],
+  | (INT, SeqExp[
+  |   | (INT, OpExp(GtOp,
+  |   |   | (STRING, VarExp(
+  |   |   |   | SimpleVar(s, STRING))),
+  |   |   | (STRING, StringExp("else"))))])))
+../testcases/test62.tig:6.5:function compare is undefined
+(ERROR, LetExp([
+  | VarDec(s,true,STRING,
+  |   (STRING, StringExp("whatever"))),
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test63.tig:6.5:function isdigit is undefined
+(ERROR, LetExp([
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test64.tig:8.5:function isdigit is undefined
+(ERROR, LetExp([
+  | VarDec(buffer,true,STRING,
+  |   (STRING, StringExp("5"))),
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+(INT, OpExp(GeOp,
+  | (INT, CallExp(ord,[
+  |   | (STRING, StringExp("1"))])),
+  | (INT, CallExp(ord,[
+  |   | (STRING, StringExp("0"))]))))
+(INT, OpExp(GeOp,
+  | (INT, IntExp(1)),
+  | (INT, IntExp(0))))
+(INT, OpExp(LtOp,
+  | (INT, IntExp(1)),
+  | (INT, IntExp(2))))
+(UNIT, LetExp([
+  | VarDec(x,true,INT,
+  |   (INT, IntExp(1))),
+  | VarDec(y,true,INT,
+  |   (INT, IntExp(2)))],
+  | (UNIT, SeqExp[
+  |   | (UNIT, ErrorExp)])))
+(INT, CallExp(ord,[
+  | (STRING, StringExp("0"))]))
+(STRING, SeqExp[
+  | (INT, IntExp(0)),
+  | (STRING, CallExp(getchar,[]))])
+(INT, LetExp([
+  | VarDec(x,true,STRING,
+  |   (STRING, SeqExp[
+  |   |   (INT, IntExp(0)),
+  |   |   (STRING, CallExp(getchar,[]))]))],
+  | (INT, SeqExp[
+  |   | (INT, IntExp(0))])))
+../testcases/test72.tig:260.5:function TstArith is undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test73.tig:6.5:function chk is undefined
+../testcases/test73.tig:7.5:function chk is undefined
+(ERROR, LetExp([
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp),
+  |   | (ERROR, ErrorExp)])))
+(INT, OpExp(TimesOp,
+  | (INT, IntExp(4)),
+  | (INT, SeqExp[
+  |   | (INT, OpExp(TimesOp,
+  |   |   | (INT, IntExp(3)),
+  |   |   | (INT, IntExp(2))))])))
+../testcases/test75.tig:17.5:function mod is undefined
+(ERROR, LetExp([
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test76.tig:93.5:function TstBool is undefined
+(ERROR, LetExp([
+  | TypeDec[],
+  | VarDec(true,true,INT,
+  |   (INT, IntExp(1))),
+  | VarDec(false,true,INT,
+  |   (INT, IntExp(0))),
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[],
+  | TypeDec[]],
+  | (ERROR, SeqExp[
+  |   | (ERROR, ErrorExp)])))
+../testcases/test77.tig:2.8:syntax error: replacing  COMMA with  SEMICOLON
+../testcases/test77.tig:2.1:function dec is undefined
+(ERROR, ErrorExp)
+../testcases/test78.tig:3.18:syntax error: deleting  ID
+(UNIT, LetExp([
+  | TypeDec[]],
+  | (UNIT, SeqExp[])))
+../testcases/test79.tig:2.5:syntax error: inserting  VAR
+../testcases/test79.tig:2.11:type  x undefined
+(UNIT, LetExp([
+  | VarDec(kek,true,INT,
+  |   (INT, IntExp(5)))],
+  | (UNIT, SeqExp[])))
+../testcases/test80.tig:2.32:syntax error: replacing  ELSE with  PLUS
+(INT, IfExp(
+  | (INT, SeqExp[
+  |   | (INT, OpExp(GtOp,
+  |   |   | (INT, IntExp(10)),
+  |   |   | (INT, IntExp(20))))]),
+  | (INT, IfExp(
+  |   | (INT, IntExp(20)),
+  |   | (INT, OpExp(PlusOp,
+  |   |   | (INT, IntExp(2)),
+  |   |   | (INT, IntExp(3)))),
+  |   | (INT, IntExp(4)))),
+  | (INT, IntExp(40))))
+../testcases/test81.tig:2.13:syntax error found at EOF
+(INT, IntExp(3))
+(STRING, StringExp("I'm a cool doctor!"))
+../testcases/test84.tig:1.1:syntax error found at EOF
+(UNIT, LetExp([
+  | VarDec(x,true,INT,
+  |   (INT, IntExp(5)))],
+  | (UNIT, SeqExp[])))
+(INT, IfExp(
+  | (INT, IntExp(2)),
+  | (INT, IntExp(3)),
+  | (INT, IntExp(4))))
+(UNIT, LetExp([
+  | VarDec(v,true,INT,
+  |   (INT, IntExp(6)))],
+  | (UNIT, SeqExp[
+  |   | (UNIT, CallExp(print,[
+  |   |   | (INT, VarExp(
+  |   |   |   | SimpleVar(v, INT)))])),
+  |   | (UNIT, LetExp([
+  |   |   | VarDec(v,true,INT,
+  |   |   |   (INT, IntExp(7)))],
+  |   |   | (UNIT, SeqExp[
+  |   |   |   | (UNIT, CallExp(print,[
+  |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   | SimpleVar(v, INT)))]))]))),
+  |   | (UNIT, CallExp(print,[
+  |   |   | (INT, VarExp(
+  |   |   |   | SimpleVar(v, INT)))])),
+  |   | (UNIT, LetExp([
+  |   |   | VarDec(v,true,INT,
+  |   |   |   (INT, IntExp(8)))],
+  |   |   | (UNIT, SeqExp[
+  |   |   |   | (UNIT, CallExp(print,[
+  |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   | SimpleVar(v, INT)))]))]))),
+  |   | (UNIT, CallExp(print,[
+  |   |   | (INT, VarExp(
+  |   |   |   | SimpleVar(v, INT)))]))])))
+(UNIT, LetExp([
+  | VarDec(x,true,NIL,
+  |   (INT, NilExp))],
+  | (UNIT, SeqExp[
+  |   | (UNIT, ErrorExp)])))

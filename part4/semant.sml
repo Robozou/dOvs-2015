@@ -116,9 +116,13 @@ fun lookupTy tenv sym pos =
     end
 
 fun actualTy (Ty.NAME (s, ty)) pos =
-    let in case !ty of
+    let
+    in
+	case !ty of
 	NONE =>  Ty.ERROR
-     |  SOME ty => actualTy ty pos end
+     |  SOME ty => actualTy ty pos
+    end
+  | actualTy (Ty.ARRAY(t,u)) pos = Ty.ARRAY(actualTy(t) pos,u)
   | actualTy t _ = t
 
 
@@ -149,7 +153,7 @@ fun compareTypes(t1,t2, pos) =
        |  (Ty.NIL,Ty.RECORD(_,_))  => ()
        |  (_,_) => (errorTypMis(pos,PT.asString(t1),PT.asString(t2));())
   else ()				 
-					   
+
 fun typEq(t1,t2,ty,pos) =
   if (t1 <> ty) then
       (errorTypMis(pos,PT.asString(ty),PT.asString(t1));())
@@ -157,8 +161,6 @@ fun typEq(t1,t2,ty,pos) =
       (errorTypMis(pos,PT.asString(ty),PT.asString(t2));())
   else ()
       
-
-
 fun transTy (tenv, t) = Ty.ERROR (* TODO *)
 
 fun transExp (venv, tenv, extra : extra) =
@@ -208,7 +210,7 @@ fun transExp (venv, tenv, extra : extra) =
 		{exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
 		 ty = Ty.INT}) (* Int because bool is 0/1 *)
 	    end
-          | trexp (A.RecordExp _) = TODO
+          | trexp (A.RecordExp {fields,typ,pos}) = TODO
           | trexp (A.SeqExp (exps)) = 
 	    let val texp = getSeqFromExps(venv, tenv, exps, [])
             in
@@ -219,7 +221,7 @@ fun transExp (venv, tenv, extra : extra) =
 		val texp as {exp = tyexp, ty = expty} = trexp e
             in		    
 		(compareTypes(varty, expty, pos);
-		 TODO)
+		 {exp = TAbs.ErrorExp, ty = Ty.UNIT})
 	    end
           | trexp (A.IfExp {test,thn,els,pos}) =
 	    let val test' as {exp = testexp, ty = tty} = trexp test
@@ -268,9 +270,18 @@ fun transExp (venv, tenv, extra : extra) =
           | trexp (A.ArrayExp {typ, size, init, pos}) =
 	    (case S.look(tenv,typ) of
 		NONE => (errorTypUnd (pos, typ); TODO)
-	     |  SOME typ => let val act = actualTy(typ)
+	     |  SOME typ => let val act = actualTy(typ) pos
 			    in
-				TODO
+				case act of
+				    Ty.ARRAY(att,u) =>
+				    let val tinit as {exp = inexp, ty = inty} = trexp init
+					val tsize as {exp = sizexp, ty = sizty} = trexp size
+				    in
+					(compareTypes(Ty.INT, sizty, pos);
+					 compareTypes(att, inty, pos);
+					 {exp = TAbs.ArrayExp {size = tsize, init = tinit}, ty = att})
+				    end
+				 | t => (errorTypMis(pos, PT.asString(act), "array"); TODO)
 			    end )
           | trexp _ = TODO
 
