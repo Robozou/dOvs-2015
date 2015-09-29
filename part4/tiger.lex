@@ -25,8 +25,8 @@ fun eof () =
 
 fun s2i t pos =
     let
-        val opti = (Int.fromString t) 
-            handle Overflow => 
+        val opti = (Int.fromString t)
+            handle Overflow =>
                    (ErrorMsg.error pos "Integer too large"; SOME 0)
         fun s2i_aux NONE = (ErrorMsg.error pos "Ill-formed integer"; 0)
           | s2i_aux (SOME n) = n
@@ -138,7 +138,8 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 					linePos := yypos :: !linePos;
 					continue());
 <IGNORE>"\\t"                       => (continue());
-<IGNORE>"\\"{control}               => (continue()); (* After feedback *)
+<IGNORE>"\\f"                       => (continue());
+<IGNORE>"\\"{control}               => (continue() (* WHAT DO YOU WANT CASPER? *) ); 
 <IGNORE>"\\"                        => (YYBEGIN STRING; continue());
 <IGNORE>.                           => (ErrorMsg.error yypos ("Invalid character in ignore. No support for " ^ yytext); continue());
 
@@ -149,4 +150,3 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 
 .                                   => (ErrorMsg.error yypos ("illegal char " ^ yytext);
                                         continue());
-
