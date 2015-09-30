@@ -159,11 +159,11 @@ and recList(fields, init, tenv) =
     case fields of [] => init
                 |   [{name, escape, typ = (s,p), pos}] => (case S.look(tenv,s) of
                                                                NONE => (errorTypUnd(pos,s);init)
-                                                             | SOME(t) => [(name,t)] @ init)
+                                                             | SOME(t) => init @ [(name,t)])
                 |   ({name, escape, typ = (s,p), pos}::xs) => (case S.look(tenv,s) of
 								   NONE => (errorTypUnd(pos,s);init)
-								 | SOME(t) => recList(xs,[(name,t)] @
-											 init,tenv))
+								 | SOME(t) => recList(xs,init @[(name,t)]
+										      ,tenv))
 fun transExp (venv, tenv, extra : extra) =
   let
       (* this is a placeholder value to get started *)
