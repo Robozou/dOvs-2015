@@ -283,7 +283,7 @@ fun transExp (venv, tenv, extra : extra) =
 				   in
 				       (compareTypes(Ty.INT, sizty, pos);
 					compareTypes(att, inty, pos);
-					{exp = TAbs.ArrayExp {size = tsize, init = tinit}, ty = att})
+					{exp = TAbs.ArrayExp {size = tsize, init = tinit}, ty = act})
 				   end
 				 | t => (errorTypMis(pos, PT.asString(act), "array"); TODO)
 			   end )
