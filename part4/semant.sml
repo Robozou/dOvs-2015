@@ -190,15 +190,14 @@ fun transExp (venv, tenv, extra : extra) =
 			 *)
 			 val typexps = getTypExps(venv, tenv, args, [])
 		     in (checkformals(formals,typexps,pos);
-			 {exp = TAbs.CallExp {func = func, args = typexps}, ty = result}) end)
-
+			 {exp = TAbs.CallExp {func = func, args = typexps}, ty = actualTy result pos}) end)
           | trexp (A.OpExp {left,oper,right,pos}) =
 	    let val lexp as {exp = _, ty = lty} = trexp left
 		val rexp as {exp = _, ty = rty} = trexp right
   		val bop = case oper of
 			      A.EqOp  => TAbs.EqOp
-		      | A.NeqOp => TAbs.NeqOp
- 		      | A.LtOp => TAbs.LtOp
+			    | A.NeqOp => TAbs.NeqOp
+ 			    | A.LtOp => TAbs.LtOp
  			    | A.LeOp => TAbs.LeOp
 			    | A.GtOp => TAbs.GtOp
 			    | A.GeOp => TAbs.GeOp
@@ -208,11 +207,11 @@ fun transExp (venv, tenv, extra : extra) =
 			    | A.DivideOp => TAbs.DivideOp
 			    | A.ExponentOp => TAbs.ExponentOp
 	    in  (if (bop = TAbs.EqOp orelse bop = TAbs.NeqOp)
-              then (compareTypes (actualTy lty pos, actualTy rty pos,pos);
-                   {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp}, ty = Ty.INT})
-           else (typEq(lty,rty,Ty.INT,pos);
-		{exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
-		 ty = Ty.INT})) (* Int because bool is 0/1 *)
+                 then (compareTypes (actualTy lty pos, actualTy rty pos,pos);
+                       {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp}, ty = Ty.INT})
+		 else (typEq(lty,rty,Ty.INT,pos);
+		       {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
+			ty = Ty.INT})) (* Int because bool is 0/1 *)
 	    end
           | trexp (A.RecordExp {fields,typ,pos}) = TODO
           | trexp (A.SeqExp (exps)) =
@@ -224,7 +223,7 @@ fun transExp (venv, tenv, extra : extra) =
 	    let val tvar as {exp = tyvar, ty = varty} = trvar v
 		val texp as {exp = tyexp, ty = expty} = trexp e
             in
-		(compareTypes(varty, expty, pos);
+		(compareTypes(actualTy varty pos, actualTy expty pos, pos);
 		 {exp = TAbs.ErrorExp, ty = Ty.UNIT})
 	    end
           | trexp (A.IfExp {test,thn,els,pos}) =
@@ -234,11 +233,11 @@ fun transExp (venv, tenv, extra : extra) =
 		(compareTypes(tty,Ty.INT,pos);
 		 let val els' =
 			 case els of
-			     NONE => (compareTypes(Ty.UNIT,thty,pos); NONE)
+			     NONE => (compareTypes(Ty.UNIT, actualTy thty pos,pos); NONE)
 			   | SOME e =>
 			     let val elexp as {exp = exp, ty = ety} = trexp e
 			     in
-				 (compareTypes(thty,ety, pos); SOME elexp)
+				 (compareTypes(actualTy thty pos, actualTy ety pos, pos); SOME elexp)
 			     end
 		 in
 		     {exp = TAbs.IfExp {test = test', thn = thn', els = els'}, ty = thty}
@@ -367,21 +366,20 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
 			      Ty.NIL => {decl = makeVarDec(name,escape,ty,{exp = exp, ty = acttyp}),
 					 tenv = tenv,
 					 venv = S.enter(venv, name, E.VarEntry{ty = acttyp})}
-			   |  _  => (compareTypes(typ,ty,pos);
-				     {decl = makeVarDec(name,escape,ty,{exp = exp, ty = acttyp}),
+			   |  _  => (compareTypes(acttyp,actualTy ty pos,pos);
+				     {decl = makeVarDec(name,escape, actualTy ty pos,{exp = exp, ty = acttyp}),
 				      tenv = tenv,
 				      venv = S.enter(venv, name, E.VarEntry{ty = acttyp})}))
 		     end
              end
   | transDec (venv, tenv, A.TypeDec tydecls, extra) =
     (* Type Declarations:
-      1. Function that takes a list of tydecls from absyn.sml
-      2. For each entry in the tydecl list create a TAbs.tydecldata and concat to list
-
+       1. Check for duplicate types in makeTypDec
+       2. Check for cyclic definition (i.e. a -> b -> c -> a is illegal)
     *)
-    let val test = makeTypDec(tydecls ,[] ,tenv, venv)
+    let val tydecs = makeTypDec(tydecls ,[] ,tenv, venv)
     in
-	test
+	tydecs
     end(* TODO *)
 
   | transDec (venv, tenv, A.FunctionDec fundecls, extra) =
