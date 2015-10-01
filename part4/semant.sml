@@ -28,7 +28,7 @@ structure TAbs = TAbsyn
    It should become obvious when you actually need it, what to do.
    Alternatively, you have to add extra parameters to your functions *)
 
-type extra = {}
+type extra = {break : bool}
 
 (* placehloder for declarations, the final code should compile without this *)
 val TODO_DECL = TAbs.TypeDec [] (* Delete when possible *)
@@ -51,6 +51,9 @@ fun errorNil (pos, id) =
 fun errorTypUnd (pos, ty) =
   err pos ("type  " ^ S.name ty ^ " undefined")
 
+fun errorFieldNotInRec (pos, id) =
+  err pos ("field '" ^ S.name id ^"' not in record")
+
 fun errorTypMis (pos, exp, act) =
   err pos ("type mismatch, expected " ^ exp ^ " but found " ^ act)
 
@@ -68,6 +71,9 @@ fun errorFormalMismatch (pos, lenf, lenga) =
 
 fun errorVarUndef (pos, var) =
   err pos ("var " ^ S.name var ^ " is undefined")
+
+fun errorNotARec (pos, id) =
+  err pos (S.name id ^ " not a record")
 
 (* Write additional error messages here *)
 
@@ -174,7 +180,12 @@ fun transExp (venv, tenv, extra : extra) =
         | trexp (A.VarExp var) = trvar var
         | trexp (A.IntExp int) = {exp = TAbs.IntExp int, ty = Ty.INT}
         | trexp (A.StringExp (s,_)) = {exp = TAbs.StringExp s, ty = Ty.STRING}
-        | trexp (A.BreakExp(_)) = {exp = TAbs.BreakExp , ty = Ty.UNIT}
+        | trexp (A.BreakExp(_)) = let val breakex as {break = breakbool} = extra
+				  in
+				      if  (print(Bool.toString(breakbool)); breakbool)
+				      then {exp = TAbs.BreakExp , ty = Ty.UNIT}
+				      else TODO
+				  end
         | trexp (A.CallExp {func, args, pos}) =
 	  (case S.look(venv,func) of
 	       NONE => (errorFunUnd(pos,func);TODO)
@@ -214,9 +225,22 @@ fun transExp (venv, tenv, extra : extra) =
 		     {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
 		      ty = Ty.INT})) (* Int because bool is 0/1 *)
 	  end
-        | trexp (A.RecordExp {fields,typ,pos}) = TODO
+        | trexp (A.RecordExp {fields,typ,pos}) =
+	  (case S.look(tenv, typ) of
+	       NONE => (errorTypUnd(pos,typ);TODO)
+	    |  SOME(t) => let val act = actualTy t pos
+			  in
+			      (case actualTy t pos of
+				   Ty.RECORD(tfs,u) => (
+				    let val defFields = convertRecFields(tenv, venv, fields, [])
+				    in
+					(compareRecfields(tfs,fields,pos);
+					 {exp = TAbs.RecordExp {fields = defFields}, ty = act})
+				    end)
+				 | act => (errorTypMis(pos,"record",PT.asString(act));TODO))
+			  end)
         | trexp (A.SeqExp (exps)) =
-	  let val texp = getSeqFromExps(venv, tenv, exps, [])
+	  let val texp = getSeqFromExps(venv, tenv, exps, [], extra)
           in
 	      texp
 	  end
@@ -246,7 +270,7 @@ fun transExp (venv, tenv, extra : extra) =
 	  end
         | trexp (A.WhileExp {test,body,pos}) =
 	  let val test' as {exp = _, ty = tty} = trexp test
-              val body' as {exp = _, ty = bty} = trexp body
+              val body' as {exp = _, ty = bty} = transExp (venv, tenv, {break = true}) body
 	  in
 	      (compareTypes(Ty.INT, tty, pos);
 	       compareTypes(Ty.UNIT, bty, pos);
@@ -257,7 +281,7 @@ fun transExp (venv, tenv, extra : extra) =
 	  let val tlo as {exp = _, ty = tylo} = trexp lo
 	      val thi as {exp = _, ty = tyhi} = trexp hi
 	      val venv' = S.enter(venv, var, E.VarEntry{ty = Ty.INT})
-	      val tbody as {exp = _, ty = tybody}  = transExp(venv', tenv, {}) body
+	      val tbody as {exp = _, ty = tybody}  = transExp(venv', tenv, {break = true}) body
 	  in
 	      (typEq(tylo,tyhi,Ty.INT,pos);
 	       compareTypes(Ty.UNIT,tybody, pos);
@@ -265,8 +289,8 @@ fun transExp (venv, tenv, extra : extra) =
 	  end
         | trexp (A.LetExp {decls,body,pos = _}) =
 	  let
-	      val {decls=decls', tenv=tenv', venv=venv'} = transDecs(venv, tenv, decls, {})
-	      val bexp as {exp = _, ty = bty} = transExp(venv',tenv', {}) body
+	      val {decls=decls', tenv=tenv', venv=venv'} = transDecs(venv, tenv, decls, {break = false})
+	      val bexp as {exp = _, ty = bty} = transExp(venv',tenv', {break = false}) body
           in
 	      {exp = TAbs.LetExp {decls = decls', body = bexp},
 	       ty = bty}
@@ -287,7 +311,6 @@ fun transExp (venv, tenv, extra : extra) =
 				   end
 				 | t => (errorTypMis(pos, PT.asString(act), "array"); TODO)
 			   end )
-
       and trvar (A.SimpleVar (id, pos)) =
 	  (case S.look(venv, id) of
 	       NONE =>
@@ -296,11 +319,70 @@ fun transExp (venv, tenv, extra : extra) =
 	       (errorFoundNeed(pos, "function", "var", id);TODO)
 	     | SOME (E.VarEntry{ty}) =>
 	       {exp = TAbs.VarExp {var = TAbs.SimpleVar(id), ty = ty}, ty = ty})
-        | trvar (A.FieldVar (var, id, pos)) = TODO
-        | trvar (A.SubscriptVar (var, exp, pos)) = TODO
+        | trvar (A.FieldVar (var, id, pos)) = (* TODO: Doesn't actually check field type at the moment *)
+	  let val tvar as {exp = varex, ty = vty} = trvar var
+	  in
+	      (case vty of
+		   Ty.RECORD(fields,u) =>
+		   (let val varTy = checkIfFieldExists(fields,id,pos)
+			val typedVar =
+			    (case varex of (TAbs.VarExp {var = var', ty = _}) => var')
+		    in 
+			{exp = TAbs.VarExp {var = TAbs.FieldVar ({var = typedVar, ty = vty}, id), ty = varTy}
+			,ty = varTy}
+		    end)
+		| t => (errorTypMis(pos,"record", PT.asString(t)); TODO))
+	  end
+        | trvar (A.SubscriptVar (var, exp, pos)) =
+	  let val tvar as {exp = varex, ty = vty} = trvar var
+	  in
+	      (case vty of
+		   Ty.ARRAY(ty,u) => let val exp' as {exp = exp, ty = ty'} = transExp(venv,tenv,{break = false}) exp
+					 val typedVar =
+					     (case varex of (TAbs.VarExp {var = var', ty = _}) => var')
+				     in
+					 (case ty' of
+					      Ty.INT =>
+					      {exp = TAbs.VarExp {var =
+								  TAbs.SubscriptVar(
+								      {var = typedVar, ty = vty},exp'),
+								  ty = ty}, (* TODO: Is this actual type? *)
+					       ty = vty}
+					   |  t => TODO)
+				     end
+		| t => (errorTypMis(pos, "array", PT.asString(t)); TODO))
+	  end
+
+										    
   in
       trexp
   end
+and convertRecFields(venv, tenv, fields, init) =
+    case fields of
+	[] => init
+      | [(s,e,p)] => let val trexp = transExp(tenv, venv, {break = false}) e
+		     in
+			 init @ [(s,trexp)]
+		     end
+      | ((s,e,p)::xs) => let val trexp = transExp(tenv, venv, {break = false}) e
+			 in
+			     convertRecFields(venv, tenv, xs, init @ [(s,trexp)])
+			 end
+and compareRecfields(fs,tfs,pos) =
+    let val lengfs = length fs
+	val lengtfs = length tfs
+    in
+	if(lengfs <> lengtfs) then (errorFormalMismatch(pos,lengfs,lengtfs);()) else
+	(case tfs of
+	     [] => ()
+	  |  [(s,e,p)] => ()
+	  |  ((s,e,p)::xs) => ())
+    end
+and checkIfFieldExists(fields,id,pos) =
+    (case fields of
+	[] => (errorFieldNotInRec(pos,id); Ty.ERROR)
+     | 	[(s,t)] => if(s = id) then t else (errorFieldNotInRec(pos,id); Ty.ERROR)
+     |  ((s,t)::xs) => if(s = id) then t else checkIfFieldExists(xs, id, pos))			 
 and checkformals (forms, args, pos) = (* TODO *)
     let val lenf = length forms
 	val lena = length args
@@ -320,28 +402,28 @@ and checkformals (forms, args, pos) = (* TODO *)
 and getTypExps (venv, tenv, exps, inp) =
     case exps of
 	[]          => []
-     |  [(x,p)]     => let val texp = transExp(venv, tenv, {}) x
+     |  [(x,p)]     => let val texp = transExp(venv, tenv, {break = false}) x
 		       in
 			   inp @ [texp]
 		       end
-     |  ((x,p)::xs) => let val texp = transExp(venv, tenv, {}) x
+     |  ((x,p)::xs) => let val texp = transExp(venv, tenv, {break = false}) x
 		       in
 			   getTypExps(venv, tenv, xs, inp @ [texp])
 		       end
-and getSeqFromExps (venv, tenv, exps, inp) =
+and getSeqFromExps (venv, tenv, exps, inp, extra : extra) =
     case exps of
         []      => {exp = TAbs.SeqExp(inp), ty = Ty.UNIT}
-     |  [(x,p)] => let val texp as {exp = _, ty = typ} = transExp(venv, tenv, {}) x
+     |  [(x,p)] => let val texp as {exp = _, ty = typ} = transExp(venv, tenv, extra) x
 		   in
 		       {exp = TAbs.SeqExp(inp @ [texp]), ty = typ}
 		   end
-     |  ((x,p)::xs) => let val texp as {exp = _, ty = typ} = transExp(venv,tenv, {}) x
+     |  ((x,p)::xs) => let val texp as {exp = _, ty = typ} = transExp(venv,tenv, extra) x
 		       in
-			   getSeqFromExps(venv, tenv, xs, inp @ [texp])
+			   getSeqFromExps(venv, tenv, xs, inp @ [texp], extra)
 		       end
 and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra : extra) =
     let
-        val {exp, ty} = transExp(venv, tenv, {}) init
+        val {exp, ty} = transExp(venv, tenv, {break = false}) init
     in
         (if (ty = Ty.NIL) then errorNil(pos,name) else ();
          {decl = makeVarDec(name,escape,ty,{exp = exp, ty = ty}),
@@ -351,7 +433,7 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
   | transDec ( venv, tenv
                , A.VarDec {name, escape, typ = SOME (s, pos), init, pos=pos1}, extra) =
     let
-	val {exp, ty} = transExp(venv, tenv, {}) init
+	val {exp, ty} = transExp(venv, tenv, {break = false}) init
     in
 	case S.look(tenv,s) of
 	    NONE =>     (errorTypUnd(pos,s);
@@ -379,7 +461,7 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
        1. Check for duplicate types in makeTypDec
        2. Check for cyclic definition (i.e. a -> b -> c -> a is illegal)
      *)
-    let val tydecs = makeTypDec(tydecls ,[] ,tenv, venv)
+    let val tydecs as {decl = decls , tenv = tenv', venv = venv} = makeTypDec(tydecls ,[] ,tenv, venv)
     in
 	tydecs
     end(* TODO *)
@@ -397,7 +479,7 @@ and  makeTypDec (decls, init, tenv, venv) =
        | ({name,ty,pos}::xs)  =>     let val tenv' = S.enter(tenv, name, transTy(tenv,ty))
 					 val newData = makeTypDecData(name,transTy(tenv', ty))
 				     in
-					 makeTypDec(xs, init @ [newData], tenv, venv)
+					 makeTypDec(xs, init @ [newData], tenv', venv)
 				     end)
 and transDecs (venv, tenv, decls, extra : extra) =
     let fun visit venv tenv decls result =
@@ -416,6 +498,6 @@ and transDecs (venv, tenv, decls, extra : extra) =
     end
 
 fun transProg absyn =
-  transExp (Env.baseVenv, Env.baseTenv, {}) absyn
+  transExp (Env.baseVenv, Env.baseTenv, {break = false}) absyn
 
 end (* Semant *)

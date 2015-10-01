@@ -150,12 +150,14 @@ fun makeFieldData (idsym, ty, p) =
 (* Precedence and associativity specifciation *)
 
 %left       AND OR
-%nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN NEQ GT LT GE LE EQ 
 %right      ELSE 
+%nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN 
+%nonassoc   NEQ GT LT GE LE EQ 
 %left       PLUS MINUS
 %left       TIMES DIVIDE
 %right      UMINUS DEC
 %right      CARET
+
 
 
 
@@ -173,8 +175,8 @@ exp       : INT                                                (A.IntExp INT)
    |        lvalue                                             (A.VarExp(lvalue))
    |        lvalue ASSIGN exp                                  (makeAssign(lvalue,exp,lvalueleft)) (*Rule 5*)
    |        ID LBRACK exp RBRACK OF exp                        (makeArExp(S.symbol(ID),exp1,exp2,IDleft))
-   |        IF exp THEN exp                                    (makeIf(exp1,exp2,NONE,IFleft))
    |        IF exp THEN exp ELSE exp                           (makeIf(exp1,exp2,SOME exp3,IFleft))
+   |        IF exp THEN exp            %prec ELSE              (makeIf(exp1,exp2,NONE,IFleft))
    |        WHILE exp DO exp                                   (makeWhileExp(exp1,exp2,WHILEleft))
    |        FOR ID ASSIGN exp TO exp DO exp                    (makeForExp(S.symbol(ID),exp1,exp2,exp3,FORleft)) (*Rule 10*)
    |        BREAK                                              (A.BreakExp BREAKleft)
@@ -208,16 +210,16 @@ seqexp    :                                                    ([])
    |        seqexp SEMICOLON exp                               (seqexp@[(exp,expleft)]) (*Rule 35*)
 
 (* Record fields *)
-recfields :                                                    ([]) 
+recfields :                                                    ([])
    |        ID EQ exp                                          ([(S.symbol(ID),exp, expleft)])
    |        ID EQ exp COMMA recfields                          (recfields @ [(S.symbol(ID),exp, expleft)])
 
 (* Declarations *)
-decl      : tydecls  %prec DEC                                 (A.TypeDec(tydecls))
+decl      : tydecls  (*%prec DEC*)                             (A.TypeDec(tydecls))
    |        vardecl                                            (A.VarDec(vardecl)) (*Rule 40*)
-   |        fundecls %prec DEC                                 (A.FunctionDec(fundecls))
+   |        fundecls (*%prec DEC    *)                         (A.FunctionDec(fundecls))
 
-decls     :                                                    (nil)
+decls     :                                                    ([])
    |        decl decls                                         ([decl] @ decls)
 
 (* Type declarations *)
