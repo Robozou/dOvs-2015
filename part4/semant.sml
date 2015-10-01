@@ -499,7 +499,7 @@ and makeFunDecs (decls, init, tenv, venv) = (* Maybe literally the ugliest funct
 	 in	     
 	     {decl =
 	      TAbs.FunctionDec([{name = name, params = params', resultTy = resultTy, body = body'}] @ init),
-	      venv = venv, tenv = tenv}
+	      venv = venv'', tenv = tenv}
 	 end
        | ({name = name, params = params, result = result, body = body,pos = pos}::xs) =>
 	 let val res as SOME (s:S.symbol,p:A.pos) = result
