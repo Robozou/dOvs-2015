@@ -101,6 +101,9 @@ fun makeVarDec (name, escape, ty, init) =
 fun makeTypDecData (name, ty) =
   {name = name, ty = ty} : TAbs.tydecldata
 
+fun makeFunDecData (name, params, resultTy, body) =
+  {name = name, params = params, resultTy = resultTy, body = body} : TAbs.fundecldata
+
 
 
 fun lookupTy tenv sym pos =
@@ -249,7 +252,12 @@ fun transExp (venv, tenv, extra : extra) =
 	      val texp as {exp = tyexp, ty = expty} = trexp e
           in
 	      (compareTypes(actualTy varty pos, actualTy expty pos, pos);
-	       {exp = TAbs.ErrorExp, ty = Ty.UNIT})
+	       let val actvar =
+		       (case tyvar of (TAbs.VarExp {var = var', ty = ty'}) => {var = var', ty = ty'})
+	       in
+	       	   {exp = TAbs.AssignExp {var = actvar, exp = texp}, ty = Ty.UNIT}
+	       end)
+
 	  end
         | trexp (A.IfExp {test,thn,els,pos}) =
 	  let val test' as {exp = testexp, ty = tty} = trexp test
@@ -285,7 +293,8 @@ fun transExp (venv, tenv, extra : extra) =
 	  in
 	      (typEq(tylo,tyhi,Ty.INT,pos);
 	       compareTypes(Ty.UNIT,tybody, pos);
-	       {exp = TAbs.ForExp {var = var, escape = escape, lo = tlo, hi = thi, body = tbody}, ty = Ty.UNIT})
+	       {exp = TAbs.ForExp {var = var, escape = escape, lo = tlo, hi = thi, body = tbody},
+		ty = Ty.UNIT})
 	  end
         | trexp (A.LetExp {decls,body,pos = _}) =
 	  let
@@ -466,9 +475,31 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
 	tydecs
     end(* TODO *)
 
-  | transDec (venv, tenv, A.FunctionDec fundecls, extra) =
-    {decl = TODO_DECL, tenv = tenv, venv = venv} (* TODO *)
-and  makeTypDec (decls, init, tenv, venv) =
+  | transDec (venv, tenv, A.FunctionDec fundecls, extra) = 
+    makeFunDec(fundecls,[],tenv,venv)(*{decl = TODO_DECL, tenv = tenv, venv = venv} (* TODO *)*)
+and makeFunDec (decls, init, tenv, venv) =
+    (case decls of
+	 [] =>
+	 {decl = TAbs.FunctionDec init, tenv = tenv, venv = venv}
+       | [{name, params, result = (rt,p:A.pos), body,pos}] =>
+	 let val SOME(result) = S.look(tenv,rt)
+	     fun transparam{name,escape,typ = (t,p),pos} =
+	       case S.look(tenv,t)
+		of SOME t => {name=name,ty=t,escape = escape}
+	     val params' = map transparam params
+	     val venv' = S.enter(venv,name,
+				 E.FunEntry{formals = map #ty params',
+					   result=result})
+	     fun enterparam ({name,ty,escape},venv) =
+	       S.enter(venv,name,
+		       E.VarEntry{ty=ty})
+	     val venv'' = foldl enterparam venv' params'
+	 in
+	     transExp(venv'',tenv, {break = false}) body;
+	     {decl = TAbs.FunctionDec([]), venv = venv', tenv = tenv}
+	 end)
+	
+and makeTypDec (decls, init, tenv, venv) =
      (case decls of
 	  []            =>     {decl = TAbs.TypeDec init, tenv = tenv, venv = venv}
        |  [{name,ty,pos}]     =>     let val tenv' = S.enter(tenv, name, transTy(tenv,ty))
