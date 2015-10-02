@@ -1,5 +1,20 @@
+/* define valid recursive types */
 let
-    type b = {x:int}
-    type rectype = {a :b} in for i := 0 to 100 do (a := a+1; (); break)  end
+    /* define a list */
+    type intlist = {hd: int, tl: intlist} 
+
+    /* define a tree */
+    var n := "h"
+    type tree = {key: int, children: treelist}
+    var n := 5
+    type treelist = {hd: tree, tl: treelist}
+
+    var lis: intlist := intlist{hd=0, tl=nil}
+in
+    lis;
+    n
+end
+
+
 
 

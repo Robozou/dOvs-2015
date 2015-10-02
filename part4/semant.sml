@@ -340,29 +340,30 @@ fun transExp (venv, tenv, extra : extra) =
 			{exp = TAbs.VarExp {var = TAbs.FieldVar ({var = typedVar, ty = vty}, id), ty = varTy}
 			,ty = varTy}
 		    end)
-		| t => (errorTypMis(pos,"record", PT.asString(t)); TODO))
+		 | t => (errorTypMis(pos,"record", PT.asString(t)); TODO))
 	  end
         | trvar (A.SubscriptVar (var, exp, pos)) =
 	  let val tvar as {exp = varex, ty = vty} = trvar var
 	  in
 	      (case vty of
-		   Ty.ARRAY(ty,u) => let val exp' as {exp = exp, ty = ty'} = transExp(venv,tenv,{break = false}) exp
-					 val typedVar =
-					     (case varex of (TAbs.VarExp {var = var', ty = _}) => var')
-				     in
-					 (case ty' of
-					      Ty.INT =>
-					      {exp = TAbs.VarExp {var =
-								  TAbs.SubscriptVar(
-								      {var = typedVar, ty = vty},exp'),
-								  ty = ty}, (* TODO: Is this actual type? *)
-					       ty = vty}
-					   |  t => TODO)
-				     end
-		| t => (errorTypMis(pos, "array", PT.asString(t)); TODO))
+		   Ty.ARRAY(ty,u) =>
+		   let val exp' as {exp = exp, ty = ty'} = transExp(venv,tenv,{break = false}) exp
+		       val typedVar =
+			   (case varex of (TAbs.VarExp {var = var', ty = _}) => var')
+		   in
+		       (case ty' of
+			    Ty.INT =>
+			    {exp = TAbs.VarExp {var =
+						TAbs.SubscriptVar(
+						    {var = typedVar, ty = vty},exp'),
+						ty = ty}, (* TODO: Is this actual type? *)
+			     ty = vty}
+			 |  t => TODO)
+		   end
+		 | t => (errorTypMis(pos, "array", PT.asString(t)); TODO))
 	  end
 
-										    
+	      
   in
       trexp
   end
@@ -470,7 +471,7 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
        1. Check for duplicate types in makeTypDec
        2. Check for cyclic definition (i.e. a -> b -> c -> a is illegal)
      *)
-    let val tydecs as {decl = decls , tenv = tenv', venv = venv} = makeTypDec(tydecls ,[] ,tenv, venv)
+    let val tydecs as {decl = decls  , tenv = tenv', venv = venv} = makeTypDec(tydecls,tenv, venv)
     in
 	tydecs
     end(* TODO *)
@@ -483,7 +484,7 @@ and makeFunDecs (decls, init, tenv, venv) = (* Maybe literally the ugliest funct
 	 {decl = TAbs.FunctionDec init, tenv = tenv, venv = venv}
        | [{name = name, params = params, result = result, body = body,pos = pos}] =>
 	 let val res as SOME (s:S.symbol,p:A.pos) = result
-	     val SOME(resultTy) = S.look(tenv,s)
+	     val SOME(resultTy) = S.look(tenv,s) 
 	     fun transparam{name,escape,typ = (t,p),pos} =
 	       case S.look(tenv,t)
 		of SOME t => {name=name,ty=t,escape = escape}
@@ -521,20 +522,18 @@ and makeFunDecs (decls, init, tenv, venv) = (* Maybe literally the ugliest funct
 			  [{name = name, params = params', resultTy = resultTy, body = body'}] @ init,
 			 tenv,venv'')    
 	 end)
-
-and makeTypDec (decls, init, tenv, venv) =
-     (case decls of
-	  []            =>     {decl = TAbs.TypeDec init, tenv = tenv, venv = venv}
-       |  [{name,ty,pos}]     =>     let val tenv' = S.enter(tenv, name, transTy(tenv,ty))
-					 val newData = makeTypDecData(name,transTy(tenv', ty))
-				     in
-					 {decl = TAbs.TypeDec (init @ [newData]), venv = venv, tenv = tenv'}
-				     end
-       | ({name,ty,pos}::xs)  =>     let val tenv' = S.enter(tenv, name, transTy(tenv,ty))
-					 val newData = makeTypDecData(name,transTy(tenv', ty))
-				     in
-					 makeTypDec(xs, init @ [newData], tenv', venv)
-				     end)
+and makeTypDec (decls, tenv, venv) =
+    (let val tenv' = foldl (fn ({name,ty,pos},env) =>
+			       (S.enter(env,name, Ty.NAME(name,ref NONE)))) tenv decls
+	 val tenv'' = foldl (fn ({name,ty,pos},env) =>
+			    (case S.look(env,name)
+			    of SOME(Ty.NAME(n,r)) =>
+			    (r := SOME(transTy(env,ty)); env))) tenv' decls
+	 fun transDecls{name,ty,pos} =
+	   case S.look(tenv'',name) of
+	       SOME t => {name = name, ty = t}
+	 val newData = map transDecls decls
+    in {decl = TAbs.TypeDec newData, tenv = tenv'', venv = venv} end)			    
 and transDecs (venv, tenv, decls, extra : extra) =
     let fun visit venv tenv decls result =
           case decls
