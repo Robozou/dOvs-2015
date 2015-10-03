@@ -1,3 +1,0 @@
-let
-    type b = {x:int}
-    type rectype = {a :b,} in end

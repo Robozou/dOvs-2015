@@ -75,6 +75,9 @@ fun errorVarUndef (pos, var) =
 fun errorNotARec (pos, id) =
   err pos (S.name id ^ " not a record")
 
+fun errorTodo (pos) =
+  err pos ("unfinished code in compiler")
+
 (* Write additional error messages here *)
 
 
@@ -110,7 +113,9 @@ fun lookupTy tenv sym pos =
   let
       val tyOpt = S.look (tenv, sym)
   in
-      Ty.ERROR (* TODO *)
+      case tyOpt of
+	  NONE   => (errorTypUnd(pos,sym);Ty.ERROR)
+	| SOME(t) =>  t
   end
 
 fun actualTy (Ty.NAME (s, ty)) pos =
@@ -122,6 +127,11 @@ fun actualTy (Ty.NAME (s, ty)) pos =
   end
   | actualTy (Ty.ARRAY(t,u)) pos = Ty.ARRAY(actualTy(t) pos,u)
   | actualTy t _ = t
+
+
+fun checkdup (tydecs, tenv) =
+  print("unfinished code in compiler when checking for duplicate types\n")
+  
 
 
 fun checkInt (ty, pos) =
@@ -163,16 +173,16 @@ fun transTy (tenv, t) =
   case t of A.NameTy(s,p) => (case S.look(tenv,s) of SOME(t) => t)
           | A.ArrayTy(s,p) => (case S.look(tenv,s) of SOME(t) => Ty.ARRAY(t, ref())
                                                     | NONE => (errorTypUnd(p,s); Ty.ERROR))
-          | A.RecordTy(fields) => Ty.RECORD(recList(fields, [], tenv), ref())
-and recList(fields, init, tenv) =
-    case fields of [] => init
-                |   [{name, escape, typ = (s,p), pos}] => (case S.look(tenv,s) of
-                                                               NONE => (errorTypUnd(pos,s);init)
-                                                             | SOME(t) => init @ [(name,t)])
-                |   ({name, escape, typ = (s,p), pos}::xs) => (case S.look(tenv,s) of
-								   NONE => (errorTypUnd(pos,s);init)
-								 | SOME(t) => recList(xs,init @[(name,t)]
-										      ,tenv))
+          | A.RecordTy(fields) => Ty.RECORD(recList(fields, tenv), ref())
+and recList(fields, tenv) =
+    let val ret = foldl (fn ({name,escape,typ = (s,p), pos},l) =>
+			    case S.look(tenv,s) of
+				NONE => (errorTypUnd(pos,s);l)
+			     |  SOME(t) => l @ [(name,t)])  [] fields
+    in
+	ret
+    end
+
 fun transExp (venv, tenv, extra : extra) =
   let
       (* this is a placeholder value to get started *)
@@ -203,7 +213,7 @@ fun transExp (venv, tenv, extra : extra) =
 			    4. If 1 element return typed version of expression and put into a list
 			    5. If multiple elements: concat typed version of new exp and call recursively
 		    *)
-		   val typexps = getTypExps(venv, tenv, args, [])
+		   val typexps = getTypExps(venv, tenv, args)
 	       in (checkformals(formals,typexps,pos);
 		   {exp = TAbs.CallExp {func = func, args = typexps}, ty = actualTy result pos}) end)
         | trexp (A.OpExp {left,oper,right,pos}) =
@@ -235,7 +245,7 @@ fun transExp (venv, tenv, extra : extra) =
 			  in
 			      (case actualTy t pos of
 				   Ty.RECORD(tfs,u) => (
-				    let val defFields = convertRecFields(tenv, venv, fields, [])
+				    let val defFields = convertRecFields(tenv, venv, fields)
 				    in
 					(compareRecfields(tfs,fields,pos);
 					 {exp = TAbs.RecordExp {fields = defFields}, ty = act})
@@ -257,7 +267,6 @@ fun transExp (venv, tenv, extra : extra) =
 	       in
 	       	   {exp = TAbs.AssignExp {var = actvar, exp = texp}, ty = Ty.UNIT}
 	       end)
-
 	  end
         | trexp (A.IfExp {test,thn,els,pos}) =
 	  let val test' as {exp = testexp, ty = tty} = trexp test
@@ -367,17 +376,16 @@ fun transExp (venv, tenv, extra : extra) =
   in
       trexp
   end
-and convertRecFields(venv, tenv, fields, init) =
-    case fields of
-	[] => init
-      | [(s,e,p)] => let val trexp = transExp(tenv, venv, {break = false}) e
-		     in
-			 init @ [(s,trexp)]
-		     end
-      | ((s,e,p)::xs) => let val trexp = transExp(tenv, venv, {break = false}) e
-			 in
-			     convertRecFields(venv, tenv, xs, init @ [(s,trexp)])
-			 end
+and convertRecFields(venv, tenv, fields) =
+    let val newFields =
+	    foldl (fn ((s,e,p),l) =>
+		      let val trexp = transExp(tenv, venv, {break = false}) e
+		      in
+			  l @ [(s,trexp)]
+		      end) [] fields
+    in
+	newFields
+    end
 and compareRecfields(fs,tfs,pos) =
     let val lengfs = length fs
 	val lengtfs = length tfs
@@ -409,17 +417,16 @@ and checkformals (forms, args, pos) = (* TODO *)
             in test(forms, args)
             end
     end
-and getTypExps (venv, tenv, exps, inp) =
-    case exps of
-	[]          => []
-     |  [(x,p)]     => let val texp = transExp(venv, tenv, {break = false}) x
-		       in
-			   inp @ [texp]
-		       end
-     |  ((x,p)::xs) => let val texp = transExp(venv, tenv, {break = false}) x
-		       in
-			   getTypExps(venv, tenv, xs, inp @ [texp])
-		       end
+and getTypExps (venv, tenv, exps) =
+    let val typExps =
+	    foldl (fn ((x,p),l) =>
+		  let val texp = transExp(venv, tenv, {break = false}) x
+		  in
+		      l @ [texp]
+		  end) [] exps
+    in
+	typExps
+    end
 and getSeqFromExps (venv, tenv, exps, inp, extra : extra) =
     case exps of
         []      => {exp = TAbs.SeqExp(inp), ty = Ty.UNIT}
@@ -473,7 +480,8 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
      *)
     let val tydecs as {decl = decls  , tenv = tenv', venv = venv} = makeTypDec(tydecls,tenv, venv)
     in
-	tydecs
+	(checkdup(tydecs,tenv');
+	tydecs)
     end(* TODO *)
 
   | transDec (venv, tenv, A.FunctionDec fundecls, extra) = 
