@@ -32,6 +32,7 @@ type extra = {break : bool}
 
 (* placehloder for declarations, the final code should compile without this *)
 val TODO_DECL = TAbs.TypeDec [] (* Delete when possible *)
+val TODO_FUN = TAbs.FunctionDec [] (* Delete when possible *)
 
 (* Error messages *)
 
@@ -77,6 +78,9 @@ fun errorNotARec (pos, id) =
 
 fun errorTodo (pos) =
   err pos ("unfinished code in compiler")
+
+fun errorDuplicate (pos, name) =
+  err pos ("duplicate " ^ S.name name)
 
 (* Write additional error messages here *)
 
@@ -129,9 +133,11 @@ fun actualTy (Ty.NAME (s, ty)) pos =
   | actualTy t _ = t
 
 
-fun checkdup (tydecs, tenv) =
-  print("unfinished code in compiler when checking for duplicate types\n")
-  
+fun checkdup ([],[]) = ()
+  | checkdup (name::xs, pos::poss) =
+    if (List.all (fn (x) => (name <> x)) xs)
+    then checkdup(xs,poss)
+    else (errorDuplicate(pos, name))
 
 
 fun checkInt (ty, pos) =
@@ -293,8 +299,7 @@ fun transExp (venv, tenv, extra : extra) =
 	       compareTypes(Ty.UNIT, bty, pos);
 	       {exp = TAbs.WhileExp {test = test', body = body'}, ty = Ty.UNIT})
 	  end
-        | trexp (A.ForExp {var, escape, lo, hi, body, pos}) =
-	  (* Implicit declaration: HOW?! *)
+        | trexp (A.ForExp {var, escape, lo, hi, body, pos}) = 
 	  let val tlo as {exp = _, ty = tylo} = trexp lo
 	      val thi as {exp = _, ty = tyhi} = trexp hi
 	      val venv' = S.enter(venv, var, E.VarEntry{ty = Ty.INT})
@@ -401,7 +406,7 @@ and checkIfFieldExists(fields,id,pos) =
 	[] => (errorFieldNotInRec(pos,id); Ty.ERROR)
      | 	[(s,t)] => if(s = id) then t else (errorFieldNotInRec(pos,id); Ty.ERROR)
      |  ((s,t)::xs) => if(s = id) then t else checkIfFieldExists(xs, id, pos))			 
-and checkformals (forms, args, pos) = (* TODO *)
+and checkformals (forms, args, pos) = 
     let val lenf = length forms
 	val lena = length args
     in if (lenf <> lena)
@@ -480,12 +485,16 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
      *)
     let val tydecs as {decl = decls  , tenv = tenv', venv = venv} = makeTypDec(tydecls,tenv, venv)
     in
-	(checkdup(tydecs,tenv');
+	(checkdup(map #name tydecls, map #pos tydecls);
 	tydecs)
     end(* TODO *)
 
-  | transDec (venv, tenv, A.FunctionDec fundecls, extra) = 
-    makeFunDecs(fundecls,[],tenv,venv)
+  | transDec (venv, tenv, A.FunctionDec fundecls, extra) =
+    let val fundecs = makeFunDecsPrime(fundecls,tenv, venv)
+    in
+	(checkdup(map #name fundecls, map #pos fundecls);
+	 fundecs)
+    end
 and makeFunDecs (decls, init, tenv, venv) = (* Maybe literally the ugliest function we have ever made *)
     (case decls of
 	 [] =>
@@ -496,6 +505,7 @@ and makeFunDecs (decls, init, tenv, venv) = (* Maybe literally the ugliest funct
 	     fun transparam{name,escape,typ = (t,p),pos} =
 	       case S.look(tenv,t)
 		of SOME t => {name=name,ty=t,escape = escape}
+		 | NONE => (errorTypUnd(pos,t);{name=name,ty=Ty.ERROR,escape = escape})
 	     val params' = map transparam params
 	     val funEntr = E.FunEntry{formals = map #ty params',
 				     result=resultTy}
@@ -504,32 +514,68 @@ and makeFunDecs (decls, init, tenv, venv) = (* Maybe literally the ugliest funct
 	       S.enter(venv,name,
 		       E.VarEntry{ty=ty})
 	     val venv'' = foldl enterparam venv' params'
-	     val body' = transExp(venv'',tenv, {break = false}) body;
-	 in	     
-	     {decl =
-	      TAbs.FunctionDec([{name = name, params = params', resultTy = resultTy, body = body'}] @ init),
-	      venv = venv'', tenv = tenv}
-	 end
-       | ({name = name, params = params, result = result, body = body,pos = pos}::xs) =>
-	 let val res as SOME (s:S.symbol,p:A.pos) = result
-	     val SOME(resultTy) = S.look(tenv,s)
-	     fun transparam{name,escape,typ = (t,p),pos} =
-	       case S.look(tenv,t)
-		of SOME t => {name=name,ty=t,escape = escape}
-	     val params' = map transparam params
-	     val funEntr = E.FunEntry{formals = map #ty params',
-				     result=resultTy}
-	     val venv' = S.enter(venv,name, funEntr)
-	     fun enterparam ({name,ty,escape},venv) =
-	       S.enter(venv,name,
-		       E.VarEntry{ty=ty})
-	     val venv'' = foldl enterparam venv' params'
-	     val body' = transExp(venv'',tenv, {break = false}) body;
-	 in	     	     
-	      makeFunDecs(xs,
-			  [{name = name, params = params', resultTy = resultTy, body = body'}] @ init,
-			 tenv,venv'')    
+	     val body' as {exp = _, ty = bty} = transExp(venv'',tenv, {break = false}) body;
+	     val res = if bty = resultTy
+		       then {decl =
+			     TAbs.FunctionDec([{name = name,
+						params = params',
+						resultTy = resultTy,
+						body = body'}] @ init),
+			     venv = venv', tenv = tenv}
+		       else {decl = TODO_DECL, venv = venv, tenv = tenv}
+	 in
+	     res
 	 end)
+and makeFunDecsPrime (decls, tenv, venv) = (* Maybe literally the ugliest function we have ever made *)
+    let val venv'
+	    = foldl (fn ({name, params, result, body,pos}, venv) =>
+			let val res as SOME (s:S.symbol,p:A.pos) = result
+			    val SOME(resultTy) = S.look(tenv,s) 
+			    fun transparam{name,escape,typ = (t,p),pos} =
+			      case S.look(tenv,t)
+			       of SOME t => {name=name,ty=t,escape = escape}
+				| NONE => (errorTypUnd(pos,t);{name=name,ty=Ty.ERROR,escape = escape})
+			    val params' = map transparam params
+			    val funEntr = E.FunEntry{formals = map #ty params',
+						     result=resultTy}
+			in
+			    S.enter(venv,name,funEntr)
+			end) venv decls
+	val venv'' =
+	    foldl (fn ({name, params, result, body, pos}, venv) =>
+		      let fun transparam{name,escape,typ = (t,p),pos} =
+			    case S.look(tenv,t)
+			     of SOME t => {name=name,ty=t,escape = escape}
+			      | NONE => (errorTypUnd(pos,t);{name=name,ty=Ty.ERROR,escape = escape})
+			  val params' = map transparam params
+			  fun enterparam ({name,ty,escape},venv) =
+			    S.enter(venv,name,
+				    E.VarEntry{ty=ty})
+			  val venv'' = foldl enterparam venv' params'
+			  val body' as {exp = _, ty = bty} = transExp(venv'',tenv, {break = false}) body
+		  in
+		    venv
+		      end) venv decls
+	fun transFuncs{name,params,result,body,pos} =
+	  (let fun transparam{name,escape,typ = (t,p),pos} =
+		 (case S.look(tenv,t)
+		   of SOME t => {name=name,ty=t,escape = escape}
+		    | NONE => (errorTypUnd(pos,t);{name=name,ty=Ty.ERROR,escape = escape}))
+	       val params' = map transparam params
+	       val resultTemp as SOME (s:S.symbol, p:A.pos) = result
+	       val SOME(res') = S.look(tenv,s)
+	       fun enterparam ({name,ty,escape},venv) =
+		 S.enter(venv,name,
+			 E.VarEntry{ty=ty})
+	       val venv'' = foldl enterparam venv' params'
+	       val body' = transExp(venv'', tenv, {break = false}) body
+	       val newFunc = (case S.look(venv',name) of
+				  SOME f => {name = name, params = params', resultTy = res', body = body'})
+	   in newFunc end)
+	val funcs = map transFuncs decls
+    in
+	{decl = TAbs.FunctionDec funcs, venv = venv', tenv = tenv}
+    end
 and makeTypDec (decls, tenv, venv) =
     (let val tenv' = foldl (fn ({name,ty,pos},env) =>
 			       (S.enter(env,name, Ty.NAME(name,ref NONE)))) tenv decls
