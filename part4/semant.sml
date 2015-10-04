@@ -176,12 +176,15 @@ fun checkAssignable (declared: Ty.ty, assigned: Ty.ty, pos, msg) =
   end
 
 fun compareTypes(t1,t2, pos) =
-  if(t1 <> t2) then
-      case (t1,t2) of
-	  (Ty.RECORD(_,_),Ty.NIL) => ()
-       |  (Ty.NIL,Ty.RECORD(_,_))  => ()
-       |  (_,_) => (errorTypMis(pos,PT.asString(t1),PT.asString(t2));())
-  else ()
+  let val act = actualTy t1 pos
+  in
+      if(act <> t2) then
+	  case (act,t2) of
+	      (Ty.RECORD(_,_),Ty.NIL) => ()
+	   |  (Ty.NIL,Ty.RECORD(_,_))  => ()
+	   |  (_,_) => (errorTypMis(pos,PT.asString(act),PT.asString(t2));())
+      else ()
+  end
 
 fun typEq(t1,t2,ty,pos) =
   if (t1 <> ty) then
@@ -253,7 +256,7 @@ fun transExp (venv, tenv, extra : extra) =
 			  | A.DivideOp => TAbs.DivideOp
 			  | A.ExponentOp => TAbs.ExponentOp
 	  in  if (bop = TAbs.EqOp orelse bop = TAbs.NeqOp)
-               then (compareTypes (actualTy lty pos, actualTy rty pos,pos);
+               then (compareTypes (lty, actualTy rty pos,pos);
                      {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp}, ty = Ty.INT})
 	       else if (bop = TAbs.PlusOp orelse bop = TAbs.MinusOp
 			orelse bop = TAbs.TimesOp orelse bop = TAbs.ExponentOp)
@@ -303,7 +306,7 @@ fun transExp (venv, tenv, extra : extra) =
 	      val tvar as {exp = tyvar, ty = varty} = trvar v
 	      val texp as {exp = tyexp, ty = expty} = trexp e
           in
-	      (compareTypes(actualTy varty pos, actualTy expty pos, pos);
+	      (compareTypes(varty, actualTy expty pos, pos);
 	       let val actvar =
 		       (case tyvar of (TAbs.VarExp {var = var', ty = ty'}) => {var = var', ty = ty'})
 	       in
@@ -319,14 +322,14 @@ fun transExp (venv, tenv, extra : extra) =
 	  let val test' as {exp = testexp, ty = tty} = trexp test
 	      val thn'  as {exp = thenexp, ty = thty} = trexp thn
 	  in
-	      (compareTypes(actualTy tty pos,Ty.INT,pos);
+	      (compareTypes(tty, Ty.INT,pos);
 	       let val els' =
 		       case els of
 			   NONE => (compareTypes(Ty.UNIT, actualTy thty pos,pos); NONE)
 			 | SOME e =>
 			   let val elexp as {exp = exp, ty = ety} = trexp e
 			   in
-			       (compareTypes(actualTy thty pos, actualTy ety pos, pos); SOME elexp)
+			       (compareTypes(thty, actualTy ety pos, pos); SOME elexp)
 			   end
 	       in
 		   {exp = TAbs.IfExp {test = test', thn = thn', els = els'}, ty = thty}
