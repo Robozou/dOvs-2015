@@ -1,20 +1,12 @@
-/* define valid recursive types */
 let
-    /* define a list */
-    type intlist = {hd: int, tl: intlist} 
+	type rectype1 = {name : string}
+        type rectype2 = {name : string}
 
-    /* define a tree */
-    var n := "h"
-    type tree = {key: int, children: treelist}
-    var n := 5
-    type treelist = {hd: tree, tl: treelist}
-
-    var lis: intlist := intlist{hd=0, tl=nil}
+	var rec1 := rectype1 {name = "Hallo"}
+	var rec2 := rectype2 {name = "Joe"}
+	var rec3 := rectype2 {name = "James"}
 in
-    lis;
-    n
+    rec3 = rec2
 end
-
-
 
 

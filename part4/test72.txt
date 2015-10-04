@@ -1,0 +1,1837 @@
+(UNIT, LetExp([
+  | FunctionDec[
+  |   (TstArith,[],
+  |   | UNIT,
+  |   | (UNIT, LetExp([
+  |   |   | FunctionDec[
+  |   |   |   (XX,[],
+  |   |   |   | INT,
+  |   |   |   | (INT, IntExp(999)))],
+  |   |   | VarDec(a,true,INT,
+  |   |   |   (INT, IntExp(5))),
+  |   |   | VarDec(b,true,INT,
+  |   |   |   (INT, IntExp(12))),
+  |   |   | VarDec(c,true,INT,
+  |   |   |   (INT, IntExp(2))),
+  |   |   | VarDec(ch,true,STRING,
+  |   |   |   (STRING, StringExp(" ")))],
+  |   |   | (UNIT, SeqExp[
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, IntExp(111)),
+  |   |   |   |   |   | (INT, IntExp(222)))),
+  |   |   |   |   | (INT, IntExp(333)),
+  |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, IntExp(111)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(116)),
+  |   |   |   |   | (STRING, StringExp("b"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   |   |   | (INT, IntExp(17)),
+  |   |   |   |   | (STRING, StringExp("c"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(c, INT))))),
+  |   |   |   |   | (INT, IntExp(19)),
+  |   |   |   |   | (STRING, StringExp("d"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   | (INT, IntExp(222)))),
+  |   |   |   |   | (INT, IntExp(234)),
+  |   |   |   |   | (STRING, StringExp("e"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(c, INT)))))]))),
+  |   |   |   |   | (INT, IntExp(19)),
+  |   |   |   |   | (STRING, StringExp("f"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, CallExp(XX,[])),
+  |   |   |   |   |   | (INT, IntExp(1)))),
+  |   |   |   |   | (INT, IntExp(1000)),
+  |   |   |   |   | (STRING, StringExp("g"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, IntExp(2)),
+  |   |   |   |   |   | (INT, CallExp(XX,[])))),
+  |   |   |   |   | (INT, IntExp(1001)),
+  |   |   |   |   | (STRING, StringExp("h"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, CallExp(XX,[])),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(1004)),
+  |   |   |   |   | (STRING, StringExp("i"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   | (INT, CallExp(XX,[])))),
+  |   |   |   |   | (INT, IntExp(1011)),
+  |   |   |   |   | (STRING, StringExp("j"))])),
+  |   |   |   | (UNIT, CallExp(fill,[
+  |   |   |   |   | (STRING, StringExp("k"))])),
+  |   |   |   | (UNIT, CallExp(newl,[])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(111)),
+  |   |   |   |   |   | (INT, IntExp(222)))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(111)))),
+  |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(111)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(106)),
+  |   |   |   |   | (STRING, StringExp("b"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(7)))),
+  |   |   |   |   | (STRING, StringExp("c"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(c, INT))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(9)))),
+  |   |   |   |   | (STRING, StringExp("d"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   | (INT, IntExp(222)))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(210)))),
+  |   |   |   |   | (STRING, StringExp("e"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(c, INT)))))]))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(5)))),
+  |   |   |   |   | (STRING, StringExp("f"))])),
+  |   |   |   | (UNIT, CallExp(print,[
+  |   |   |   |   | (STRING, StringExp("ghij"))])),
+  |   |   |   | (UNIT, CallExp(fill,[
+  |   |   |   |   | (STRING, StringExp("k"))])),
+  |   |   |   | (UNIT, CallExp(newl,[])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(5)))),
+  |   |   |   |   | (STRING, StringExp("b"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(17)))),
+  |   |   |   |   | (STRING, StringExp("c"))])),
+  |   |   |   | (UNIT, IfExp(
+  |   |   |   |   | (INT, OpExp(EqOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(17)))))),
+  |   |   |   |   | (UNIT, CallExp(print,[
+  |   |   |   |   |   | (STRING, StringExp("d"))])),
+  |   |   |   |   | (UNIT, CallExp(print,[
+  |   |   |   |   |   | (STRING, StringExp("."))])))),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(900)))),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(b, INT),
+  |   |   |   |   | (INT, IntExp(90)))),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(ch, STRING),
+  |   |   |   |   | (STRING, CallExp(chr,[
+  |   |   |   |   |   | (INT, IntExp(57))])))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(ch, STRING)))])))),
+  |   |   |   |   | (INT, IntExp(1047)),
+  |   |   |   |   | (STRING, StringExp("e"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(ch, STRING)))])))),
+  |   |   |   |   | (INT, IntExp(933)),
+  |   |   |   |   | (STRING, StringExp("f"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(ch, STRING)))])),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]))),
+  |   |   |   |   | (INT, IntExp(1047)),
+  |   |   |   |   | (STRING, StringExp("g"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(ch, STRING)))])),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(933)))),
+  |   |   |   |   | (STRING, StringExp("h"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(ch, STRING),
+  |   |   |   |   | (STRING, CallExp(chr,[
+  |   |   |   |   |   | (INT, IntExp(10))])))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(ch, STRING)))])))),
+  |   |   |   |   | (INT, IntExp(9900)),
+  |   |   |   |   | (STRING, StringExp("i"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(ch, STRING)))])),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]))),
+  |   |   |   |   | (INT, IntExp(9900)),
+  |   |   |   |   | (STRING, StringExp("j"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(1000)),
+  |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(ch, STRING)))])))),
+  |   |   |   |   | (INT, IntExp(990)),
+  |   |   |   |   | (STRING, StringExp("k"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(ch, STRING),
+  |   |   |   |   | (STRING, CallExp(chr,[
+  |   |   |   |   |   | (INT, IntExp(200))])))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(ch, STRING)))])),
+  |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(ch, STRING)))])))),
+  |   |   |   |   | (INT, IntExp(400)),
+  |   |   |   |   | (STRING, StringExp("l"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(803)))),
+  |   |   |   |   | (STRING, StringExp("m"))])),
+  |   |   |   | (UNIT, CallExp(fill,[
+  |   |   |   |   | (STRING, StringExp("n"))])),
+  |   |   |   | (UNIT, CallExp(newl,[])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(5)))),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(b, INT),
+  |   |   |   |   | (INT, IntExp(12)))),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(c, INT),
+  |   |   |   |   | (INT, IntExp(2)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(3)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(15)),
+  |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   |   |   | (INT, IntExp(60)),
+  |   |   |   |   | (STRING, StringExp("b"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(c, INT))))),
+  |   |   |   |   | (INT, IntExp(120)),
+  |   |   |   |   | (STRING, StringExp("c"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(12)),
+  |   |   |   |   |   | (INT, IntExp(6)))),
+  |   |   |   |   | (INT, IntExp(72)),
+  |   |   |   |   | (STRING, StringExp("d"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (INT, IntExp(15)),
+  |   |   |   |   | (STRING, StringExp("e"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(3)),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]))),
+  |   |   |   |   | (INT, IntExp(180)),
+  |   |   |   |   | (STRING, StringExp("f"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (INT, IntExp(180)),
+  |   |   |   |   | (STRING, StringExp("g"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(c, INT)))))]))),
+  |   |   |   |   | (INT, IntExp(120)),
+  |   |   |   |   | (STRING, StringExp("h"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(c, INT))))),
+  |   |   |   |   | (INT, IntExp(120)),
+  |   |   |   |   | (STRING, StringExp("i"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(c, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(4))))]))),
+  |   |   |   |   | (INT, IntExp(480)),
+  |   |   |   |   | (STRING, StringExp("j"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(1))))]))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(5)))),
+  |   |   |   |   | (STRING, StringExp("k"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(1))))]))),
+  |   |   |   |   | (INT, IntExp(5)),
+  |   |   |   |   | (STRING, StringExp("l"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, IntExp(2)))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(10)))),
+  |   |   |   |   | (STRING, StringExp("m"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(2))))]))),
+  |   |   |   |   | (INT, IntExp(10)),
+  |   |   |   |   | (STRING, StringExp("n"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, IntExp(4)))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(20)))),
+  |   |   |   |   | (STRING, StringExp("o"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(4))))]))),
+  |   |   |   |   | (INT, IntExp(20)),
+  |   |   |   |   | (STRING, StringExp("p"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, IntExp(256)))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(1280)))),
+  |   |   |   |   | (STRING, StringExp("q"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(256))))]))),
+  |   |   |   |   | (INT, IntExp(1280)),
+  |   |   |   |   | (STRING, StringExp("r"))])),
+  |   |   |   | (UNIT, CallExp(fill,[
+  |   |   |   |   | (STRING, StringExp("s"))])),
+  |   |   |   | (UNIT, CallExp(newl,[])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(3)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(15)),
+  |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   |   |   | (INT, IntExp(60)),
+  |   |   |   |   | (STRING, StringExp("b"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(c, INT))))),
+  |   |   |   |   | (INT, IntExp(120)),
+  |   |   |   |   | (STRING, StringExp("c"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(12)),
+  |   |   |   |   |   | (INT, IntExp(6)))),
+  |   |   |   |   | (INT, IntExp(72)),
+  |   |   |   |   | (STRING, StringExp("d"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (INT, IntExp(15)),
+  |   |   |   |   | (STRING, StringExp("e"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(3)),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]))),
+  |   |   |   |   | (INT, IntExp(180)),
+  |   |   |   |   | (STRING, StringExp("f"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (INT, IntExp(180)),
+  |   |   |   |   | (STRING, StringExp("g"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(c, INT)))))]))),
+  |   |   |   |   | (INT, IntExp(120)),
+  |   |   |   |   | (STRING, StringExp("h"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(c, INT))))),
+  |   |   |   |   | (INT, IntExp(120)),
+  |   |   |   |   | (STRING, StringExp("i"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(c, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(4))))]))),
+  |   |   |   |   | (INT, IntExp(480)),
+  |   |   |   |   | (STRING, StringExp("j"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   | (STRING, StringExp("k"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(5)),
+  |   |   |   |   | (STRING, StringExp("l"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(2)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(10)),
+  |   |   |   |   | (STRING, StringExp("m"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(3)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(15)),
+  |   |   |   |   | (STRING, StringExp("n"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(4)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(20)),
+  |   |   |   |   | (STRING, StringExp("o"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(5)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(25)),
+  |   |   |   |   | (STRING, StringExp("p"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(6)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(30)),
+  |   |   |   |   | (STRING, StringExp("q"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(7)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(35)),
+  |   |   |   |   | (STRING, StringExp("r"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(8)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(40)),
+  |   |   |   |   | (STRING, StringExp("s"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   | (STRING, StringExp("t"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(1)))),
+  |   |   |   |   | (INT, IntExp(5)),
+  |   |   |   |   | (STRING, StringExp("u"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(2)))),
+  |   |   |   |   | (INT, IntExp(10)),
+  |   |   |   |   | (STRING, StringExp("v"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (INT, IntExp(15)),
+  |   |   |   |   | (STRING, StringExp("w"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(4)))),
+  |   |   |   |   | (INT, IntExp(20)),
+  |   |   |   |   | (STRING, StringExp("x"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(5)))),
+  |   |   |   |   | (INT, IntExp(25)),
+  |   |   |   |   | (STRING, StringExp("y"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(6)))),
+  |   |   |   |   | (INT, IntExp(30)),
+  |   |   |   |   | (STRING, StringExp("z"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(7)))),
+  |   |   |   |   | (INT, IntExp(35)),
+  |   |   |   |   | (STRING, StringExp("0"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(8)))),
+  |   |   |   |   | (INT, IntExp(40)),
+  |   |   |   |   | (STRING, StringExp("1"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(256)))),
+  |   |   |   |   | (INT, IntExp(1280)),
+  |   |   |   |   | (STRING, StringExp("2"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(65536)))),
+  |   |   |   |   | (INT, IntExp(327680)),
+  |   |   |   |   | (STRING, StringExp("3"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(16777216)))),
+  |   |   |   |   | (INT, IntExp(83886080)),
+  |   |   |   |   | (STRING, StringExp("4"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   | (INT, IntExp(13)),
+  |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   | (STRING, StringExp("5"))])),
+  |   |   |   | (UNIT, CallExp(fill,[
+  |   |   |   |   | (STRING, StringExp("6"))])),
+  |   |   |   | (UNIT, CallExp(newl,[])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(2)),
+  |   |   |   |   | (STRING, StringExp("b"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(2))))]))),
+  |   |   |   |   | (INT, IntExp(6)),
+  |   |   |   |   | (STRING, StringExp("c"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, CallExp(XX,[])),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (INT, IntExp(333)),
+  |   |   |   |   | (STRING, StringExp("d"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, IntExp(1000)),
+  |   |   |   |   |   | (INT, CallExp(XX,[])))),
+  |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   | (STRING, StringExp("e"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, CallExp(XX,[])),
+  |   |   |   |   |   | (INT, IntExp(888))])),
+  |   |   |   |   | (INT, IntExp(111)),
+  |   |   |   |   | (STRING, StringExp("f"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, IntExp(1002)),
+  |   |   |   |   |   | (INT, CallExp(XX,[]))])),
+  |   |   |   |   | (INT, IntExp(3)),
+  |   |   |   |   | (STRING, StringExp("g"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, CallExp(XX,[])),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(199)),
+  |   |   |   |   | (STRING, StringExp("h"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, CallExp(XX,[])),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT)))])),
+  |   |   |   |   | (INT, IntExp(4)),
+  |   |   |   |   | (STRING, StringExp("i"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (INT, IntExp(5)),
+  |   |   |   |   | (STRING, StringExp("j"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   |   |   |   | (INT, IntExp(3))])),
+  |   |   |   |   | (INT, IntExp(2)),
+  |   |   |   |   | (STRING, StringExp("k"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   | (INT, IntExp(3)),
+  |   |   |   |   | (STRING, StringExp("l"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT)))])),
+  |   |   |   |   | (INT, IntExp(2)),
+  |   |   |   |   | (STRING, StringExp("m"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))]),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(2))))]))),
+  |   |   |   |   | (INT, IntExp(5)),
+  |   |   |   |   | (STRING, StringExp("n"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, IntExp(2))))])),
+  |   |   |   |   | (INT, IntExp(2)),
+  |   |   |   |   | (STRING, StringExp("o"))])),
+  |   |   |   | (UNIT, LetExp([
+  |   |   |   |   | VarDec(d,true,INT,
+  |   |   |   |   |   (INT, IntExp(100))),
+  |   |   |   |   | VarDec(e,true,INT,
+  |   |   |   |   |   (INT, IntExp(0)))],
+  |   |   |   |   | (UNIT, SeqExp[
+  |   |   |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   |   |   | (INT, IntExp(200)))),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(d, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(4)))),
+  |   |   |   |   |   |   | (INT, IntExp(25)),
+  |   |   |   |   |   |   | (STRING, StringExp("p"))])),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(8)))),
+  |   |   |   |   |   |   | (INT, IntExp(25)),
+  |   |   |   |   |   |   | (STRING, StringExp("q"))])),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(d, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(16))])),
+  |   |   |   |   |   |   | (INT, IntExp(4)),
+  |   |   |   |   |   |   | (STRING, StringExp("r"))])),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(128))])),
+  |   |   |   |   |   |   | (INT, IntExp(72)),
+  |   |   |   |   |   |   | (STRING, StringExp("s"))])),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   |   | SimpleVar(d, INT)))))]),
+  |   |   |   |   |   |   |   | (INT, IntExp(128)))),
+  |   |   |   |   |   |   | (INT, IntExp(2)),
+  |   |   |   |   |   |   | (STRING, StringExp("t"))])),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   | SimpleVar(d, INT))))),
+  |   |   |   |   |   |   |   | (INT, IntExp(128))])),
+  |   |   |   |   |   |   | (INT, IntExp(44)),
+  |   |   |   |   |   |   | (STRING, StringExp("u"))])),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(1)))),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (STRING, StringExp("v"))])),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(d, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(1)))),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(d, INT))),
+  |   |   |   |   |   |   | (STRING, StringExp("w"))])),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(1))])),
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (STRING, StringExp("x"))])),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(d, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(1))])),
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (STRING, StringExp("y"))])),
+  |   |   |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(32)))))),
+  |   |   |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   |   |   | SimpleVar(d, INT),
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(1025)))))),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(4)))),
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(8)))),
+  |   |   |   |   |   |   | (STRING, StringExp("z"))])),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(d, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(8)))),
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(128)))),
+  |   |   |   |   |   |   | (STRING, StringExp("0"))])),
+  |   |   |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   |   |   | (INT, IntExp(8)))),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(d, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(128)))),
+  |   |   |   |   |   |   | (STRING, StringExp("1"))])),
+  |   |   |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(32)))))),
+  |   |   |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   |   |   | (INT, OpExp(TimesOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(4)))),
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, IntExp(128)))),
+  |   |   |   |   |   |   | (STRING, StringExp("2"))]))]))),
+  |   |   |   | (UNIT, CallExp(fill,[
+  |   |   |   |   | (STRING, StringExp("3"))])),
+  |   |   |   | (UNIT, CallExp(newl,[])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(100)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(1)))),
+  |   |   |   |   | (INT, IntExp(100)),
+  |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(2)))),
+  |   |   |   |   | (INT, IntExp(50)),
+  |   |   |   |   | (STRING, StringExp("b"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (INT, IntExp(33)),
+  |   |   |   |   | (STRING, StringExp("c"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(4)))),
+  |   |   |   |   | (INT, IntExp(25)),
+  |   |   |   |   | (STRING, StringExp("d"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(5)))),
+  |   |   |   |   | (INT, IntExp(20)),
+  |   |   |   |   | (STRING, StringExp("e"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(6)))),
+  |   |   |   |   | (INT, IntExp(16)),
+  |   |   |   |   | (STRING, StringExp("f"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(7)))),
+  |   |   |   |   | (INT, IntExp(14)),
+  |   |   |   |   | (STRING, StringExp("g"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(8)))),
+  |   |   |   |   | (INT, IntExp(12)),
+  |   |   |   |   | (STRING, StringExp("h"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(83886080)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(256)))),
+  |   |   |   |   | (INT, IntExp(327680)),
+  |   |   |   |   | (STRING, StringExp("i"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(65536)))),
+  |   |   |   |   | (INT, IntExp(1280)),
+  |   |   |   |   | (STRING, StringExp("j"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(16777216)))),
+  |   |   |   |   | (INT, IntExp(5)),
+  |   |   |   |   | (STRING, StringExp("k"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(101)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(1))])),
+  |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   | (STRING, StringExp("l"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(2))])),
+  |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   | (STRING, StringExp("m"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(3))])),
+  |   |   |   |   | (INT, IntExp(2)),
+  |   |   |   |   | (STRING, StringExp("n"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(4))])),
+  |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   | (STRING, StringExp("o"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(5))])),
+  |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   | (STRING, StringExp("p"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(6))])),
+  |   |   |   |   | (INT, IntExp(5)),
+  |   |   |   |   | (STRING, StringExp("q"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(7))])),
+  |   |   |   |   | (INT, IntExp(3)),
+  |   |   |   |   | (STRING, StringExp("r"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(8))])),
+  |   |   |   |   | (INT, IntExp(5)),
+  |   |   |   |   | (STRING, StringExp("s"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(16777217)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(256))])),
+  |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   | (STRING, StringExp("t"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(65536))])),
+  |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   | (STRING, StringExp("u"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, IntExp(16777216))])),
+  |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   | (STRING, StringExp("v"))])),
+  |   |   |   | (UNIT, CallExp(fill,[
+  |   |   |   |   | (STRING, StringExp("w"))])),
+  |   |   |   | (UNIT, CallExp(newl,[])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(100)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(1)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(100)))),
+  |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(2)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(50)))),
+  |   |   |   |   | (STRING, StringExp("b"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(3)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(33)))),
+  |   |   |   |   | (STRING, StringExp("c"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(4)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(25)))),
+  |   |   |   |   | (STRING, StringExp("d"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(5)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(20)))),
+  |   |   |   |   | (STRING, StringExp("e"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(6)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(16)))),
+  |   |   |   |   | (STRING, StringExp("f"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(7)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(14)))),
+  |   |   |   |   | (STRING, StringExp("g"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(8)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(12)))),
+  |   |   |   |   | (STRING, StringExp("h"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(83886080)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(256)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(327680)))),
+  |   |   |   |   | (STRING, StringExp("i"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(65536)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(1280)))),
+  |   |   |   |   | (STRING, StringExp("j"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(16777216)))))),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(5)))),
+  |   |   |   |   | (STRING, StringExp("k"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(101)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(1))))])),
+  |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   | (STRING, StringExp("l"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(2))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(1)))),
+  |   |   |   |   | (STRING, StringExp("m"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(3))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(1)))),
+  |   |   |   |   | (STRING, StringExp("n"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(4))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (STRING, StringExp("o"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(5))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(4)))),
+  |   |   |   |   | (STRING, StringExp("p"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(6))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(1)))),
+  |   |   |   |   | (STRING, StringExp("q"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(7))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(4)))),
+  |   |   |   |   | (STRING, StringExp("r"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(8))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(3)))),
+  |   |   |   |   | (STRING, StringExp("s"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(16777217)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(256))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(255)))),
+  |   |   |   |   | (STRING, StringExp("t"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(65536))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(65535)))),
+  |   |   |   |   | (STRING, StringExp("u"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(16777216))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(16777215)))),
+  |   |   |   |   | (STRING, StringExp("v"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(16777216))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(1)))),
+  |   |   |   |   | (STRING, StringExp("w"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(65536))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(1)))),
+  |   |   |   |   | (STRING, StringExp("x"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(101)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(8))))])),
+  |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   | (INT, IntExp(5)))),
+  |   |   |   |   | (STRING, StringExp("y"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, CallExp(mod,[
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(1))))])),
+  |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   | (STRING, StringExp("z"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(83886080)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(256)))))),
+  |   |   |   |   | (INT, IntExp(327680)),
+  |   |   |   |   | (STRING, StringExp("0"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(65536)))))),
+  |   |   |   |   | (INT, IntExp(1280)),
+  |   |   |   |   | (STRING, StringExp("1"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(16777216)))))),
+  |   |   |   |   | (INT, IntExp(5)),
+  |   |   |   |   | (STRING, StringExp("2"))])),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   | (INT, IntExp(100)))),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(8)))))),
+  |   |   |   |   | (INT, IntExp(12)),
+  |   |   |   |   | (STRING, StringExp("3"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(2)))))),
+  |   |   |   |   | (INT, IntExp(50)),
+  |   |   |   |   | (STRING, StringExp("4"))])),
+  |   |   |   | (UNIT, CallExp(chk,[
+  |   |   |   |   | (INT, OpExp(DivideOp,
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   | (INT, IntExp(1)))))),
+  |   |   |   |   | (INT, IntExp(100)),
+  |   |   |   |   | (STRING, StringExp("5"))])),
+  |   |   |   | (UNIT, CallExp(fill,[
+  |   |   |   |   | (STRING, StringExp("6"))])),
+  |   |   |   | (UNIT, CallExp(newl,[]))])))),
+  |   (mod,[
+  |   | (a,true,INT),
+  |   | (b,true,INT)],
+  |   | INT,
+  |   | (INT, LetExp([
+  |   |   | FunctionDec[
+  |   |   |   (mod_neg,[
+  |   |   |   | (a,true,INT),
+  |   |   |   | (b,true,INT)],
+  |   |   |   | INT,
+  |   |   |   | (INT, SeqExp[
+  |   |   |   |   | (UNIT, WhileExp(
+  |   |   |   |   |   | (INT, OpExp(LtOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   |   |   | (INT, OpExp(PlusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT))))))))),
+  |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   | SimpleVar(a, INT)))])),
+  |   |   |   (mod_pos,[
+  |   |   |   | (a,true,INT),
+  |   |   |   | (b,true,INT)],
+  |   |   |   | INT,
+  |   |   |   | (INT, SeqExp[
+  |   |   |   |   | (UNIT, WhileExp(
+  |   |   |   |   |   | (INT, OpExp(GeOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   |   |   | SimpleVar(a, INT),
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(b, INT))))))))),
+  |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   | SimpleVar(a, INT)))]))]],
+  |   |   | (INT, SeqExp[
+  |   |   |   | (INT, IfExp(
+  |   |   |   |   | (INT, OpExp(GtOp,
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   | (INT, IfExp(
+  |   |   |   |   |   | (INT, OpExp(GeOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   |   | (INT, CallExp(mod_pos,[
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(b, INT)))])),
+  |   |   |   |   |   | (INT, CallExp(mod_neg,[
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(b, INT)))])))),
+  |   |   |   |   | (INT, IfExp(
+  |   |   |   |   |   | (INT, OpExp(LtOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(b, INT))),
+  |   |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   |   | (INT, IfExp(
+  |   |   |   |   |   |   | (INT, OpExp(GeOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, CallExp(mod_neg,[
+  |   |   |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))])))),
+  |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   | (INT, CallExp(mod_pos,[
+  |   |   |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   |   | SimpleVar(a, INT))))),
+  |   |   |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   |   | SimpleVar(b, INT)))))])))))),
+  |   |   |   |   |   | (INT, SeqExp[
+  |   |   |   |   |   |   | (UNIT, CallExp(print,[
+  |   |   |   |   |   |   |   | (STRING, StringExp("Error: mod (_,0) "))])),
+  |   |   |   |   |   |   | (STRING, CallExp(chr,[
+  |   |   |   |   |   |   |   | (INT, OpExp(MinusOp,
+  |   |   |   |   |   |   |   |   | (INT, IntExp(0)),
+  |   |   |   |   |   |   |   |   | (INT, IntExp(1))))])),
+  |   |   |   |   |   |   | (INT, IntExp(0))])))))])))),
+  |   (newl,[],
+  |   | UNIT,
+  |   | (UNIT, CallExp(print,[
+  |   |   | (STRING, CallExp(chr,[
+  |   |   |   | (INT, IntExp(10))]))]))),
+  |   (fill,[
+  |   | (first,true,STRING)],
+  |   | UNIT,
+  |   | (UNIT, SeqExp[
+  |   |   | (UNIT, ForExp(i,true,
+  |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   | (STRING, StringExp("z"))])),
+  |   |   |   | (UNIT, IfExp(
+  |   |   |   |   | (INT, IfExp(
+  |   |   |   |   |   | (INT, IfExp(
+  |   |   |   |   |   |   | (INT, OpExp(LeOp,
+  |   |   |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   |   |   | SimpleVar(first, STRING)))])))),
+  |   |   |   |   |   |   | (INT, OpExp(LeOp,
+  |   |   |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   |   |   | SimpleVar(first, STRING)))])),
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(i, INT))))),
+  |   |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   |   | (INT, OpExp(LeOp,
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(i, INT))),
+  |   |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   |   | (STRING, StringExp("z"))])))),
+  |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   | (UNIT, CallExp(print,[
+  |   |   |   |   |   | (STRING, CallExp(chr,[
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(i, INT)))]))])))))),
+  |   |   | (UNIT, ForExp(i,true,
+  |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   | (STRING, StringExp("0"))])),
+  |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   | (STRING, StringExp("9"))])),
+  |   |   |   | (UNIT, IfExp(
+  |   |   |   |   | (INT, IfExp(
+  |   |   |   |   |   | (INT, IfExp(
+  |   |   |   |   |   |   | (INT, IfExp(
+  |   |   |   |   |   |   |   | (INT, OpExp(LeOp,
+  |   |   |   |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   |   |   |   | (STRING, StringExp("0"))])),
+  |   |   |   |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   |   |   |   | SimpleVar(first, STRING)))])))),
+  |   |   |   |   |   |   |   | (INT, OpExp(LeOp,
+  |   |   |   |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   |   |   |   | SimpleVar(first, STRING)))])),
+  |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   | SimpleVar(i, INT))))),
+  |   |   |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   |   |   | (INT, OpExp(LeOp,
+  |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(i, INT))),
+  |   |   |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   |   |   | (STRING, StringExp("9"))])))),
+  |   |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   |   | (INT, OpExp(LeOp,
+  |   |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   |   | (STRING, StringExp("a"))])),
+  |   |   |   |   |   |   | (INT, CallExp(ord,[
+  |   |   |   |   |   |   |   | (STRING, VarExp(
+  |   |   |   |   |   |   |   |   | SimpleVar(first, STRING)))])))))),
+  |   |   |   |   | (UNIT, CallExp(print,[
+  |   |   |   |   |   | (STRING, CallExp(chr,[
+  |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   | SimpleVar(i, INT)))]))]))))))])),
+  |   (chk,[
+  |   | (a,true,INT),
+  |   | (b,true,INT),
+  |   | (msg,true,STRING)],
+  |   | UNIT,
+  |   | (UNIT, IfExp(
+  |   |   | (INT, OpExp(EqOp,
+  |   |   |   | (INT, VarExp(
+  |   |   |   |   | SimpleVar(a, INT))),
+  |   |   |   | (INT, VarExp(
+  |   |   |   |   | SimpleVar(b, INT))))),
+  |   |   | (UNIT, CallExp(print,[
+  |   |   |   | (STRING, VarExp(
+  |   |   |   |   | SimpleVar(msg, STRING)))])),
+  |   |   | (UNIT, CallExp(print,[
+  |   |   |   | (STRING, StringExp("."))])))))]],
+  | (UNIT, SeqExp[
+  |   | (UNIT, CallExp(TstArith,[]))])))

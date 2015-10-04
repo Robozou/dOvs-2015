@@ -28,7 +28,10 @@ structure TAbs = TAbsyn
    It should become obvious when you actually need it, what to do.
    Alternatively, you have to add extra parameters to your functions *)
 
-type extra = {break : bool}
+
+
+				    
+type extra = {break : bool, assign : S.symbol list option}
 
 (* placehloder for declarations, the final code should compile without this *)
 val TODO_DECL = TAbs.TypeDec [] (* Delete when possible *)
@@ -61,7 +64,6 @@ fun errorTypMis (pos, exp, act) =
 fun errorFunUnd (pos, func) =
   err pos ("function " ^ S.name func ^ " is undefined")
 
-
 fun errorFoundNeed (pos, found, need, name) =
   err pos ("found " ^ found ^ " " ^ S.name name ^ " should have been " ^ need)
 
@@ -84,6 +86,15 @@ fun errorDuplicate (pos, name) =
 
 fun errorFunRet (pos,exp,act) =
   err pos ("found return type " ^ act  ^ " expected " ^ exp)
+
+fun errorCompErr (pos) =
+  err pos ("error in compiler")
+
+fun errorNoTypInName (pos, name) =
+  err pos ("no type in name " ^ name)
+
+fun errorNotAssignable (pos, var) =
+  err pos ("can't assign to variable " ^ S.name var)
 
 (* Write additional error messages here *)
 
@@ -141,6 +152,7 @@ fun checkdup ([],[]) = ()
     if (List.all (fn (x) => (name <> x)) xs)
     then checkdup(xs,poss)
     else (errorDuplicate(pos, name))
+
 
 
 fun checkInt (ty, pos) =
@@ -202,7 +214,7 @@ fun transExp (venv, tenv, extra : extra) =
         | trexp (A.VarExp var) = trvar var
         | trexp (A.IntExp int) = {exp = TAbs.IntExp int, ty = Ty.INT}
         | trexp (A.StringExp (s,_)) = {exp = TAbs.StringExp s, ty = Ty.STRING}
-        | trexp (A.BreakExp(_)) = let val breakex as {break = breakbool} = extra
+        | trexp (A.BreakExp(_)) = let val breakex as {break = breakbool, assign = NONE} = extra
 				  in
 				      if  (print(Bool.toString(breakbool)); breakbool)
 				      then {exp = TAbs.BreakExp , ty = Ty.UNIT}
@@ -240,12 +252,31 @@ fun transExp (venv, tenv, extra : extra) =
 			  | A.TimesOp => TAbs.TimesOp
 			  | A.DivideOp => TAbs.DivideOp
 			  | A.ExponentOp => TAbs.ExponentOp
-	  in  (if (bop = TAbs.EqOp orelse bop = TAbs.NeqOp)
+	  in  if (bop = TAbs.EqOp orelse bop = TAbs.NeqOp)
                then (compareTypes (actualTy lty pos, actualTy rty pos,pos);
                      {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp}, ty = Ty.INT})
-	       else (typEq(lty,rty,Ty.INT,pos);
+	       else if (bop = TAbs.PlusOp orelse bop = TAbs.MinusOp
+			orelse bop = TAbs.TimesOp orelse bop = TAbs.ExponentOp)
+		     then 
+		   (typEq(actualTy lty pos, actualTy rty pos,Ty.INT,pos);
 		     {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
-		      ty = Ty.INT})) (* Int because bool is 0/1 *)
+		      ty = Ty.INT})
+		     else (case lty of
+			       Ty.INT => (compareTypes(Ty.INT,rty,pos);
+					  {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
+					   ty = Ty.INT})
+			     | Ty.STRING => (compareTypes(Ty.STRING,rty,pos);
+					     {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
+					      ty = Ty.INT})
+			     | Ty.ARRAY(t,u) => (compareTypes(Ty.ARRAY(t,u),rty,pos);
+					     {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
+					      ty = Ty.INT})
+			     | Ty.RECORD(fs,u) => (compareTypes(Ty.RECORD(fs,u),rty,pos);
+					     {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
+					      ty = Ty.INT})
+			     | t => (errorTypMis(pos, " int, string, array or record ", PT.asString(t));
+			  {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
+				    ty = Ty.ERROR})) (* Int because bool is 0/1 *)
 	  end
         | trexp (A.RecordExp {fields,typ,pos}) =
 	  (case S.look(tenv, typ) of
@@ -267,14 +298,21 @@ fun transExp (venv, tenv, extra : extra) =
 	      texp
 	  end
         | trexp (A.AssignExp {var = v,exp = e, pos}) =
-	  let val tvar as {exp = tyvar, ty = varty} = trvar v
+	  let val extrarec as {break = _, assign = asslist} = extra
+	      val actualvar = (case v of A.SimpleVar(s,p) => s)
+	      val tvar as {exp = tyvar, ty = varty} = trvar v
 	      val texp as {exp = tyexp, ty = expty} = trexp e
           in
 	      (compareTypes(actualTy varty pos, actualTy expty pos, pos);
 	       let val actvar =
 		       (case tyvar of (TAbs.VarExp {var = var', ty = ty'}) => {var = var', ty = ty'})
 	       in
-	       	   {exp = TAbs.AssignExp {var = actvar, exp = texp}, ty = Ty.UNIT}
+		   (case asslist of NONE =>
+	       			    {exp = TAbs.AssignExp {var = actvar, exp = texp}, ty = Ty.UNIT}
+				  | SOME(x::xs) =>
+				    (if (List.all (fn (x) => (actualvar = x)) xs)
+				    then (errorNotAssignable(pos,x);TODO)
+				    else {exp = TAbs.AssignExp {var = actvar, exp = texp}, ty = Ty.UNIT}))
 	       end)
 	  end
         | trexp (A.IfExp {test,thn,els,pos}) =
@@ -296,7 +334,7 @@ fun transExp (venv, tenv, extra : extra) =
 	  end
         | trexp (A.WhileExp {test,body,pos}) =
 	  let val test' as {exp = _, ty = tty} = trexp test
-              val body' as {exp = _, ty = bty} = transExp (venv, tenv, {break = true}) body
+              val body' as {exp = _, ty = bty} = transExp (venv, tenv, {break = true, assign = NONE}) body
 	  in
 	      (compareTypes(Ty.INT, tty, pos);
 	       compareTypes(Ty.UNIT, bty, pos);
@@ -306,7 +344,13 @@ fun transExp (venv, tenv, extra : extra) =
 	  let val tlo as {exp = _, ty = tylo} = trexp lo
 	      val thi as {exp = _, ty = tyhi} = trexp hi
 	      val venv' = S.enter(venv, var, E.VarEntry{ty = Ty.INT})
-	      val tbody as {exp = _, ty = tybody}  = transExp(venv', tenv, {break = true}) body
+	      val extraAss as {break = _, assign = assignlist} = extra
+	      val asslist = (case assignlist of
+				NONE => []
+			      | SOME(x) => x)
+	      val tbody as {exp = _, ty = tybody} =
+		  transExp(venv', tenv,
+			   {break = true, assign = SOME(var :: asslist)}) body
 	  in
 	      (typEq(tylo,tyhi,Ty.INT,pos);
 	       compareTypes(Ty.UNIT,tybody, pos);
@@ -315,8 +359,9 @@ fun transExp (venv, tenv, extra : extra) =
 	  end
         | trexp (A.LetExp {decls,body,pos = _}) =
 	  let
-	      val {decls=decls', tenv=tenv', venv=venv'} = transDecs(venv, tenv, decls, {break = false})
-	      val bexp as {exp = _, ty = bty} = transExp(venv',tenv', {break = false}) body
+	      val {decls=decls', tenv=tenv', venv=venv'} = transDecs(venv, tenv, decls, {break = false,
+								    assign = NONE})
+	      val bexp as {exp = _, ty = bty} = transExp(venv',tenv', {break = false, assign = NONE}) body
           in
 	      {exp = TAbs.LetExp {decls = decls', body = bexp},
 	       ty = bty}
@@ -355,7 +400,7 @@ fun transExp (venv, tenv, extra : extra) =
 			    (case varex of (TAbs.VarExp {var = var', ty = _}) => var')
 		    in 
 			{exp = TAbs.VarExp {var = TAbs.FieldVar ({var = typedVar, ty = vty}, id), ty = varTy}
-			,ty = varTy}
+			,ty = actualTy varTy pos}
 		    end)
 		 | t => (errorTypMis(pos,"record", PT.asString(t)); TODO))
 	  end
@@ -364,7 +409,8 @@ fun transExp (venv, tenv, extra : extra) =
 	  in
 	      (case vty of
 		   Ty.ARRAY(ty,u) =>
-		   let val exp' as {exp = exp, ty = ty'} = transExp(venv,tenv,{break = false}) exp
+		   let val exp' as {exp = exp, ty = ty'} =
+			   transExp(venv,tenv,{break = false, assign = NONE}) exp
 		       val typedVar =
 			   (case varex of (TAbs.VarExp {var = var', ty = _}) => var')
 		   in
@@ -372,22 +418,20 @@ fun transExp (venv, tenv, extra : extra) =
 			    Ty.INT =>
 			    {exp = TAbs.VarExp {var =
 						TAbs.SubscriptVar(
-						    {var = typedVar, ty = vty},exp'),
+						    {var = typedVar, ty = ty},exp'),
 						ty = ty}, (* TODO: Is this actual type? *)
-			     ty = vty}
+			     ty = ty}
 			 |  t => TODO)
 		   end
 		 | t => (errorTypMis(pos, "array", PT.asString(t)); TODO))
-	  end
-
-	      
+	  end	      
   in
       trexp
   end
 and convertRecFields(venv, tenv, fields) =
     let val newFields =
 	    foldl (fn ((s,e,p),l) =>
-		      let val trexp = transExp(tenv, venv, {break = false}) e
+		      let val trexp = transExp(tenv, venv, {break = false, assign = NONE}) e
 		      in
 			  l @ [(s,trexp)]
 		      end) [] fields
@@ -428,7 +472,7 @@ and checkformals (forms, args, pos) =
 and getTypExps (venv, tenv, exps) =
     let val typExps =
 	    foldl (fn ((x,p),l) =>
-		  let val texp = transExp(venv, tenv, {break = false}) x
+		  let val texp = transExp(venv, tenv, {break = false, assign = NONE}) x
 		  in
 		      l @ [texp]
 		  end) [] exps
@@ -446,9 +490,9 @@ and getSeqFromExps (venv, tenv, exps, inp, extra : extra) =
 		       in
 			   getSeqFromExps(venv, tenv, xs, inp @ [texp], extra)
 		       end
-and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra : extra) =
+and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra : extra) =
     let
-        val {exp, ty} = transExp(venv, tenv, {break = false}) init
+        val {exp, ty} = transExp(venv, tenv, {break = false, assign = NONE}) init
     in
         (if (ty = Ty.NIL) then errorNil(pos,name) else ();
          {decl = makeVarDec(name,escape,ty,{exp = exp, ty = ty}),
@@ -458,7 +502,7 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
   | transDec ( venv, tenv
                , A.VarDec {name, escape, typ = SOME (s, pos), init, pos=pos1}, extra) =
     let
-	val {exp, ty} = transExp(venv, tenv, {break = false}) init
+	val {exp, ty} = transExp(venv, tenv, {break = false, assign = NONE}) init
     in
 	case S.look(tenv,s) of
 	    NONE =>     (errorTypUnd(pos,s);
@@ -483,8 +527,7 @@ and transDec ( venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra
     end
   | transDec (venv, tenv, A.TypeDec tydecls, extra) =
     (* Type Declarations:
-       1. Check for duplicate types in makeTypDec
-       2. Check for cyclic definition (i.e. a -> b -> c -> a is illegal)
+       1. Check for cyclic definition (i.e. a -> b -> c -> a is illegal)
      *)
     let val tydecs as {decl = decls  , tenv = tenv', venv = venv} = makeTypDec(tydecls,tenv, venv)
     in
@@ -528,7 +571,8 @@ and makeFunDecs (decls, tenv, venv) = (* Maybe literally the ugliest function we
 			    S.enter(venv,name,
 				    E.VarEntry{ty=ty})
 			  val venv'' = foldl enterparam venv' params'
-			  val body' as {exp = _, ty = bty} = transExp(venv'',tenv, {break = false}) body
+			  val body' as {exp = _, ty = bty} = transExp(venv'',tenv, {break = false,
+										    assign = NONE}) body
 		      in
 			  venv
 		      end) venv decls
@@ -548,10 +592,11 @@ and makeFunDecs (decls, tenv, venv) = (* Maybe literally the ugliest function we
 		 S.enter(venv,name,
 			 E.VarEntry{ty=ty})
 	       val venv'' = foldl enterparam venv' params'
-	       val body' as {exp = _, ty = bty} = transExp(venv'', tenv, {break = false}) body
+	       val body' as {exp = _, ty = bty} = transExp(venv'', tenv, {break = false, assign = NONE}) body
 	   in
 	       case S.look(venv',name) of
 		   SOME s => {name = name, params = params', resultTy = res', body = body'}
+		 | NONE => {name = name, params = params', resultTy = Ty.ERROR, body = body'}
 	   end)
 	val funcs = map transFuncs decls
     in
@@ -562,8 +607,10 @@ and makeTypDec (decls, tenv, venv) =
 			       (S.enter(env,name, Ty.NAME(name,ref NONE)))) tenv decls
 	 val tenv'' = foldl (fn ({name,ty,pos},env) =>
 			    (case S.look(env,name)
-			    of SOME(Ty.NAME(n,r)) =>
-			    (r := SOME(transTy(env,ty)); env))) tenv' decls
+			    of
+			       SOME(Ty.NAME(n,r)) =>
+			       (r := SOME(transTy(env,ty)); env)
+			    |  _ => (errorNoTypInName(pos,S.name name); env))) tenv' decls
 	 fun transDecls{name,ty,pos} =
 	   case S.look(tenv'',name) of
 	       SOME t => {name = name, ty = t}
@@ -586,6 +633,6 @@ and transDecs (venv, tenv, decls, extra : extra) =
     end
 
 fun transProg absyn =
-  transExp (Env.baseVenv, Env.baseTenv, {break = false}) absyn
+  transExp (Env.baseVenv, Env.baseTenv, {break = false, assign = NONE}) absyn
 
 end (* Semant *)
