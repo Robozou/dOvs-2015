@@ -1,12 +1,9 @@
 let
-	type rectype1 = {name : string}
-        type rectype2 = {name : string}
-
-	var rec1 := rectype1 {name = "Hallo"}
-	var rec2 := rectype2 {name = "Joe"}
-	var rec3 := rectype2 {name = "James"}
+    type  rectype = {name:string, age:int}
+    var rec1: rectype := rectype{name="Nobody", age=1000}
 in
-    rec3 = rec2
+    rec1.name := "Somebody";
+    rec1
 end
 
 
