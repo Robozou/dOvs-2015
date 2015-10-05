@@ -107,6 +107,9 @@ fun errorNoTypInName (pos, name) =
 fun errorNotAssignable (pos, var) =
   err pos ("can't assign to variable " ^ S.name var)
 
+fun errorDuplicateField (pos, field) =
+  err pos ("duplicate field '" ^ S.name field ^ "' in record")
+
 
 
 (* Write additional error messages here *)
@@ -189,7 +192,7 @@ fun checkAssignable (declared: Ty.ty, assigned: Ty.ty, pos, msg) =
       () (* TODO *)
   end
 
-fun compareTypes(t1,t2, pos) =
+fun compareTypes (t1,t2, pos) =
   let val act = actualTy t1 pos
   in
       if(act <> t2) then
@@ -200,20 +203,32 @@ fun compareTypes(t1,t2, pos) =
       else ()
   end
 
-fun typEq(t1,t2,ty,pos) =
+fun typEq (t1,t2,ty,pos) =
   if (t1 <> ty) then
       (errorTypMis(pos,PT.asString(ty),PT.asString(t1));())
   else if (t2 <> ty) then
       (errorTypMis(pos,PT.asString(ty),PT.asString(t2));())
   else ()
 
-fun transTy (tenv, t) =
+fun transTy (tenv, t) = (* TODO: Return ERROR or tell user there is an error *)
   case t of A.NameTy(s,p) => (case S.look(tenv,s) of SOME(t) => t
 						   | NONE => (errorTypUnd(p,s); Ty.ERROR))
           | A.ArrayTy(s,p) => (case S.look(tenv,s) of SOME(t) => Ty.ARRAY(t, ref())
                                                     | NONE => (errorTypUnd(p,s); Ty.ERROR))
-          | A.RecordTy(fields) => Ty.RECORD(recList(fields, tenv), ref())
-and recList(fields, tenv) =
+          | A.RecordTy(fields) => (if (checkFieldDuplicates(fields))
+				  then Ty.RECORD(recList(fields, tenv), ref())
+				  else Ty.ERROR) (* TODO: Return ERROR or tell user there is an error *)
+and checkFieldDuplicates (fields) =
+    (case fields of
+	[] => true
+      | ({name,escape,typ,pos}::xs) => (if (checkFieldWithRest(name,xs,pos))
+					then checkFieldDuplicates(xs)
+					else false))
+and checkFieldWithRest (n, rest, pos) =
+    (if (List.all (fn ({name,escape,typ,pos}) => n <> name) rest)
+     then true
+     else (errorDuplicateField(pos,n); false))
+and recList (fields, tenv) =
     let val ret = foldl (fn ({name,escape,typ = (s,p), pos},l) =>
 			    case S.look(tenv,s) of
 				NONE => (errorTypUnd(pos,s);l)
