@@ -35,6 +35,9 @@ fun listprint (seen, init) =
       [] => init
    |  [x] =>  init ^ S.name x ^ "]"
    |  (x::xs) => listprint(xs, init ^ S.name x ^ ", ")
+
+fun listprintprime (seen) =
+  foldl (fn (x,l) => l ^ S.name x ^ " ") "[ " seen
 		     
 type extra = {break : bool, assign : S.symbol list option}
 
@@ -61,7 +64,7 @@ fun errorTypUnd (pos, ty) =
   err pos ("type  " ^ S.name ty ^ " undefined")
 
 fun errorCycleFound (pos,n,seen) =
-  err pos ("found cycle for " ^ S.name n ^ " in type dec list " ^ listprint(seen,"["))
+  err pos ("found cycle for " ^ S.name n ^ " in type dec list " ^ listprintprime(seen) ^ "]")
 
 fun errorFieldNotInRec (pos, id) =
   err pos ("field '" ^ S.name id ^"' not in record")
@@ -103,6 +106,8 @@ fun errorNoTypInName (pos, name) =
 
 fun errorNotAssignable (pos, var) =
   err pos ("can't assign to variable " ^ S.name var)
+
+
 
 (* Write additional error messages here *)
 
@@ -160,6 +165,7 @@ fun checkdup ([],[]) = ()
     if (List.all (fn (x) => (name <> x)) xs)
     then checkdup(xs,poss)
     else (errorDuplicate(pos, name))
+  | checkdup (_,_) = ()
 
 
 
@@ -202,7 +208,8 @@ fun typEq(t1,t2,ty,pos) =
   else ()
 
 fun transTy (tenv, t) =
-  case t of A.NameTy(s,p) => (case S.look(tenv,s) of SOME(t) => t)
+  case t of A.NameTy(s,p) => (case S.look(tenv,s) of SOME(t) => t
+						   | NONE => (errorTypUnd(p,s); Ty.ERROR))
           | A.ArrayTy(s,p) => (case S.look(tenv,s) of SOME(t) => Ty.ARRAY(t, ref())
                                                     | NONE => (errorTypUnd(p,s); Ty.ERROR))
           | A.RecordTy(fields) => Ty.RECORD(recList(fields, tenv), ref())
@@ -319,7 +326,8 @@ fun transExp (venv, tenv, extra : extra) =
 					    ty = Ty.INT}
 					 | _ =>
 					   {exp = TAbs.OpExp{left = lexp, oper = bop, right = TODO},
-					    ty = Ty.INT}))) (* Int because bool is 0/1 *)
+					    ty = Ty.INT}))
+		      | t => (errorTypMis(pos, " int or string ", PT.asString(t)); TODO)) 
 	  end
         | trexp (A.RecordExp {fields,typ,pos}) =
 	  (case S.look(tenv, typ) of
@@ -350,7 +358,8 @@ fun transExp (venv, tenv, extra : extra) =
           in
 	      (compareTypes(varty, actualTy expty pos, pos);
 	       let val actvar =
-		       (case tyvar of (TAbs.VarExp {var = var', ty = ty'}) => {var = var', ty = ty'})
+		       (case tyvar of (TAbs.VarExp {var = var', ty = ty'}) => {var = var', ty = ty'}
+				   | _ => {var = TAbs.SimpleVar(S.symbol("_")), ty = Ty.ERROR})
 	       in
 		   (case asslist of
 			NONE =>
@@ -457,7 +466,8 @@ fun transExp (venv, tenv, extra : extra) =
 		   Ty.RECORD(fields,u) =>
 		   (let val varTy = checkIfFieldExists(fields,id,pos)
 			val typedVar =
-			    (case varex of (TAbs.VarExp {var = var', ty = _}) => var')
+			    (case varex of (TAbs.VarExp {var = var', ty = _}) => var'
+					| _ => TAbs.SimpleVar(S.symbol "_")) (* <= ERROR*)
 		    in 
 			{exp = TAbs.VarExp {var = TAbs.FieldVar ({var = typedVar, ty = actvty}, id),
 					    ty = varTy}
@@ -473,7 +483,8 @@ fun transExp (venv, tenv, extra : extra) =
 		   let val exp' as {exp = exp, ty = ty'} =
 			   transExp(venv,tenv,{break = false, assign = NONE}) exp
 		       val typedVar =
-			   (case varex of (TAbs.VarExp {var = var', ty = _}) => var')
+			   (case varex of (TAbs.VarExp {var = var', ty = _}) => var'
+				       | _ => TAbs.SimpleVar(S.symbol "_")) (* <= ERROR*)
 		   in
 		       (case ty' of
 			    Ty.INT =>
@@ -608,9 +619,10 @@ and checkcycles (tenv,decs) =
 	 ({name,ty,pos}::xs) =>
 	 let val xs = xs
 	 in
-	     case S.look(tenv,name) of
-		 NONE => ()
-	       | SOME(Ty.NAME(_,r)) => (checkcycle(tenv,!r,[name],pos));checkcycles(tenv,xs)
+	     (case S.look(tenv,name) of
+		  NONE => ()
+		| SOME(Ty.NAME(_,r)) => (checkcycle(tenv,!r,[name],pos);checkcycles(tenv,xs))
+		| _ => ())
 	 end
        | _ => ())
 and checkcycle (tenv, cur, seen, pos) =
@@ -693,6 +705,7 @@ and makeTypDec (decls, tenv, venv) =
 	 fun transDecls{name,ty,pos} =
 	   case S.look(tenv'',name) of
 	       SOME t => {name = name, ty = t}
+	     | NONE => {name = name, ty = Ty.ERROR} 
 	 val newData = map transDecls decls
      in {decl = TAbs.TypeDec newData, tenv = tenv'', venv = venv} end)			    
 and transDecs (venv, tenv, decls, extra : extra) =
