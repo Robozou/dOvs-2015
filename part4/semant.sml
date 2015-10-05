@@ -30,6 +30,11 @@ structure TAbs = TAbsyn
 
 
 
+fun listprint (seen, init) =
+  case seen of
+      [] => init
+   |  [x] =>  init ^ S.name x ^ "]"
+   |  (x::xs) => listprint(xs, init ^ S.name x ^ ", ")
 		     
 type extra = {break : bool, assign : S.symbol list option}
 
@@ -55,8 +60,8 @@ fun errorNil (pos, id) =
 fun errorTypUnd (pos, ty) =
   err pos ("type  " ^ S.name ty ^ " undefined")
 
-fun errorCycleFound (pos) =
-  err pos ("found cycle")
+fun errorCycleFound (pos,n,seen) =
+  err pos ("found cycle for " ^ S.name n ^ " in type dec list " ^ listprint(seen,"["))
 
 fun errorFieldNotInRec (pos, id) =
   err pos ("field '" ^ S.name id ^"' not in record")
@@ -612,7 +617,7 @@ and checkcycle (tenv, cur, seen, pos) =
     (case cur of
 	 SOME(Ty.NAME(n,r)) => (if (List.all(fn (x) => n <> x) seen)
 				then checkcycle(tenv,!r,n::seen,pos)
-				else errorCycleFound(pos))
+				else errorCycleFound(pos,n,seen))
        | NONE => ()
        | _ => ())
 and makeFunDecs (decls, tenv, venv) = (* Maybe literally the ugliest function we have ever made *)
