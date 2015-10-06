@@ -1,0 +1,6 @@
+let
+
+
+in
+   if(1 <> 2 & "hej" < "lo" | 2 > 3) then () else ()
+end
