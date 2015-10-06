@@ -1,0 +1,9 @@
+let
+	type rectype1 = {name : string}
+	type rectype2 = {rec : rectype1}
+	var rec := rectype1 {name = "name"}
+	var rec2 := rectype2 {rec = rec}
+
+in
+	rec2.rec.name := "hej"
+end

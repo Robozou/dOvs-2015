@@ -269,7 +269,7 @@ fun transExp (venv, tenv, extra : extra) =
 		    *)
 		   val typexps = getTypExps(venv, tenv, args)
 	       in (checkformals(formals,typexps,pos);
-		   {exp = TAbs.CallExp {func = func, args = typexps}, ty = actualTy result pos}) end)
+		   {exp = TAbs.CallExp {func = func, args = typexps}, ty = result}) end)
         | trexp (A.OpExp {left,oper,right,pos}) =
 	  let val lexp as {exp = _, ty = lty} = trexp left
 	      val rexp as {exp = _, ty = rty} = trexp right
@@ -308,14 +308,28 @@ fun transExp (venv, tenv, extra : extra) =
 						ty = Ty.INT}
 					    |  _ => {exp = TAbs.OpExp{left = lexp, oper = bop, right = TODO},
 						     ty = Ty.INT}))
-		      | Ty.RECORD(fs,u) => (compareTypes(Ty.RECORD(fs,u), actualTy rty pos,pos);
-					    (case rty of
+		      | Ty.RECORD(fs,u) => (case actualTy rty pos of
 						 Ty.RECORD(fs,u) =>
 						 {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
 						  ty = Ty.INT}
-					      |  _ =>
-						 {exp = TAbs.OpExp{left = lexp, oper = bop, right = TODO},
-						  ty = Ty.INT}))
+						 | Ty.NIL =>
+						   {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
+						    ty = Ty.INT}
+					      |  t =>
+						 (errorTypMis(pos, PT.asString(Ty.NIL), PT.asString(t));
+						    {exp =
+						     TAbs.OpExp{left = lexp, oper = bop, right = TODO},
+						     ty = Ty.INT}))
+		      | Ty.NIL => ((case actualTy rty pos of
+				       Ty.RECORD(fs,u) =>
+				       {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
+				       ty = Ty.INT}
+				       | Ty.NIL =>
+					 {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
+					  ty = Ty.INT}
+				     | t => (errorTypMis(pos, PT.asString(Ty.NIL), PT.asString(t));
+					     {exp = TAbs.OpExp{left = lexp, oper = bop, right = TODO},
+					    ty = Ty.INT})))
 		      | t => (errorTypMis(pos, " int, string, array or record ", PT.asString(t));
 			      {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
 			       ty = Ty.ERROR}))
@@ -354,7 +368,7 @@ fun transExp (venv, tenv, extra : extra) =
 				    let val defFields = convertRecFields(tenv, venv, fields)
 				    in
 					(compareRecfields(tfs,fields,pos);
-					 {exp = TAbs.RecordExp {fields = defFields}, ty = act})
+					 {exp = TAbs.RecordExp {fields = defFields}, ty = t})
 				    end)
 				 | t => (errorTypMis(pos,"record",PT.asString(act));TODO))
 			  end)
@@ -412,7 +426,7 @@ fun transExp (venv, tenv, extra : extra) =
 			       (compareTypes(thty, actualTy ety pos, pos); SOME elexp)
 			   end
 	       in
-		   {exp = TAbs.IfExp {test = test', thn = thn', els = els'}, ty = actualTy thty pos}
+		   {exp = TAbs.IfExp {test = test', thn = thn', els = els'}, ty = thty}
 	       end)
 	  end
         | trexp (A.WhileExp {test,body,pos}) =
@@ -436,7 +450,7 @@ fun transExp (venv, tenv, extra : extra) =
 			   {break = true, assign = SOME(var :: asslist)}) body
 	  in
 	      (typEq(actualTy tylo pos, actualTy tyhi pos,Ty.INT,pos);
-	       compareTypes(Ty.UNIT,tybody, pos);
+	       compareTypes(Ty.UNIT, actualTy tybody pos, pos);
 	       {exp = TAbs.ForExp {var = var, escape = escape, lo = tlo, hi = thi, body = tbody},
 		ty = Ty.UNIT})
 	  end
@@ -545,8 +559,8 @@ and checkformals (forms, args, pos) =
 	val lena = length args
     in if (lenf <> lena)
        then (errorFormalMismatch(pos, lena, lenf); ())
-       else let fun test([x],[{exp, ty}]) = compareTypes(x, ty, pos)
-                  | test((x::xs), ({exp, ty}::exps)) = (compareTypes(x, ty, pos); test(xs, exps))
+       else let fun test([x],[{exp, ty}]) = compareTypes(x, actualTy ty pos, pos)
+                  | test((x::xs), ({exp, ty}::exps)) = (compareTypes(x, actualTy ty pos, pos); test(xs, exps))
                   | test([],[]) = ()
                   (* Boilerplate to avoid nonexhaustive match warning *)
                   | test([x],[]) = (errorFormalMismatch(pos, lena, lenf); ())
@@ -602,14 +616,14 @@ and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra 
 	    let val acttyp = actualTy typ pos
             in
 		(case ty of
-		     Ty.NIL => {decl = makeVarDec(name,escape,ty,{exp = exp, ty = acttyp}),
+		     Ty.NIL => {decl = makeVarDec(name,escape,ty,{exp = exp, ty = ty}),
 				tenv = tenv,
-				venv = S.enter(venv, name, E.VarEntry{ty = acttyp})}
+				venv = S.enter(venv, name, E.VarEntry{ty = ty})}
 		  |  _  => (compareTypes(acttyp,actualTy ty pos,pos);
-			    {decl = makeVarDec(name,escape, actualTy ty pos,
-					       {exp = exp, ty = acttyp}),
+			    {decl = makeVarDec(name,escape, ty,
+					       {exp = exp, ty = ty}),
 			     tenv = tenv,
-			     venv = S.enter(venv, name, E.VarEntry{ty = acttyp})}))
+			     venv = S.enter(venv, name, E.VarEntry{ty = ty})}))
 	    end
     end
   | transDec (venv, tenv, A.TypeDec tydecls, extra) =
@@ -696,12 +710,15 @@ and makeFunDecs (decls, tenv, venv) = (* Maybe literally the ugliest function we
 				 |  NONE => (errorTypUnd(pos,s);Ty.ERROR)))
 	       fun enterparam ({name,ty,escape},venv) =
 		 S.enter(venv,name,
-			 E.VarEntry{ty=ty})
+			 E.VarEntry{ty= actualTy ty pos})
 	       val venv'' = foldl enterparam venv' params'
 	       val body' as {exp = _, ty = bty} = transExp(venv'', tenv, {break = false, assign = NONE}) body
+	       val res'' = (if (actualTy bty pos) = (actualTy res' pos)
+			    then res'
+			    else (errorTypMis(pos,PT.asString(res'),PT.asString(bty)); Ty.ERROR))
 	   in
 	       case S.look(venv',name) of
-		   SOME s => {name = name, params = params', resultTy = res', body = body'}
+		   SOME s => {name = name, params = params', resultTy = res'', body = body'}
 		 | NONE => {name = name, params = params', resultTy = Ty.ERROR, body = body'}
 	   end)
 	val funcs = map transFuncs decls
