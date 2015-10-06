@@ -1,11 +1,3 @@
-../testcases/test76.tig:38.21:type mismatch, expected UNIT but found INT
-../testcases/test76.tig:38.21:type mismatch, expected UNIT but found INT
-../testcases/test76.tig:48.13:type mismatch, expected UNIT but found INT
-../testcases/test76.tig:50.13:type mismatch, expected UNIT but found INT
-../testcases/test76.tig:38.21:type mismatch, expected UNIT but found INT
-../testcases/test76.tig:38.21:type mismatch, expected UNIT but found INT
-../testcases/test76.tig:48.13:type mismatch, expected UNIT but found INT
-../testcases/test76.tig:50.13:type mismatch, expected UNIT but found INT
 (UNIT, LetExp([
   | TypeDec[
   |   (bool,
@@ -54,16 +46,16 @@
   |   |   |   |   |   | (INT, VarExp(
   |   |   |   |   |   |   | SimpleVar(b, INT))))]],
   |   |   |   |   | (UNIT, SeqExp[
-  |   |   |   |   |   | (NAME bool = INT, IfExp(
-  |   |   |   |   |   |   | (UNIT, AssignExp(
-  |   |   |   |   |   |   |   | SimpleVar(R1, INT),
+  |   |   |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   |   |   | SimpleVar(R1, INT),
+  |   |   |   |   |   |   | (NAME bool = INT, IfExp(
   |   |   |   |   |   |   |   | (NAME bool = INT, CallExp(FF,[
   |   |   |   |   |   |   |   |   | (INT, VarExp(
-  |   |   |   |   |   |   |   |   |   | SimpleVar(b1, INT)))])))),
-  |   |   |   |   |   |   | (NAME bool = INT, CallExp(FF,[
-  |   |   |   |   |   |   |   | (INT, VarExp(
-  |   |   |   |   |   |   |   |   | SimpleVar(b2, INT)))])),
-  |   |   |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   |   |   |   |   |   | SimpleVar(b1, INT)))])),
+  |   |   |   |   |   |   |   | (NAME bool = INT, CallExp(FF,[
+  |   |   |   |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   |   |   |   | SimpleVar(b2, INT)))])),
+  |   |   |   |   |   |   |   | (INT, IntExp(0)))))),
   |   |   |   |   |   | (UNIT, AssignExp(
   |   |   |   |   |   |   | SimpleVar(bo1, INT),
   |   |   |   |   |   |   | (NAME bool = INT, CallExp(FF,[
@@ -125,28 +117,28 @@
   |   |   |   |   |   | (STRING, StringExp("b"))])),
   |   |   |   |   | (UNIT, CallExp(print,[
   |   |   |   |   |   | (STRING, StringExp("."))])))),
-  |   |   |   | (INT, IfExp(
-  |   |   |   |   | (UNIT, AssignExp(
-  |   |   |   |   |   | SimpleVar(B3, INT),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(B3, INT),
+  |   |   |   |   | (INT, IfExp(
   |   |   |   |   |   | (INT, VarExp(
-  |   |   |   |   |   |   | SimpleVar(B1, INT))))),
-  |   |   |   |   | (INT, IntExp(1)),
-  |   |   |   |   | (INT, VarExp(
-  |   |   |   |   |   | SimpleVar(B2, INT))))),
+  |   |   |   |   |   |   | SimpleVar(B1, INT))),
+  |   |   |   |   |   | (INT, IntExp(1)),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(B2, INT))))))),
   |   |   |   | (UNIT, CallExp(chk,[
   |   |   |   |   | (INT, VarExp(
   |   |   |   |   |   | SimpleVar(B3, INT))),
   |   |   |   |   | (INT, VarExp(
   |   |   |   |   |   | SimpleVar(true, INT))),
   |   |   |   |   | (STRING, StringExp("c"))])),
-  |   |   |   | (INT, IfExp(
-  |   |   |   |   | (UNIT, AssignExp(
-  |   |   |   |   |   | SimpleVar(B3, INT),
+  |   |   |   | (UNIT, AssignExp(
+  |   |   |   |   | SimpleVar(B3, INT),
+  |   |   |   |   | (INT, IfExp(
   |   |   |   |   |   | (INT, VarExp(
-  |   |   |   |   |   |   | SimpleVar(B1, INT))))),
-  |   |   |   |   | (INT, VarExp(
-  |   |   |   |   |   | SimpleVar(B2, INT))),
-  |   |   |   |   | (INT, IntExp(0)))),
+  |   |   |   |   |   |   | SimpleVar(B1, INT))),
+  |   |   |   |   |   | (INT, VarExp(
+  |   |   |   |   |   |   | SimpleVar(B2, INT))),
+  |   |   |   |   |   | (INT, IntExp(0)))))),
   |   |   |   | (UNIT, CallExp(chk,[
   |   |   |   |   | (INT, VarExp(
   |   |   |   |   |   | SimpleVar(B3, INT))),

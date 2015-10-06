@@ -149,10 +149,11 @@ fun makeFieldData (idsym, ty, p) =
 
 (* Precedence and associativity specifciation *)
 
+
+%right      ELSE
+%nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN
 %left       AND OR
-%right      ELSE 
-%nonassoc   FUNCTION VAR TYPE THEN DO OF ASSIGN 
-%nonassoc   NEQ GT LT GE LE EQ 
+%nonassoc   NEQ GT LT GE LE EQ
 %left       PLUS MINUS
 %left       TIMES DIVIDE
 %right      UMINUS DEC

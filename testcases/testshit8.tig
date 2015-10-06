@@ -1,0 +1,7 @@
+let
+
+	type rectype1 = {name : string, id : string}
+	var rec1 := rectype1 {name = "Hi", id = ""}
+
+in
+end

@@ -1,0 +1,13 @@
+let	
+	type bool = int
+	var false := 0
+	var true := 1
+
+	function T (b : bool) : bool = b
+	
+	var r : bool := T(false) & T(true)
+	var t : int := 5
+
+in
+	r := T(false) & T(true)
+end

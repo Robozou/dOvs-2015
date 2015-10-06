@@ -63,6 +63,15 @@ fun errorNil (pos, id) =
 fun errorTypUnd (pos, ty) =
   err pos ("type  " ^ S.name ty ^ " undefined")
 
+fun errorRecFields (pos, s, s2) =
+  err pos ("wrong record field '" ^ S.name s ^ "' expected '" ^ S.name s2 ^ "'")
+
+fun errorRecFieldNotFound (pos, s) =
+  err pos ("field '" ^ S.name s ^ "' not in record ")
+
+fun errorRecfieldTypeWrong (pos, s, ty,actt) =
+  err pos ("type of field '" ^ S.name s ^ "' should be " ^ PT.asString(ty) ^ " but found " ^ PT.asString(actt))
+
 fun errorCycleFound (pos,n,seen) =
   err pos ("found cycle for " ^ S.name n ^ " in type dec list " ^ listprintprime(seen) ^ "]")
 
@@ -367,7 +376,7 @@ fun transExp (venv, tenv, extra : extra) =
 				   Ty.RECORD(tfs,u) => (
 				    let val defFields = convertRecFields(tenv, venv, fields)
 				    in
-					(compareRecfields(tfs,fields,pos);
+					(compareRecfields(tfs,fields,pos,tenv,venv,extra);
 					 {exp = TAbs.RecordExp {fields = defFields}, ty = t})
 				    end)
 				 | t => (errorTypMis(pos,"record",PT.asString(act));TODO))
@@ -459,8 +468,8 @@ fun transExp (venv, tenv, extra : extra) =
 	      val {decls=decls', tenv=tenv', venv=venv'} = transDecs(venv, tenv, decls, {break = false,
 											 assign = NONE})
 	      val bexp as {exp = _, ty = bty} = transExp(venv',tenv', {break = false, assign = NONE}) body
-          in
-	      {exp = TAbs.LetExp {decls = decls', body = bexp},
+          in	      
+	       {exp = TAbs.LetExp {decls = decls', body = bexp},
 	       ty = bty}
 	  end
         | trexp (A.ArrayExp {typ, size, init, pos}) =
@@ -475,7 +484,7 @@ fun transExp (venv, tenv, extra : extra) =
 				   in
 				       (compareTypes(Ty.INT, actualTy sizty pos, pos);
 					compareTypes(att, actualTy inty pos, pos);
-					{exp = TAbs.ArrayExp {size = tsize, init = tinit}, ty = act})
+					{exp = TAbs.ArrayExp {size = tsize, init = tinit}, ty = typ})
 				   end
 				 | t => (errorTypMis(pos, PT.asString(act), "array"); TODO)
 			   end )
@@ -532,22 +541,67 @@ fun transExp (venv, tenv, extra : extra) =
 and convertRecFields(venv, tenv, fields) =
     let val newFields =
 	    foldl (fn ((s,e,p),l) =>
-		      let val trexp = transExp(tenv, venv, {break = false, assign = NONE}) e
+		      let val trexp as {exp = exp, ty = ty'} =
+			      transExp(tenv, venv, {break = false, assign = NONE}) e
 		      in
-			  l @ [(s,trexp)]
+			  [(s,trexp)] @ l
 		      end) [] fields
     in
 	newFields
     end
-and compareRecfields(fs,tfs,pos) =
+and compareRecfields(tfs,fs,pos,tenv,venv,extra) =
     let val lengfs = length fs
 	val lengtfs = length tfs
     in
 	if(lengfs <> lengtfs) then (errorFormalMismatch(pos,lengfs,lengtfs);()) else
-	(case tfs of
-	     [] => ()
-	  |  [(s,e,p)] => ()
-	  |  ((s,e,p)::xs) => ())
+	(let fun test([]) = ()
+	       | test [(sy,ex,po)] = (checkshit(pos,sy,ex,tfs,tenv,venv,extra))
+	       | test ((sy,ex,pos)::ts) = (checkshit(pos,sy,ex,tfs,tenv,venv,extra);test(ts))
+	in
+	    test(fs)
+	end)
+    end
+and checkshit (pos,cur,ex,fields,tenv,venv,extra) =
+    let val res = case fields of
+		      [] => (errorRecFieldNotFound(pos,cur))
+		   | [(s,e)] => (if cur <> s
+				 then errorRecFieldNotFound(pos,cur)
+				 else (let val texp as {exp = _, ty = ty'} = transExp(venv,tenv,extra) ex
+				       in
+					   (case actualTy e pos of
+						Ty.RECORD(f,u) =>
+						(case actualTy ty' pos of
+						     Ty.RECORD(f,u) => ()
+						   | Ty.NIL => ()
+						   | _ => errorRecfieldTypeWrong(pos,cur,e,ty'))
+					      | Ty.NAME(n,r) =>
+						(case actualTy ty' pos of
+						     Ty.NIL => ()
+						   | _ => errorRecfieldTypeWrong(pos,cur,e,ty'))
+					      | t => if (e = ty')
+						     then ()
+						     else errorRecfieldTypeWrong(pos,cur,e,ty'))
+				       end)) 
+		   | ((s,e)::fs) =>  (if (cur <> s) then checkshit(pos,cur,ex,fs,tenv,venv,extra)
+				      else let val texp as {exp = _, ty = ty'} = transExp(venv,tenv,extra) ex
+					   in
+					       (case actualTy e pos of
+						    Ty.RECORD(f,u) =>
+						    (case actualTy ty' pos of
+							 Ty.RECORD(f,u) =>
+							 ()
+						       | Ty.NIL => ()
+						       | _ => errorRecfieldTypeWrong(pos,cur,e,ty'))
+						  | Ty.NAME(n,r) =>
+						    (case actualTy ty' pos of
+							 Ty.NIL => ()
+						       | _ => errorRecfieldTypeWrong(pos,cur,e,ty'))
+						  | t => if (e = ty')
+							 then ()
+							 else errorRecfieldTypeWrong(pos,cur,e,ty'))
+					   end)
+    in
+	()
     end
 and checkIfFieldExists(fields,id,pos) =
     (case fields of
