@@ -256,7 +256,7 @@ fun transExp (venv, tenv, extra : extra) =
         | trexp (A.VarExp var) = trvar var
         | trexp (A.IntExp int) = {exp = TAbs.IntExp int, ty = Ty.INT}
         | trexp (A.StringExp (s,_)) = {exp = TAbs.StringExp s, ty = Ty.STRING}
-        | trexp (A.BreakExp(_)) = let val breakex as {break = breakbool, assign = NONE} = extra
+        | trexp (A.BreakExp(_)) = let val breakex as {break = breakbool, assign = _} = extra
 				  in
 				      if  (breakbool)
 				      then {exp = TAbs.BreakExp , ty = Ty.UNIT}

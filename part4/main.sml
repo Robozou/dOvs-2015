@@ -4,9 +4,9 @@ struct
 fun compile infile =
     let
         val absyn = Parse.parse infile
-(*	val printab = PrintAbsyn.print(TextIO.stdOut, absyn)			*)
+(*	val printab = PrintAbsyn.print(TextIO.stdOut, absyn)	*)
         val tabsyn = Semant.transProg absyn
-(*	val print = PrintTAbsyn.print(TextIO.stdOut, tabsyn)*)
+	val print = PrintTAbsyn.print(TextIO.stdOut, tabsyn)
     in
         if !ErrorMsg.anyErrors then OS.Process.exit 1
         else ()

@@ -1,0 +1,11 @@
+/* Definition of types of types in an environment */
+
+let
+	type a = int
+	type c = a
+	type d = c
+	var a : c := 5
+	var b : d := a
+in
+	b + a
+end
