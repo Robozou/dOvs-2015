@@ -62,6 +62,9 @@ fun errorNil (pos, id) =
 fun errorTypUnd (pos, ty) =
   err pos ("type  " ^ S.name ty ^ " undefined")
 
+fun errorUnitNotAllowed (pos) =
+  err pos ("unit type not allowed")
+
 fun errorRecFields (pos, s, s2) =
   err pos ("wrong record field '" ^ S.name s ^ "' expected '" ^ S.name s2 ^ "'")
 
@@ -398,23 +401,26 @@ fun transExp (venv, tenv, extra : extra) =
 	       let val actvar =
 		       (case tyvar of (TAbs.VarExp {var = var', ty = ty'}) => {var = var', ty = ty'}
 				   | _ => {var = TAbs.SimpleVar(S.symbol("_")), ty = Ty.ERROR})
+		   val actexp =
+		       (case expty of Ty.UNIT => (errorUnitNotAllowed(pos);ERROR)
+				   | _ => texp)
 	       in
 		   (case asslist of
 			NONE =>
-	       		{exp = TAbs.AssignExp {var = actvar, exp = texp}, ty = Ty.UNIT}
+	       		{exp = TAbs.AssignExp {var = actvar, exp = actexp}, ty = Ty.UNIT}
 		      | SOME(x) =>
 			(let fun checkVar([x]) =
 			       (if (actualvar = x)
 				then (errorNotAssignable(pos,x); {exp = TAbs.ErrorExp,
 				      ty = Ty.UNIT})
-				else {exp = TAbs.AssignExp {var = actvar, exp = texp},
+				else {exp = TAbs.AssignExp {var = actvar, exp = actexp},
 				      ty = Ty.UNIT})
 			       | checkVar (x::xs) =
 				 (if (actualvar = x)
 				  then (errorNotAssignable(pos,x); {exp = TAbs.ErrorExp,
 				      ty = Ty.UNIT})
 				  else checkVar(xs))
-			       | checkVar([]) = {exp = TAbs.AssignExp {var = actvar, exp = texp},
+			       | checkVar([]) = {exp = TAbs.AssignExp {var = actvar, exp = actexp},
 				      ty = Ty.UNIT} 
 			 in
 			     checkVar(x)
@@ -649,10 +655,18 @@ and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra 
     let
         val {exp, ty} = transExp(venv, tenv, {break = false, assign = NONE}) init
     in
-        (if (ty = Ty.NIL) then errorNil(pos,name) else ();
-         {decl = makeVarDec(name,escape,ty,{exp = exp, ty = ty}),
-	  tenv = tenv,
-	  venv = S.enter(venv, name, E.VarEntry{ty = ty})})
+	case ty of
+	    Ty.NIL => (errorNil(pos,name); {decl = makeVarDec(name,escape,Ty.ERROR,
+							      {exp = exp, ty = Ty.ERROR}),
+					    tenv = tenv,
+					    venv = S.enter(venv, name, E.VarEntry{ty = Ty.ERROR})})
+	  | Ty.UNIT => (errorUnitNotAllowed(pos); {decl = makeVarDec(name,escape,Ty.ERROR,
+								     {exp = exp, ty = Ty.ERROR}),
+						   tenv = tenv,
+						   venv = S.enter(venv, name, E.VarEntry{ty = Ty.ERROR})})
+	  | _ => {decl = makeVarDec(name,escape,ty,{exp = exp, ty = ty}),
+			  tenv = tenv,
+			  venv = S.enter(venv, name, E.VarEntry{ty = ty})}
     end
   | transDec ( venv, tenv
                , A.VarDec {name, escape, typ = SOME (s, pos), init, pos=pos1}, extra) =
@@ -663,7 +677,7 @@ and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra 
 	    NONE =>     (errorTypUnd(pos,s);
 			 {decl = makeVarDec(name,escape,ty,{exp = exp, ty = ty}),
 			  tenv = tenv,
-			  venv = S.enter(venv, name, E.VarEntry{ty = ty})})
+			  venv = S.enter(venv, name, E.VarEntry{ty = Ty.ERROR})})
          |  SOME(typ) =>
 	    (* 1. Check actual type
 		         2. Compare init type to dec type*)
@@ -673,11 +687,14 @@ and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra 
 		     Ty.NIL => {decl = makeVarDec(name,escape,ty,{exp = exp, ty = ty}),
 				tenv = tenv,
 				venv = S.enter(venv, name, E.VarEntry{ty = ty})}
-		  |  _  => (compareTypes(acttyp,actualTy ty pos,pos);
-			    {decl = makeVarDec(name,escape, ty,
-					       {exp = exp, ty = ty}),
-			     tenv = tenv,
-			     venv = S.enter(venv, name, E.VarEntry{ty = ty})}))
+		   | Ty.UNIT => {decl = makeVarDec(name, escape,Ty.ERROR,{exp = exp, ty = Ty.ERROR}),
+				tenv = tenv,
+				venv = S.enter(venv, name, E.VarEntry{ty = Ty.ERROR})}
+		   |  _  => (compareTypes(acttyp,actualTy ty pos,pos);
+			     {decl = makeVarDec(name,escape, ty,
+						{exp = exp, ty = ty}),
+			      tenv = tenv,
+			      venv = S.enter(venv, name, E.VarEntry{ty = ty})}))
 	    end
     end
   | transDec (venv, tenv, A.TypeDec tydecls, extra) =

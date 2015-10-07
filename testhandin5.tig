@@ -1,0 +1,13 @@
+/* a very long record type and 4 record variables */
+let
+    type  rectype1 = {name:string}
+    type  rectype2 = {rec :rectype1}
+    type  rectype3 = {rec:rectype2}
+    type  rectype4 = {rec:rectype3}
+    var rec1: rectype1 := rectype1{name="Nobody"}
+    var rec2: rectype2 := rectype2{rec = rec1}
+    var rec3: rectype3 := rectype3{rec = rec2}
+    var rec4: rectype4 := rectype4{rec = rec3}
+in
+    rec4.rec.rec.rec.name := "Somebody"
+end
