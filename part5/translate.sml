@@ -67,7 +67,7 @@ fun seq [] = T.EXP (T.CONST 0)
   | seq [s] = s
   | seq (h::t) = T.SEQ (h, seq t)
 
-fun unEx (Ex e) = e
+fun unEx (Ex e) = e 
   | unEx (Cx genstm) =
     let
         val r = Temp.newtemp ()
@@ -173,8 +173,8 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
             raise TODO
           | (_, Ex _, Cx _) =>
             raise TODO
-          | (_, _, _) =>
-            raise Bug "encountered thenBody and elseBody of different kinds"
+(*          | (_, _, _) =>
+            raise Bug "encountered thenBody and elseBody of different kinds"*)
     end
 
 fun binop2IR (oper, left, right) =
@@ -183,16 +183,18 @@ fun binop2IR (oper, left, right) =
 fun relop2IR (oper, left, right) =
     Cx (raise TODO)
 
-fun intOp2IR (TAbs.PlusOp, left, right)   = binop2IR (T.PLUS, left, right)
-  | intOp2IR (TAbs.MinusOp, left, right)  = binop2IR (T.MINUS, left, right)
-  | intOp2IR (TAbs.TimesOp, left, right)  = binop2IR (T.MUL, left, right)
-  | intOp2IR (TAbs.DivideOp, left, right) = binop2IR (T.DIV, left, right)
-  | intOp2IR (TAbs.EqOp, left, right)     = relop2IR (T.EQ, left, right)
-  | intOp2IR (TAbs.NeqOp, left, right)    = relop2IR (T.NE, left, right)
-  | intOp2IR (TAbs.LtOp, left, right)     = relop2IR (T.LT, left, right)
-  | intOp2IR (TAbs.LeOp, left, right)     = relop2IR (T.LE, left, right)
-  | intOp2IR (TAbs.GtOp, left, right)     = relop2IR (T.GT, left, right)
-  | intOp2IR (TAbs.GeOp, left, right)     = relop2IR (T.GE, left, right)
+fun intOp2IR (TAbs.PlusOp, left, right)     = binop2IR (T.PLUS, left, right)
+  | intOp2IR (TAbs.MinusOp, left, right)    = binop2IR (T.MINUS, left, right)
+  | intOp2IR (TAbs.TimesOp, left, right)    = binop2IR (T.MUL, left, right)
+  | intOp2IR (TAbs.DivideOp, left, right)   = binop2IR (T.DIV, left, right)
+  | intOp2IR (TAbs.ExponentOp, left, right) = raise TODO (* External C call *)
+  | intOp2IR (TAbs.EqOp, left, right)       = relop2IR (T.EQ, left, right)
+  | intOp2IR (TAbs.NeqOp, left, right)      = relop2IR (T.NE, left, right)
+  | intOp2IR (TAbs.LtOp, left, right)       = relop2IR (T.LT, left, right)
+  | intOp2IR (TAbs.LeOp, left, right)       = relop2IR (T.LE, left, right)
+  | intOp2IR (TAbs.GtOp, left, right)       = relop2IR (T.GT, left, right)
+  | intOp2IR (TAbs.GeOp, left, right)       = relop2IR (T.GE, left, right)
+
 
 fun let2IR ([], body) = body
   | let2IR (decls, body) = Ex (T.ESEQ (seq (map unNx decls), unEx body))

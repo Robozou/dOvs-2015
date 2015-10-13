@@ -30,7 +30,7 @@ and decl = FunctionDec of fundecldata list
                                                                           
 and oper     = EqOp | NeqOp
              | LtOp | LeOp | GtOp | GeOp
-             | PlusOp | MinusOp | TimesOp | DivideOp
+             | PlusOp | MinusOp | TimesOp | DivideOp | ExponentOp
                                                 
 withtype var = { var : var_desc
                , ty : Types.ty }

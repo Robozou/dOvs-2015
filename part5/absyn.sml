@@ -35,7 +35,7 @@ and ty       = NameTy of S.symbol * pos
 
 and oper     = EqOp | NeqOp
              | LtOp | LeOp | GtOp | GeOp
-             | PlusOp | MinusOp | TimesOp | DivideOp
+             | PlusOp | MinusOp | TimesOp | DivideOp | ExponentOp
 
 withtype fielddata   = { name: S.symbol
                        , escape: bool ref

@@ -17,7 +17,7 @@ sig
                  | CONST of int
 	         | CALL of exp * exp list
 
-         and binop = PLUS | MINUS | MUL | DIV
+         and binop = PLUS | MINUS | MUL | DIV 
                    | AND | OR | LSHIFT | RSHIFT | ARSHIFT | XOR
 
          and relop = EQ | NE | LT | GT | LE | GE

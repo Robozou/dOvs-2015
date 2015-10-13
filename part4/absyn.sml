@@ -1,11 +1,3 @@
-(* AU Compilation 2015.
- *
- * Do not change this file, unless you suspect an error.
- * Use the course web forum to discuss that.
- *
- *)
-
-
 structure Absyn =
 struct
 
