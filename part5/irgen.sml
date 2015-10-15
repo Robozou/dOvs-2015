@@ -25,30 +25,30 @@ val TODO = {exp=Tr.bogus, ty=Ty.ERROR}
 
 fun transExp (venv, extra : extra) =
     let                               
-        fun trexp {exp=TAbs.NilExp, ty} = {exp=Tr.nil2IR (), ty=ty}
-          | trexp _ = TODO
+        (*fun trexp {exp=TAbs.NilExp, ty} = {exp=Tr.nil2IR (), ty=ty}
+          | trexp _ = TODO*)
                 
         (* The below code suggest how to translate depending what case
         you are in, however, uncommenting the section would result in
         type-errors. You will have to write the rest of the cases your
-        selves.
+        selves.*)
 
-        fun trexp (A.NilExp) _ =
+        fun trexp {exp=TAbs.NilExp,ty}  =
             {exp = Tr.nil2IR (), ty = Ty.NIL}
 
-          | trexp (A.VarExp var) break =
+         (* | trexp (TAbs.VarExp var) break =
             trvar var false break
 
-          | trexp (A.IntExp i) _ =
+          | trexp (TAbs.IntExp i) _ =
             raise TODO
 
-          | trexp (A.StringExp (str, pos)) _ =
+          | trexp (TAbs.StringExp (str)) _ =
             raise TODO
 
-          | trexp (A.OpExp {left, oper, right, pos}) break =
+          | trexp (TAbs.OpExp {left, oper, right}) break =
             raise TODO (* NB: many cases here! *)
 
-          | trexp (A.CallExp {func, args, pos}) break =
+          | trexp (TAbs.CallExp {func, args}) break =
             (case S.look (venv, func) of
                  SOME (E.FunEntry {formals, result, level=level', label}) =>
                  raise TODO (* using Tr.procCall2IR, Tr.funCall2IR *)
@@ -57,36 +57,36 @@ fun transExp (venv, extra : extra) =
                | NONE =>
                  raise TODO (* error handling *))
 
-          | trexp (A.IfExp {test, thn, els, pos}) break =
+          | trexp (TAbs.IfExp {test, thn, els}) break =
             raise TODO (* using Tr.ifThen2IR, Tr.ifThenElse2IR *)
 
-          | trexp (A.WhileExp {test, body, pos}) break =
+          | trexp (TAbs.WhileExp {test, body}) break =
             raise TODO (* using Tr.newBreakPoint, Tr.while2IR *)
 
-          | trexp (aexp as A.RecordExp {fields, typ, pos}) break =
+          | trexp (aexp as TAbs.RecordExp {fields, typ}) break =
             raise TODO (* using Tr.record2IR, maybe Tr.nil2IR with errors *)
 
-          | trexp (A.SeqExp []) _ =
+          | trexp (TAbs.SeqExp []) _ =
             (* ensure there is some expression if the SeqExp is empty *)
             raise TODO
 
-          | trexp (A.SeqExp (aexps as (aexp'::aexps'))) break =
+          | trexp (TAbs.SeqExp (aexps as (aexp'::aexps'))) break =
             raise TODO (* using Tr.seq2IR, Tr.eseq2IR *)
 
-          | trexp (A.AssignExp {var, exp, pos}) break =
+          | trexp (TAbs.AssignExp {var, exp}) break =
             raise TODO (* using Tr.assign2IR, checkAssignable *)
 
-          | trexp (A.ForExp {var, escape, lo, hi, body, pos}) _ =
+          | trexp (TAbs.ForExp {var, escape, lo, hi, body}) _ =
             raise TODO (* using Tr.newBreakPoint, Tr.allocLocal, Tr.forIR *)
 
-          | trexp (A.BreakExp pos) break =
+          | trexp (TAbs.BreakExp) break =
             raise TODO (* using Tr.break2IR *)
 
-          | trexp (term as A.LetExp {decls, body, pos}) break =
+          | trexp (term as TAbs.LetExp {decls, body}) break =
             raise TODO (* using transDecs, transExp, Tr.let2IR *)
 
-          | trexp (A.ArrayExp {typ, size, init, pos}) break =
-            raise TODO (* using Tr.array2IR *) *)
+          | trexp (TAbs.ArrayExp {size, init}) break =
+            raise TODO (* using Tr.array2IR *) 
 
         (* NB: trvar must generate a tree describing the given
          * variable such that it will work for both evaluation and
@@ -109,7 +109,7 @@ fun transExp (venv, extra : extra) =
                                        
           | trvar {var=TAbs.SubscriptVar (var, exp), ty} : {exp:Tr.exp,ty:Ty.ty} = 
             (* ignore 'mutationRequested': all array entries are mutable *)
-            TODO (* using Tr.subscript2IR *)
+            TODO (* using Tr.subscript2IR *)*)
 
     in
         trexp
