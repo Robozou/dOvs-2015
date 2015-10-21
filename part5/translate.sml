@@ -178,7 +178,12 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
     end
 
 fun binop2IR (oper, left, right) =
-    Ex (raise TODO)
+    let
+	val unleft = unEx(left)
+	val unright = unEx(right)
+    in
+	Ex (T.BINOP(oper,unleft,unright))
+    end
 
 fun relop2IR (oper, left, right) =
     Cx (raise TODO)

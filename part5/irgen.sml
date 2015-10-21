@@ -44,10 +44,18 @@ fun transExp (venv, extra : extra) =
 
           | trexp {exp = TAbs.StringExp s, ty} =
             {exp = Tr.string2IR s, ty = Ty.STRING}
-(*
-          | trexp (TAbs.OpExp {left, oper, right}) break =
-            raise TODO (* NB: many cases here! *)
 
+          | trexp {exp = TAbs.OpExp {left, oper, right}, ty} =
+	    let
+		val leftexp as {exp = lexp,ty} = trexp left
+		val rightexp as {exp = rexp,ty}= trexp right
+	    in
+		case oper of
+		    TAbs.PlusOp => {exp = Tr.intOp2IR(TAbs.PlusOp,lexp,rexp), ty = ty}
+		  | TAbs.MinusOp => {exp = Tr.intOp2IR(TAbs.MinusOp, lexp, rexp), ty = ty}
+	    end
+	     (* NB: many cases here! *)
+(*
           | trexp (TAbs.CallExp {func, args}) break =
             (case S.look (venv, func) of
                  SOME (E.FunEntry {formals, result, level=level', label}) =>
