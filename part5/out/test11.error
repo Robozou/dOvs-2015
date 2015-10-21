@@ -1,1 +1,2 @@
-Expects argument <infile>
+../testcases/test11.tig:2.23:can't assign to variable i
+../testcases/test11.tig:2.1:type mismatch, expected INT but found STRING

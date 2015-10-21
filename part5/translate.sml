@@ -83,14 +83,14 @@ fun unEx (Ex e) = e
     end
   | unEx (Nx s) = T.ESEQ (s, T.CONST 0)
 
-fun unNx (Ex e) = raise TODO
+fun unNx (Ex e) = T.EXP e
   | unNx (Cx genstm) = raise TODO
-  | unNx (Nx s) = raise TODO
+  | unNx (Nx s) = s
 
-fun unCx (Ex (T.CONST 0)) = raise TODO
-  | unCx (Ex (T.CONST _)) = raise TODO
-  | unCx (Ex e) = raise TODO
-  | unCx (Cx genstm) = raise TODO
+fun unCx (Ex (T.CONST 0)) = (fn (t,f) => T.JUMP(T.NAME f, [f]))
+  | unCx (Ex (T.CONST _)) = (fn (t,f) => T.JUMP(T.NAME t, [t]))
+  | unCx (Ex e) = (fn (t,f) => T.CJUMP(T.EQ, e, T.CONST 0, f, t))
+  | unCx (Cx genstm) = genstm
   | unCx (Nx _) = raise TODO
 
 val empty = Ex (T.CONST 0)

@@ -36,15 +36,15 @@ fun transExp (venv, extra : extra) =
         fun trexp {exp=TAbs.NilExp,ty}  =
             {exp = Tr.nil2IR (), ty = Ty.NIL}
 
-         (* | trexp (TAbs.VarExp var) break =
-            trvar var false break
+          | trexp {exp = TAbs.VarExp var, ty} =
+            trvar var 
 
-          | trexp (TAbs.IntExp i) _ =
-            raise TODO
+          | trexp {exp=TAbs.IntExp i,ty} =
+            {exp = Tr.int2IR i, ty = Ty.INT}
 
-          | trexp (TAbs.StringExp (str)) _ =
-            raise TODO
-
+          | trexp {exp = TAbs.StringExp s, ty} =
+            {exp = Tr.string2IR s, ty = Ty.STRING}
+(*
           | trexp (TAbs.OpExp {left, oper, right}) break =
             raise TODO (* NB: many cases here! *)
 
@@ -98,7 +98,7 @@ fun transExp (venv, extra : extra) =
          * the problem).  This means that Tr.simpleVar, Tr.fieldVar, 
          * and Tr.subscript2IR must return an Ex (MEM _) or an 
          * Ex (TEMP _).
-         *)
+         *)*)
 
         and trvar {var=TAbs.SimpleVar id, ty} : {exp:Tr.exp,ty:Ty.ty} = 
             TODO (* using Tr.simpleVar *)
@@ -109,7 +109,7 @@ fun transExp (venv, extra : extra) =
                                        
           | trvar {var=TAbs.SubscriptVar (var, exp), ty} : {exp:Tr.exp,ty:Ty.ty} = 
             (* ignore 'mutationRequested': all array entries are mutable *)
-            TODO (* using Tr.subscript2IR *)*)
+            TODO (* using Tr.subscript2IR *)
 
     in
         trexp

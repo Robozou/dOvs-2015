@@ -1,1 +1,2 @@
-Expects argument <infile>
+../testcases/test43.tig:3.5:unit type not allowed
+../testcases/test43.tig:5.5:type mismatch, expected INT but found ERROR

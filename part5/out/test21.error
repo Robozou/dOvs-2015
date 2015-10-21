@@ -1,1 +1,3 @@
-Expects argument <infile>
+../testcases/test21.tig:5.31:type mismatch, expected INT but found UNIT
+../testcases/test21.tig:5.31:type mismatch, expected INT but found UNIT
+../testcases/test21.tig:4.5:type mismatch, expected UNIT but found INT

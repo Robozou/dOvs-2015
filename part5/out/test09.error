@@ -1,1 +1,1 @@
-Expects argument <infile>
+../testcases/test09.tig:2.1:type mismatch, expected INT but found STRING

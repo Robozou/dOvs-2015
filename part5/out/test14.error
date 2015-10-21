@@ -1,1 +1,1 @@
-Expects argument <infile>
+../testcases/test14.tig:9.8:type mismatch, expected NIL but found ARRAY of INT

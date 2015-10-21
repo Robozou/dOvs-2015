@@ -1,1 +1,2 @@
-Expects argument <infile>
+../testcases/test20.tig:2.18:var i is undefined
+../testcases/test20.tig:2.18:type mismatch, expected INT but found ERROR

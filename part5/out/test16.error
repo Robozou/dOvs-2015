@@ -1,1 +1,4 @@
-Expects argument <infile>
+../testcases/test16.tig:3.2:found cycle for a in type dec list [ d c a ]
+../testcases/test16.tig:4.2:found cycle for a in type dec list [ d c a b ]
+../testcases/test16.tig:5.2:found cycle for c in type dec list [ a d c ]
+../testcases/test16.tig:6.2:found cycle for d in type dec list [ c a d ]
