@@ -67,7 +67,7 @@ fun seq [] = T.EXP (T.CONST 0)
   | seq [s] = s
   | seq (h::t) = T.SEQ (h, seq t)
 
-fun unEx (Ex e) = e 
+fun unEx (Ex e) = e
   | unEx (Cx genstm) =
     let
         val r = Temp.newtemp ()
@@ -144,7 +144,9 @@ fun ifThen2IR (test, thenExp) =
                        , func (t, f)
                        , T.LABEL labelEnd])
           | (_, Nx _) =>
-            raise TODO
+            Nx (seq [test' (labelThen, labelEnd)
+                , T.LABEL labelThen
+                , T.LABEL labelEnd])
           | (_, Ex ex) =>
             raise TODO
     end
@@ -165,11 +167,11 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
             in
                 raise TODO
             end
-          | (_, Nx _, _) => 
+          | (_, Nx _, _) =>
             raise TODO
-          | (_, _, Nx _) => 
+          | (_, _, Nx _) =>
             raise TODO
-          | (_, Cx _, Ex _) => 
+          | (_, Cx _, Ex _) =>
             raise TODO
           | (_, Ex _, Cx _) =>
             raise TODO
@@ -391,4 +393,3 @@ val printAccess = printX asStringAccess
 val printExp    = printX asStringExp
 
 end (* Translate *)
-

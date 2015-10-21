@@ -21,13 +21,13 @@ type extra = { level : Tr.level (* frame of enclosing function *)
 fun actualTy (Ty.NAME (_, ref (SOME ty))) = actualTy ty
   | actualTy t = t
 
-val TODO = {exp=Tr.bogus, ty=Ty.ERROR}        
+val TODO = {exp=Tr.bogus, ty=Ty.ERROR}
 
 fun transExp (venv, extra : extra) =
-    let                               
+    let
         (*fun trexp {exp=TAbs.NilExp, ty} = {exp=Tr.nil2IR (), ty=ty}
           | trexp _ = TODO*)
-                
+
         (* The below code suggest how to translate depending what case
         you are in, however, uncommenting the section would result in
         type-errors. You will have to write the rest of the cases your
@@ -37,7 +37,7 @@ fun transExp (venv, extra : extra) =
             {exp = Tr.nil2IR (), ty = Ty.NIL}
 
           | trexp {exp = TAbs.VarExp var, ty} =
-            trvar var 
+            trvar var
 
           | trexp {exp=TAbs.IntExp i,ty} =
             {exp = Tr.int2IR i, ty = Ty.INT}
@@ -47,22 +47,26 @@ fun transExp (venv, extra : extra) =
 
           | trexp {exp = TAbs.OpExp {left, oper, right}, ty} =
 	    let
-		val leftexp as {exp = lexp,ty} = trexp left
-		val rightexp as {exp = rexp,ty}= trexp right
+		val leftexp as {exp = lexp,ty = lty} = trexp left
+		val rightexp as {exp = rexp,ty = rty}= trexp right
+      val func = case (lty, rty) of
+        (Ty.INT, Ty.INT) => Tr.intOp2IR
+      | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR
+      (* | (_ , _) => raise e "type mismatch" TODO *)
 	    in
 		case oper of
-		    TAbs.PlusOp => {exp = Tr.intOp2IR(TAbs.PlusOp,lexp,rexp), ty = ty}
-		  | TAbs.MinusOp => {exp = Tr.intOp2IR(TAbs.MinusOp, lexp, rexp), ty = ty}
-		  | TAbs.TimesOp => {exp = Tr.intOp2IR(TAbs.TimesOp, lexp, rexp), ty = ty}
-		  | TAbs.DivideOp => {exp = Tr.intOp2IR(TAbs.DivideOp, lexp, rexp), ty = ty}
-		  | TAbs.ExponentOp => {exp = Tr.intOp2IR(TAbs.ExponentOp, lexp, rexp), ty = ty}
-		  | TAbs.LtOp => {exp = Tr.intOp2IR(TAbs.LtOp, lexp, rexp), ty = ty}
-		  | TAbs.LeOp => {exp = Tr.intOp2IR(TAbs.LeOp, lexp, rexp), ty = ty}
-		  | TAbs.GtOp => {exp = Tr.intOp2IR(TAbs.GtOp, lexp, rexp), ty = ty}
-		  | TAbs.GeOp => {exp = Tr.intOp2IR(TAbs.GeOp, lexp, rexp), ty = ty}
-		  | TAbs.EqOp => {exp = Tr.intOp2IR(TAbs.EqOp, lexp, rexp), ty = ty}
-		  | TAbs.NeqOp => {exp = Tr.intOp2IR(TAbs.NeqOp, lexp, rexp), ty = ty}
-								     
+		    TAbs.PlusOp => {exp = func(TAbs.PlusOp,lexp,rexp), ty = ty}
+		  | TAbs.MinusOp => {exp = func(TAbs.MinusOp, lexp, rexp), ty = ty}
+		  | TAbs.TimesOp => {exp = func(TAbs.TimesOp, lexp, rexp), ty = ty}
+		  | TAbs.DivideOp => {exp = func(TAbs.DivideOp, lexp, rexp), ty = ty}
+		  | TAbs.ExponentOp => {exp = func(TAbs.ExponentOp, lexp, rexp), ty = ty}
+      | TAbs.LtOp => {exp = func(TAbs.LtOp, lexp, rexp), ty = ty}
+		  | TAbs.LeOp => {exp = func(TAbs.LeOp, lexp, rexp), ty = ty}
+		  | TAbs.GtOp => {exp = func(TAbs.GtOp, lexp, rexp), ty = ty}
+		  | TAbs.GeOp => {exp = func(TAbs.GeOp, lexp, rexp), ty = ty}
+		  | TAbs.EqOp => {exp = func(TAbs.EqOp, lexp, rexp), ty = ty}
+		  | TAbs.NeqOp => {exp = func(TAbs.NeqOp, lexp, rexp), ty = ty}
+
 	    end
 	     (* NB: many cases here! *)
 (*
@@ -74,37 +78,64 @@ fun transExp (venv, extra : extra) =
                  raise TODO (* error handling *)
                | NONE =>
                  raise TODO (* error handling *))
-
-          | trexp (TAbs.IfExp {test, thn, els}) break =
-            raise TODO (* using Tr.ifThen2IR, Tr.ifThenElse2IR *)
-
+*)
+          | trexp {exp = TAbs.IfExp {test, thn, els}, ty} =
+            let
+              val test' as {exp = testexp, ty = testty} = trexp test
+              val thn' as {exp = thnexp, ty = thnty} = trexp thn
+            in
+              case els of
+                NONE => {exp = Tr.ifThen2IR(testexp,thnexp),ty = ty}
+              | SOME els =>
+              let
+                val els' as {exp = elsexp, ty = elsty} = trexp els
+              in
+                {exp = Tr.ifThenElse2IR(testexp,thnexp,elsexp),ty = ty}
+              end
+            end
+(*
           | trexp (TAbs.WhileExp {test, body}) break =
             raise TODO (* using Tr.newBreakPoint, Tr.while2IR *)
 
           | trexp (aexp as TAbs.RecordExp {fields, typ}) break =
             raise TODO (* using Tr.record2IR, maybe Tr.nil2IR with errors *)
-
-          | trexp (TAbs.SeqExp []) _ =
+*)
+          | trexp {exp = TAbs.SeqExp [], ty} =
             (* ensure there is some expression if the SeqExp is empty *)
-            raise TODO
-
+            {exp = Tr.seq2IR [], ty = ty}
+(*
           | trexp (TAbs.SeqExp (aexps as (aexp'::aexps'))) break =
             raise TODO (* using Tr.seq2IR, Tr.eseq2IR *)
 
-          | trexp (TAbs.AssignExp {var, exp}) break =
-            raise TODO (* using Tr.assign2IR, checkAssignable *)
-
+*)          | trexp {exp = TAbs.AssignExp {var, exp}, ty} =
+            let
+              val var' as {exp = varexp, ty = varty} = trvar var
+              val exp' as {exp = expexp, ty = expty} = trexp exp
+              in
+                {exp = Tr.assign2IR(varexp, expexp) , ty = ty} (* using Tr.assign2IR, checkAssignable *)
+            end
+(*
           | trexp (TAbs.ForExp {var, escape, lo, hi, body}) _ =
             raise TODO (* using Tr.newBreakPoint, Tr.allocLocal, Tr.forIR *)
 
-          | trexp (TAbs.BreakExp) break =
-            raise TODO (* using Tr.break2IR *)
+*)          | trexp {exp = TAbs.BreakExp, ty} =
+            let
+              val xtra as {level, break = brk} = extra
+            in
+            case brk of SOME sym =>  {exp = Tr.break2IR sym, ty = ty} (* using Tr.break2IR *)
+            end
 
-          | trexp (term as TAbs.LetExp {decls, body}) break =
-            raise TODO (* using transDecs, transExp, Tr.let2IR *)
-
+          | trexp {exp = term as TAbs.LetExp {decls, body}, ty} =
+             let
+              val ({venv = venv'}, decls') = transDecs(venv, decls, extra)
+              val body' as {exp = bodyexp, ty = bodyty} = transExp (venv', extra) body
+             in
+              {exp = Tr.let2IR(decls', bodyexp), ty=ty}
+             end
+              (* using transDecs, transExp, Tr.let2IR *)
+(*
           | trexp (TAbs.ArrayExp {size, init}) break =
-            raise TODO (* using Tr.array2IR *) 
+            raise TODO (* using Tr.array2IR *)
 
         (* NB: trvar must generate a tree describing the given
          * variable such that it will work for both evaluation and
@@ -113,31 +144,31 @@ fun transExp (venv, extra : extra) =
          * MOVE(MEM _, _) because we can only store the new value
          * into a register or into a memory cell (error cases can
          * generate a NoOp value (Ex (CONST 0)), so they avoid
-         * the problem).  This means that Tr.simpleVar, Tr.fieldVar, 
-         * and Tr.subscript2IR must return an Ex (MEM _) or an 
+         * the problem).  This means that Tr.simpleVar, Tr.fieldVar,
+         * and Tr.subscript2IR must return an Ex (MEM _) or an
          * Ex (TEMP _).
          *)*)
 
-        and trvar {var=TAbs.SimpleVar id, ty} : {exp:Tr.exp,ty:Ty.ty} = 
+        and trvar {var=TAbs.SimpleVar id, ty} : {exp:Tr.exp,ty:Ty.ty} =
             TODO (* using Tr.simpleVar *)
 
-          | trvar {var=TAbs.FieldVar (var, id), ty} : {exp:Tr.exp,ty:Ty.ty} = 
+          | trvar {var=TAbs.FieldVar (var, id), ty} : {exp:Tr.exp,ty:Ty.ty} =
             (* ignore 'mutationRequested': all record fields are mutable *)
             TODO (* using Tr.fieldVar *)
-                                       
-          | trvar {var=TAbs.SubscriptVar (var, exp), ty} : {exp:Tr.exp,ty:Ty.ty} = 
+
+          | trvar {var=TAbs.SubscriptVar (var, exp), ty} : {exp:Tr.exp,ty:Ty.ty} =
             (* ignore 'mutationRequested': all array entries are mutable *)
             TODO (* using Tr.subscript2IR *)
 
     in
         trexp
     end
-        
+
 and transDec ( venv
              , TAbs.VarDec {name,escape=ref esc,ty,init}
              , explist (* accumulate decl elaboration code *)
              , extra) =
-    let 
+    let
         val {exp=initExp,ty=initTy} = transExp (venv,extra) init
         val acc = Tr.allocLocal (#level extra) esc
         val var = Tr.simpleVar (acc, #level extra)
@@ -147,16 +178,16 @@ and transDec ( venv
                                                  , escape=ref esc})) }
         , explist @ (Tr.assign2IR(var, initExp) :: []))
     end
-                
-  | transDec (venv, TAbs.TypeDec tydecls, explist, extra) = 
+
+  | transDec (venv, TAbs.TypeDec tydecls, explist, extra) =
     (* This will actually do nothing, since we do not need typing information *)
     ({ venv = venv}, explist)
-        
+
   | transDec (venv, TAbs.FunctionDec fundecls, explist, extra) =
     ( {venv = venv}, explist) (* TODO *)
 
 and transDecs (venv, decls, extra) =
-    ({venv = venv}, []) (* TODO *)                 
+    ({venv = venv}, []) (* TODO *)
 
 fun transProg absyn : Tr.frag list  =
     let
@@ -169,5 +200,5 @@ fun transProg absyn : Tr.frag list  =
         else Tr.funEntryExit {level = E.initLevel, body = exp};
         Tr.getResult ()
     end
-        
+
 end (* IRgen *)
