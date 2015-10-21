@@ -186,7 +186,12 @@ fun binop2IR (oper, left, right) =
     end
 
 fun relop2IR (oper, left, right) =
-    Cx (raise TODO)
+  let
+      val unleft = unEx(left)
+      val unright = unEx(right)
+  in
+    Cx (fn (t,f) => T.CJUMP(oper,unleft,unright,t,f))
+  end
 
 fun intOp2IR (TAbs.PlusOp, left, right)     = binop2IR (T.PLUS, left, right)
   | intOp2IR (TAbs.MinusOp, left, right)    = binop2IR (T.MINUS, left, right)

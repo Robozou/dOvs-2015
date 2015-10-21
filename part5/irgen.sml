@@ -53,8 +53,16 @@ fun transExp (venv, extra : extra) =
 		case oper of
 		    TAbs.PlusOp => {exp = Tr.intOp2IR(TAbs.PlusOp,lexp,rexp), ty = ty}
 		  | TAbs.MinusOp => {exp = Tr.intOp2IR(TAbs.MinusOp, lexp, rexp), ty = ty}
-		  | TAbs.TimesOp => {exp = Tr.intOp2IR(Tabs.TimesOp, lexp, rexp), ty = ty}
-		  | TAbs.DivideOp => {exp = Tr.intOp2IR(Tabs.TimesOp, lexp, rexp), ty = ty}	      
+		  | TAbs.TimesOp => {exp = Tr.intOp2IR(TAbs.TimesOp, lexp, rexp), ty = ty}
+		  | TAbs.DivideOp => {exp = Tr.intOp2IR(TAbs.DivideOp, lexp, rexp), ty = ty}
+		  | TAbs.ExponentOp => {exp = Tr.intOp2IR(TAbs.ExponentOp, lexp, rexp), ty = ty}
+		  | TAbs.LtOp => {exp = Tr.intOp2IR(TAbs.LtOp, lexp, rexp), ty = ty}
+		  | TAbs.LeOp => {exp = Tr.intOp2IR(TAbs.LeOp, lexp, rexp), ty = ty}
+		  | TAbs.GtOp => {exp = Tr.intOp2IR(TAbs.GtOp, lexp, rexp), ty = ty}
+		  | TAbs.GeOp => {exp = Tr.intOp2IR(TAbs.GeOp, lexp, rexp), ty = ty}
+		  | TAbs.EqOp => {exp = Tr.intOp2IR(TAbs.EqOp, lexp, rexp), ty = ty}
+		  | TAbs.NeqOp => {exp = Tr.intOp2IR(TAbs.NeqOp, lexp, rexp), ty = ty}
+								     
 	    end
 	     (* NB: many cases here! *)
 (*
