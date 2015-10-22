@@ -49,10 +49,10 @@ fun transExp (venv, extra : extra) =
 	    let
 		val leftexp as {exp = lexp,ty = lty} = trexp left
 		val rightexp as {exp = rexp,ty = rty}= trexp right
-      val func = case (lty, rty) of
-        (Ty.INT, Ty.INT) => Tr.intOp2IR
-      | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR
-      (* | (_ , _) => raise e "type mismatch" TODO *)
+		val func = case (lty, rty) of
+			       (Ty.INT, Ty.INT) => Tr.intOp2IR
+			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR
+	    (* | (_ , _) => raise e "type mismatch" TODO *)
 	    in
 		case oper of
 		    TAbs.PlusOp => {exp = func(TAbs.PlusOp,lexp,rexp), ty = ty}
@@ -60,7 +60,7 @@ fun transExp (venv, extra : extra) =
 		  | TAbs.TimesOp => {exp = func(TAbs.TimesOp, lexp, rexp), ty = ty}
 		  | TAbs.DivideOp => {exp = func(TAbs.DivideOp, lexp, rexp), ty = ty}
 		  | TAbs.ExponentOp => {exp = func(TAbs.ExponentOp, lexp, rexp), ty = ty}
-      | TAbs.LtOp => {exp = func(TAbs.LtOp, lexp, rexp), ty = ty}
+		  | TAbs.LtOp => {exp = func(TAbs.LtOp, lexp, rexp), ty = ty}
 		  | TAbs.LeOp => {exp = func(TAbs.LeOp, lexp, rexp), ty = ty}
 		  | TAbs.GtOp => {exp = func(TAbs.GtOp, lexp, rexp), ty = ty}
 		  | TAbs.GeOp => {exp = func(TAbs.GeOp, lexp, rexp), ty = ty}
@@ -68,8 +68,7 @@ fun transExp (venv, extra : extra) =
 		  | TAbs.NeqOp => {exp = func(TAbs.NeqOp, lexp, rexp), ty = ty}
 
 	    end
-	     (* NB: many cases here! *)
-(*
+	  (*
           | trexp (TAbs.CallExp {func, args}) break =
             (case S.look (venv, func) of
                  SOME (E.FunEntry {formals, result, level=level', label}) =>
