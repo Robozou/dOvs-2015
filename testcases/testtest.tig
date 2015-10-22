@@ -1,5 +1,7 @@
 let 
-  
-in
+   var b : int := 5
 
+
+in
+    if 5 = 4 then (5 + 4; ())
 end

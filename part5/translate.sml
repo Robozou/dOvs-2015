@@ -108,8 +108,13 @@ fun followStaticLink toLevel (fromLevel as Level ({frame, parent}, _)) =
     T.TEMP F.FP (* delivered to built-in functions like chr,ord,.. *)
 
 fun simpleVar (acc, fromLevel) =
-    (* must return Ex (TEMP _) or Ex (MEM _) *)
-    raise TODO
+  let
+      val (l,f) = acc
+      val print = print(asstringLevel l)
+      val t = followStaticLink l fromLevel(* must return Ex (TEMP _) or Ex (MEM _) *)
+  in
+	Ex (t) (* TODO *)
+  end
 
 fun fieldVar (var, offset) =
     (* must return Ex (TEMP _) or Ex (MEM _) *)
@@ -143,7 +148,7 @@ fun ifThen2IR (test, thenExp) =
                        , T.LABEL labelThen
                        , func (t, f)
                        , T.LABEL labelEnd])
-          | (_, Nx _) =>
+          | (_, Nx _) => 
             Nx (seq [test' (labelThen, labelEnd)
                 , T.LABEL labelThen
                 , T.LABEL labelEnd])
@@ -327,6 +332,7 @@ fun subscript2IR (array, offset) =
         val maxInxT = Temp.newtemp ()
         val negativeL = Temp.newLabel "subs_neg"
         val nonNegativeL = Temp.newLabel "subs_nneg"
+
         val overflowL = Temp.newLabel "subs_ovf"
         val noOverflowL = Temp.newLabel "subs_novf"
         val array' = unEx array
