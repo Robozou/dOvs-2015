@@ -1,7 +1,7 @@
 let 
    var b : int := 5
-
+   var c : string := "hej"
 
 in
-    if 5 = 4 then (5 + 4; ())
+   b := 7
 end

@@ -179,10 +179,11 @@ and transDec ( venv
              , explist (* accumulate decl elaboration code *)
              , extra) =
     let
+	val print = print("EXP LIST: " ^ Int.toString(List.length explist))
         val initExp = transExp (venv,extra) init
         val acc = Tr.allocLocal (#level extra) esc
         val var = Tr.simpleVar (acc, #level extra)
-    in
+    in	
         ( { venv = S.enter(venv,name,(E.VarEntry { access=acc
                                                  , ty=actualTy ty
                                                  , escape=ref esc})) }
@@ -203,10 +204,12 @@ and transDecs (venv, decls, extra) =
 	   of [] => ({venv = venv}, result)
 	    | (d::ds) =>
 	      let
-		  val ({venv = venv'}, res) = transDec (venv, d, [], extra)
+		  val print = print("Decl length: " ^ Int.toString(List.length decls) ^ "\n")
+		  val ({venv = venv'}, res) = transDec (venv, d, result, extra)
 	      in		  
 		  visit venv' ds res
 	      end
+(*	val res' as ({venv},res) = visit venv decls []*)
     in
 	visit venv decls [] (* TODO *)
     end

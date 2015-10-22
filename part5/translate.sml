@@ -91,7 +91,7 @@ fun unCx (Ex (T.CONST 0)) = (fn (t,f) => T.JUMP(T.NAME f, [f]))
   | unCx (Ex (T.CONST _)) = (fn (t,f) => T.JUMP(T.NAME t, [t]))
   | unCx (Ex e) = (fn (t,f) => T.CJUMP(T.EQ, e, T.CONST 0, f, t))
   | unCx (Cx genstm) = genstm
-  | unCx (Nx _) = raise TODO
+  | unCx (Nx _) = raise Bug "Shouldn't ever occur"
 
 val empty = Ex (T.CONST 0)
 
@@ -107,18 +107,17 @@ fun followStaticLink toLevel (fromLevel as Level ({frame, parent}, _)) =
   | followStaticLink _ Top =
     T.TEMP F.FP (* delivered to built-in functions like chr,ord,.. *)
 
-fun simpleVar (acc, fromLevel) =
+fun simpleVar (acc, fromLevel as Level ({frame, parent}, _)) =
   let
       val (l,f) = acc
-      val print = print(asstringLevel l)
-      val t = followStaticLink l fromLevel(* must return Ex (TEMP _) or Ex (MEM _) *)
+      val test = F.exp f (T.TEMP F.FP)
   in
-	Ex (t) (* TODO *)
+      Ex (test) (* TODO *)
   end
 
 fun fieldVar (var, offset) =
     (* must return Ex (TEMP _) or Ex (MEM _) *)
-    raise TODO
+  raise TODO
 
 fun assign2IR (var, exp) =
     let
@@ -214,7 +213,7 @@ fun intOp2IR (TAbs.PlusOp, left, right)     = binop2IR (T.PLUS, left, right)
 
 
 fun let2IR ([], body) = body
-  | let2IR (decls, body) = Ex (T.ESEQ (seq (map unNx decls), unEx body))
+  | let2IR (decls, body) = (print(Int.toString(List.length(decls))); Ex (T.ESEQ (seq (map unNx decls), unEx body)))
 
 fun eseq2IR [] = raise Bug "attempt to eseq2IR an empty sequence"
   | eseq2IR (exp :: exps) =
