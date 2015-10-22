@@ -71,16 +71,16 @@ fun transExp (venv, extra : extra) =
 		  | TAbs.NeqOp => func(TAbs.NeqOp, leftexp, rightexp)
 
 	    end
-	  (*
-          | trexp (TAbs.CallExp {func, args}) break =
+	  
+          | trexp {exp = TAbs.CallExp {func, args}, ty} =
             (case S.look (venv, func) of
                  SOME (E.FunEntry {formals, result, level=level', label}) =>
-                 raise TODO (* using Tr.procCall2IR, Tr.funCall2IR *)
+                 TODO (* using Tr.procCall2IR, Tr.funCall2IR *)
                | SOME (E.VarEntry {ty, ...}) =>
-                 raise TODO (* error handling *)
+                 TODO (* error handling *)
                | NONE =>
-                 raise TODO (* error handling *))
-*)
+                 TODO (* error handling *))
+
           | trexp {exp = TAbs.IfExp {test, thn, els}, ty} =
             let
 		val test' = trexp test
@@ -95,13 +95,13 @@ fun transExp (venv, extra : extra) =
 			Tr.ifThenElse2IR(test',thn',els')
 		    end
             end
-	  (*
-          | trexp (TAbs.WhileExp {test, body}) break =
-            raise TODO (* using Tr.newBreakPoint, Tr.while2IR *)
 
-          | trexp (aexp as TAbs.RecordExp {fields, typ}) break =
-            raise TODO (* using Tr.record2IR, maybe Tr.nil2IR with errors *)
-*)
+          | trexp {exp = TAbs.WhileExp {test, body}, ty} =
+            TODO (* using Tr.newBreakPoint, Tr.while2IR *)
+
+          | trexp {exp = aexp as TAbs.RecordExp {fields}, ty} =
+            TODO (* using Tr.record2IR, maybe Tr.nil2IR with errors *)
+
           | trexp {exp = TAbs.SeqExp [], ty} =
             (* ensure there is some expression if the SeqExp is empty *)
             Tr.seq2IR []
@@ -124,15 +124,17 @@ fun transExp (venv, extra : extra) =
             in
                 Tr.assign2IR(var', exp') (* using Tr.assign2IR, checkAssignable *)
             end
-(*
-          | trexp (TAbs.ForExp {var, escape, lo, hi, body}) _ =
-            raise TODO (* using Tr.newBreakPoint, Tr.allocLocal, Tr.forIR *)
 
-*)          | trexp {exp = TAbs.BreakExp, ty} =
+          | trexp {exp = TAbs.ForExp {var, escape, lo, hi, body}, ty} =
+            TODO (* using Tr.newBreakPoint, Tr.allocLocal, Tr.forIR *)
+
+          | trexp {exp = TAbs.BreakExp, ty} =
             let
               val xtra as {level, break = brk} = extra
             in
-            case brk of SOME sym => Tr.break2IR sym (* using Tr.break2IR *)
+		case brk of
+		    SOME sym => Tr.break2IR sym (* using Tr.break2IR *)
+		  | NONE => Tr.break2IR (S.symbol "break") (* Is this right? *)
             end
 
           | trexp {exp = term as TAbs.LetExp {decls, body}, ty} =
@@ -143,9 +145,10 @@ fun transExp (venv, extra : extra) =
 		 Tr.let2IR(decls', body')
              end
               (* using transDecs, transExp, Tr.let2IR *)
-(*
-          | trexp (TAbs.ArrayExp {size, init}) break =
-            raise TODO (* using Tr.array2IR *)
+
+          | trexp {exp = TAbs.ArrayExp {size, init}, ty} =
+            TODO (* using Tr.array2IR *)
+	  | trexp _ = TODO
 
         (* NB: trvar must generate a tree describing the given
          * variable such that it will work for both evaluation and
@@ -157,9 +160,12 @@ fun transExp (venv, extra : extra) =
          * the problem).  This means that Tr.simpleVar, Tr.fieldVar,
          * and Tr.subscript2IR must return an Ex (MEM _) or an
          * Ex (TEMP _).
-         *)*)
+         *)
 
         and trvar {var=TAbs.SimpleVar id, ty} : Tr.exp =
+	    (* Implementation a bit weird TODO
+	       Do we want "true"? Or actual escape sent?
+	     *)
             Tr.simpleVar(Tr.allocLocal(#level extra) true, #level extra) (* using Tr.simpleVar *)
 
           | trvar {var=TAbs.FieldVar (var, id), ty} : Tr.exp =
@@ -179,7 +185,6 @@ and transDec ( venv
              , explist (* accumulate decl elaboration code *)
              , extra) =
     let
-	val print = print("EXP LIST: " ^ Int.toString(List.length explist))
         val initExp = transExp (venv,extra) init
         val acc = Tr.allocLocal (#level extra) esc
         val var = Tr.simpleVar (acc, #level extra)
@@ -204,7 +209,6 @@ and transDecs (venv, decls, extra) =
 	   of [] => ({venv = venv}, result)
 	    | (d::ds) =>
 	      let
-		  val print = print("Decl length: " ^ Int.toString(List.length decls) ^ "\n")
 		  val ({venv = venv'}, res) = transDec (venv, d, result, extra)
 	      in		  
 		  visit venv' ds res
