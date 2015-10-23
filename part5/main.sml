@@ -20,7 +20,6 @@ fun compile (infile, outfile) =
     let
         val absyn = Parse.parse infile
         val tabsyn = Semant.transProg absyn
-	val print = PrintTAbsyn.print(TextIO.stdOut,tabsyn)
         val frags = IRgen.transProg tabsyn
         fun emitprocs out = app (emitproc out) frags
     in

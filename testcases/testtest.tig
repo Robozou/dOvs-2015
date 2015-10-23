@@ -1,7 +1,5 @@
 let 
-   var b : int := 5
-   var c : string := "hej"
-
+    var i : int := 0
 in
-   b := 7
+    while i < 3 do (i := i +1)
 end

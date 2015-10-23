@@ -84,14 +84,19 @@ fun unEx (Ex e) = e
   | unEx (Nx s) = T.ESEQ (s, T.CONST 0)
 
 fun unNx (Ex e) = T.EXP e
-  | unNx (Cx genstm) = raise TODO
+  | unNx (Cx genstm) =
+    let
+	val t = Temp.newLabel "true"
+    in
+	genstm(t,t); T.LABEL t
+    end
   | unNx (Nx s) = s
 
 fun unCx (Ex (T.CONST 0)) = (fn (t,f) => T.JUMP(T.NAME f, [f]))
   | unCx (Ex (T.CONST _)) = (fn (t,f) => T.JUMP(T.NAME t, [t]))
   | unCx (Ex e) = (fn (t,f) => T.CJUMP(T.EQ, e, T.CONST 0, f, t))
   | unCx (Cx genstm) = genstm
-  | unCx (Nx _) = raise Bug "Shouldn't ever occur"
+  | unCx (Nx _) = raise Bug "Should never occur"
 
 val empty = Ex (T.CONST 0)
 
@@ -103,14 +108,15 @@ fun levelEq (Level (_, u1), Level (_, u2)) = (u1 = u2)
 fun followStaticLink toLevel (fromLevel as Level ({frame, parent}, _)) =
     if levelEq (toLevel, fromLevel)
     then T.TEMP F.FP
-    else raise TODO
+    else T.MEM(T.BINOP(T.PLUS,T.CONST(F.staticLinkOffset frame), followStaticLink toLevel parent))
   | followStaticLink _ Top =
     T.TEMP F.FP (* delivered to built-in functions like chr,ord,.. *)
 
-fun simpleVar (acc, fromLevel as Level ({frame, parent}, _)) =
+fun simpleVar (acc, fromLevel) =
   let
       val (l,f) = acc
-      val test = F.exp f (T.TEMP F.FP)
+      val frp = followStaticLink l fromLevel
+      val test = F.exp f frp
   in
       Ex (test) (* TODO *)
   end
@@ -257,12 +263,16 @@ fun stringOp2IR (TAbs.EqOp, l, r)  = relopStr2IR (l, r, "stringEqual")
 
 fun while2IR (test, body, done) =
     let
-        val test = unCx test
-        val body = unNx body
+        val test' = unCx test
+        val body' = unNx body
         val labelTest = Temp.newLabel "while_test"
         val labelBody = Temp.newLabel "while_body"
     in
-        raise TODO
+        Nx(seq [ T.LABEL labelTest
+               , test'(labelBody,done)
+	       , body'
+	       , T.JUMP(T.NAME labelTest, [labelTest])
+               , T.LABEL done])
     end
 
 fun for2IR (var, done, lo, hi, body) =
@@ -304,8 +314,13 @@ fun procCall2IR ( toLevel as Level ({frame, parent}, _)
     raise Bug "called procedure seems to have above-top-level context"
 
 fun array2IR (size, init) =
+  let
+      val unsize = unEx(size)
+      val uninit = unEx(init)
+  in
     Ex (T.CALL ( T.NAME (Temp.namedLabel "initArray")
-               , raise TODO))
+               , [unsize,uninit]))
+  end
 
 fun record2IR explist =
     let
@@ -325,19 +340,26 @@ fun record2IR explist =
 fun subscript2IR (array, offset) =
     (* must return Ex (TEMP _) or Ex (MEM _) *)
     let
-        val offsetT = Temp.newtemp ()
-        val arrayT = Temp.newtemp ()
-        val addressT = Temp.newtemp ()
-        val maxInxT = Temp.newtemp ()
-        val negativeL = Temp.newLabel "subs_neg"
-        val nonNegativeL = Temp.newLabel "subs_nneg"
-
-        val overflowL = Temp.newLabel "subs_ovf"
-        val noOverflowL = Temp.newLabel "subs_novf"
+        val offsetT = Temp.newtemp () (* <- Ask Casper TODO *)
+        val arrayT = Temp.newtemp () (* <- Ask Casper TODO *)
+        val addressT = Temp.newtemp () (* <- Ask Casper TODO *)
+        val maxInxT = Temp.newtemp () (* <- Ask Casper TODO *)
+        val negativeL = Temp.newLabel "subs_neg" (* <- Ask Casper TODO *) 
+        val nonNegativeL = Temp.newLabel "subs_nneg" (* <- Ask Casper TODO *)
+        val overflowL = Temp.newLabel "subs_ovf" (* <- Ask Casper TODO *)
+        val noOverflowL = Temp.newLabel "subs_novf" (* <- Ask Casper TODO *)
         val array' = unEx array
         val offset' = unEx offset
     in
-        raise TODO
+	Ex (T.MEM(T.ESEQ(seq [T.MOVE(T.TEMP offsetT,offset'), (* <- Ask Casper TODO *)
+		   T.MOVE(T.TEMP arrayT,array'),
+		   T.MOVE(T.TEMP addressT,T.BINOP(T.MUL,offset',T.CONST(F.wordSize))),
+		   T.EXP(T.TEMP maxInxT),
+		   T.LABEL negativeL,
+		   T.LABEL nonNegativeL,
+		   T.LABEL overflowL,
+		   T.LABEL noOverflowL],
+	    T.MEM(T.BINOP(T.PLUS,T.MEM(array'),T.BINOP(T.MUL,offset',T.CONST(F.wordSize)))))))
     end
 
 fun funEntryExit {level = Level ({frame, parent}, _), body = body} =

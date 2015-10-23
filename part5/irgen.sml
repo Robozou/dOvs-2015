@@ -55,7 +55,7 @@ fun transExp (venv, extra : extra) =
 		val func = case (lty, rty) of
 			       (Ty.INT, Ty.INT) => Tr.intOp2IR
 			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR
-			     | (_ , _) => raise Bug "failed type checking"
+			     | (_ , _) => raise Bug "failed type checking in compiler"
 	    in
 		case oper of
 		    TAbs.PlusOp => func(TAbs.PlusOp,leftexp,rightexp)
@@ -97,7 +97,14 @@ fun transExp (venv, extra : extra) =
             end
 
           | trexp {exp = TAbs.WhileExp {test, body}, ty} =
-            TODO (* using Tr.newBreakPoint, Tr.while2IR *)
+            let
+		val ttest = trexp test
+		val done = Tr.newBreakPoint "done_label"
+		val tbody = transExp (venv, {level = #level extra, break = SOME done}) body	
+	    in
+		Tr.while2IR(ttest,tbody, done)
+	    end
+	    (* using Tr.newBreakPoint, Tr.while2IR *)
 
           | trexp {exp = aexp as TAbs.RecordExp {fields}, ty} =
             TODO (* using Tr.record2IR, maybe Tr.nil2IR with errors *)
@@ -147,7 +154,12 @@ fun transExp (venv, extra : extra) =
               (* using transDecs, transExp, Tr.let2IR *)
 
           | trexp {exp = TAbs.ArrayExp {size, init}, ty} =
-            TODO (* using Tr.array2IR *)
+	    let
+		val tsize = trexp size
+		val tinit = trexp init
+	    in
+		Tr.array2IR(tsize,tinit)
+	    end
 	  | trexp _ = TODO
 
         (* NB: trvar must generate a tree describing the given
@@ -164,17 +176,29 @@ fun transExp (venv, extra : extra) =
 
         and trvar {var=TAbs.SimpleVar id, ty} : Tr.exp =
 	    (* Implementation a bit weird TODO
-	       Do we want "true"? Or actual escape sent?
+	       - Do we want "true"? Or actual escape sent?
+	       - AllocLocal each time? what about for assignments?
 	     *)
-            Tr.simpleVar(Tr.allocLocal(#level extra) true, #level extra) (* using Tr.simpleVar *)
-
-          | trvar {var=TAbs.FieldVar (var, id), ty} : Tr.exp =
+	    (case S.look(venv,id) of
+		SOME(E.VarEntry {access, ty, escape}) =>
+		Tr.simpleVar(access, #level extra)
+	      | SOME(E.FunEntry {formals, ...}) =>
+		TODO
+	      | NONE => Tr.simpleVar(Tr.allocLocal(#level extra) true, #level extra))
+	  (* using Tr.simpleVar *)
+              | trvar {var=TAbs.FieldVar (var, id), ty} : Tr.exp =
             (* ignore 'mutationRequested': all record fields are mutable *)
             TODO (* using Tr.fieldVar *)
 
           | trvar {var=TAbs.SubscriptVar (var, exp), ty} : Tr.exp =
             (* ignore 'mutationRequested': all array entries are mutable *)
-            TODO (* using Tr.subscript2IR *)
+	    let
+		val tvar = trvar var
+		val texp = trexp exp
+	    in
+		Tr.subscript2IR(tvar,texp)
+	    end
+             (* using Tr.subscript2IR *)
 
     in
         trexp
