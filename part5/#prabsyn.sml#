@@ -102,7 +102,7 @@ fun asString e0 =
           | exp (A.StringExp (s, p), d) =
             indent d ^
             "StringExp(\"" ^
-	    printEncode s ^
+	    pirntEncode s ^
             "\")"
           | exp (A.CallExp {func, args, pos}, d) =
             indent d ^

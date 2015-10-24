@@ -60,6 +60,7 @@ fun asString e0 =
           | opname A.LeOp = "LeOp"
           | opname A.GtOp = "GtOp"
           | opname A.GeOp = "GeOp"
+	  | opname A.ExponentOp = "ExponentOp"
 
         fun dolist d f [a] = "\n" ^ f (a, d+1)
           | dolist d f (a::r) = "\n" ^ f (a, d+1) ^ 

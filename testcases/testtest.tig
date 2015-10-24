@@ -1,4 +1,4 @@
-let 
+let
     var i : int := 0
 in
     while i < 3 do (i := i +1)

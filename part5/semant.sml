@@ -684,7 +684,7 @@ and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra 
 	    let val acttyp = actualTy typ pos
             in
 		(case ty of
-		     Ty.NIL => {decl = makeVarDec(name,escape,ty,{exp = exp, ty = ty}),
+		     Ty.NIL => {decl = makeVarDec(name,escape,ty,{exp = exp, ty = typ}),
 				tenv = tenv,
 				venv = S.enter(venv, name, E.VarEntry{ty = ty})}
 		   | Ty.UNIT => {decl = makeVarDec(name, escape,Ty.ERROR,{exp = exp, ty = Ty.ERROR}),
