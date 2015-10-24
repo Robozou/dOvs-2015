@@ -83,6 +83,9 @@ fun errorFieldNotInRec (pos, id) =
 fun errorTypMis (pos, exp, act) =
   err pos ("type mismatch, expected " ^ exp ^ " but found " ^ act)
 
+fun errorBreakNotAllowed (pos) =
+  err pos ("no break allowed here")
+
 fun errorFunUnd (pos, func) =
   err pos ("function " ^ S.name func ^ " is undefined")
 
@@ -258,11 +261,11 @@ fun transExp (venv, tenv, extra : extra) =
         | trexp (A.VarExp var) = trvar var
         | trexp (A.IntExp int) = {exp = TAbs.IntExp int, ty = Ty.INT}
         | trexp (A.StringExp (s,_)) = {exp = TAbs.StringExp s, ty = Ty.STRING}
-        | trexp (A.BreakExp(_)) = let val breakex as {break = breakbool, assign = _} = extra
+        | trexp (A.BreakExp(pos)) = let val breakex as {break = breakbool, assign = _} = extra
 				  in
 				      if  (breakbool)
 				      then {exp = TAbs.BreakExp , ty = Ty.UNIT}
-				      else ERROR
+				      else (errorBreakNotAllowed(pos); ERROR)
 				  end
         | trexp (A.CallExp {func, args, pos}) =
 	  (case S.look(venv,func) of
