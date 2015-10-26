@@ -153,7 +153,7 @@ fun ifThen2IR (test, thenExp) =
                        , T.LABEL labelThen
                        , func (t, f)
                        , T.LABEL labelEnd])
-          | (_, Nx _) => 
+          | (_, Nx _) =>
             Nx (seq [test' (labelThen, labelEnd)
                 , T.LABEL labelThen
                 , T.LABEL labelEnd])
@@ -295,8 +295,10 @@ fun funCall2IR ( toLevel as Level ({frame, parent}, _)
                , exps) =
     let
         val sl = followStaticLink parent fromLevel
+        fun iter [] = []
+        | iter(x::xs) = unEx(x)::iter(xs)
     in
-        Ex (T.CALL (T.NAME label, sl :: (raise TODO)))
+        Ex (T.CALL (T.NAME label, sl :: iter(exps)))
     end
   | funCall2IR (Top, _, _, _) =
     raise Bug "called function seems to have above-top-level context"
@@ -307,8 +309,10 @@ fun procCall2IR ( toLevel as Level ({frame, parent}, _)
                 , exps) =
     let
         val sl = followStaticLink parent fromLevel
+        fun iter [] = []
+        | iter(x::xs) = unEx(x)::iter(xs)
     in
-        Nx (T.EXP (T.CALL (T.NAME label, sl :: (raise TODO))))
+        Nx (T.EXP (T.CALL (T.NAME label, sl :: iter(exps))))
     end
   | procCall2IR (Top, _, _, _) =
     raise Bug "called procedure seems to have above-top-level context"
@@ -344,7 +348,7 @@ fun subscript2IR (array, offset) =
         val arrayT = Temp.newtemp () (* <- Ask Casper TODO *)
         val addressT = Temp.newtemp () (* <- Ask Casper TODO *)
         val maxInxT = Temp.newtemp () (* <- Ask Casper TODO *)
-        val negativeL = Temp.newLabel "subs_neg" (* <- Ask Casper TODO *) 
+        val negativeL = Temp.newLabel "subs_neg" (* <- Ask Casper TODO *)
         val nonNegativeL = Temp.newLabel "subs_nneg" (* <- Ask Casper TODO *)
         val overflowL = Temp.newLabel "subs_ovf" (* <- Ask Casper TODO *)
         val noOverflowL = Temp.newLabel "subs_novf" (* <- Ask Casper TODO *)

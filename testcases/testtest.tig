@@ -1,6 +1,5 @@
 let
-   type rectype = {name : string, id : int}
-   var rec1 : rectype := nil
+   
 in   
-   rec1
+   ord("fak")
 end

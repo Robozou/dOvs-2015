@@ -71,15 +71,22 @@ fun transExp (venv, extra : extra) =
 		  | TAbs.NeqOp => func(TAbs.NeqOp, leftexp, rightexp)
 
 	    end
-	  
+
           | trexp {exp = TAbs.CallExp {func, args}, ty} =
             (case S.look (venv, func) of
                  SOME (E.FunEntry {formals, result, level=level', label}) =>
-                 TODO (* using Tr.procCall2IR, Tr.funCall2IR *)
+                let
+                  fun iter [] = []
+                  | iter(x::xs) = trexp(x)::iter(xs)
+                in
+                 (case result of
+                    Ty.UNIT => Tr.procCall2IR(level',#level extra,label,iter(args))
+                  | _       => Tr.funCall2IR(level',#level extra,label,iter(args)))
+                end
                | SOME (E.VarEntry {ty, ...}) =>
-                 TODO (* error handling *)
+                 raise Bug "VarEntry found"
                | NONE =>
-                 TODO (* error handling *))
+                 raise Bug "Function does not exist VERY DANGER")
 
           | trexp {exp = TAbs.IfExp {test, thn, els}, ty} =
             let
@@ -100,7 +107,7 @@ fun transExp (venv, extra : extra) =
             let
 		val ttest = trexp test
 		val done = Tr.newBreakPoint "done_label"
-		val tbody = transExp (venv, {level = #level extra, break = SOME done}) body	
+		val tbody = transExp (venv, {level = #level extra, break = SOME done}) body
 	    in
 		Tr.while2IR(ttest,tbody, done)
 	    end
@@ -130,7 +137,7 @@ fun transExp (venv, extra : extra) =
 	    end
 
           | trexp {exp = TAbs.AssignExp {var, exp}, ty} =
-            let	
+            let
 		val var' = trvar var
 		val exp' = trexp exp
             in
@@ -217,7 +224,7 @@ and transDec ( venv
         val initExp = transExp (venv,extra) init
         val acc = Tr.allocLocal (#level extra) esc
         val var = Tr.simpleVar (acc, #level extra)
-    in	
+    in
         ( { venv = S.enter(venv,name,(E.VarEntry { access=acc
                                                  , ty=actualTy ty
                                                  , escape=ref esc})) }
@@ -229,7 +236,28 @@ and transDec ( venv
     ({ venv = venv}, explist)
 
   | transDec (venv, TAbs.FunctionDec fundecls, explist, extra) =
-    ( {venv = venv}, explist) (* TODO *)
+    let
+      val venv' = foldl (fn({name,params,resultTy,body},env) =>
+        let
+           val nameString = Temp.newLabel(S.name name)
+           fun getrefs (x) = !x
+           val newLevel = Tr.newLevel{parent = #level extra,
+                                      name = nameString,
+                                      formals = true::(map getrefs((map #escape params)))}
+           val funEntry = E.FunEntry{formals = map #ty params,
+                                     result = resultTy,
+                                     label = nameString,
+                                     level = newLevel}
+         in
+           S.enter(env,name,funEntry)
+        end) venv fundecls
+        (* MY AWESOME ITERATOR lel kek 
+        fun iter [] = []
+        | iter(x::xs) = func(x)::iter(xs)
+        *)
+    in
+      ({venv = venv'}, explist)
+    end
 
 and transDecs (venv, decls, extra) =
     let
@@ -239,7 +267,7 @@ and transDecs (venv, decls, extra) =
 	    | (d::ds) =>
 	      let
 		  val ({venv = venv'}, res) = transDec (venv, d, result, extra)
-	      in		  
+	      in
 		  visit venv' ds res
 	      end
 (*	val res' as ({venv},res) = visit venv decls []*)
