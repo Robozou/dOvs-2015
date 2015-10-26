@@ -107,7 +107,12 @@ fun transExp (venv, extra : extra) =
 	    (* using Tr.newBreakPoint, Tr.while2IR *)
 
           | trexp {exp = aexp as TAbs.RecordExp {fields}, ty} =
-            TODO (* using Tr.record2IR, maybe Tr.nil2IR with errors *)
+	    let
+		fun transExps (s,e) = trexp e
+		val exps = map transExps fields
+	    in
+		Tr.record2IR(exps)
+	    end
 
           | trexp {exp = TAbs.SeqExp [], ty} =
             (* ensure there is some expression if the SeqExp is empty *)

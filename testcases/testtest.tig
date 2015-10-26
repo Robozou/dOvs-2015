@@ -1,5 +1,6 @@
 let
-    var i : int := 0
-in
-    while i < 3 do (i := i +1)
+   type rectype = {name : string, id : int}
+   var rec1 : rectype := nil
+in   
+   rec1
 end

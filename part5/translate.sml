@@ -327,9 +327,9 @@ fun record2IR explist =
         val size = T.CONST (length explist)
         val r = Temp.newtemp ()
         val setup = T.MOVE ( T.TEMP r
-                           , raise TODO (* call "allocRecord" *))
+                           , T.CALL(T.NAME(Temp.namedLabel("allocRecord")),[size]))
         fun step (exp, n) =
-            T.MOVE ( raise TODO (* the n-th field in the record *)
+            T.MOVE (T.MEM(T.BINOP(T.PLUS, T.TEMP r, T.CONST (n * F.wordSize)))
                    , unEx exp)
         fun steps ([], n) = []
           | steps (e::es, n) = (step (e, n))::(steps (es, n+1))
