@@ -1,5 +1,5 @@
 let
-   function lel(n: int, x: int): int = n+x
+	
 in   
-   
+	if 1<5 then 2>1 else 0   
 end

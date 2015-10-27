@@ -156,6 +156,7 @@ fun ifThen2IR (test, thenExp) =
           | (_, Nx _) =>
             Nx (seq [test' (labelThen, labelEnd)
                 , T.LABEL labelThen
+                , unNx(thenExp)
                 , T.LABEL labelEnd])
           | (_, Ex ex) =>
             raise TODO
@@ -167,24 +168,75 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
         val labelThen = Temp.newLabel "if_then"
         val labelElse = Temp.newLabel "if_else"
         val labelJoin = Temp.newLabel "if_join"
+
     in
         case (test', thenExp, elseExp)
          of (_, Cx _, Cx _) =>
-            raise TODO
+          let
+             val then' = unCx(thenExp)
+             val else' = unCx(elseExp)
+          in
+             Cx (fn(t, f) =>
+                seq [test' (labelThen, labelElse)
+                , T.LABEL labelThen
+                , then' (t,f)
+                , T.JUMP(T.NAME labelJoin, [labelJoin])
+                , T.LABEL labelElse
+                , else' (t,f)
+                , T.LABEL labelJoin
+                 ])
+          end
           | (_, Ex _, Ex _) =>
-            let
-                val r = Temp.newtemp () (* suggested on page 162 *)
-            in
-                raise TODO
-            end
+          let
+              val r = Temp.newtemp () (* suggested on page 162 *)
+              val then' = unEx(thenExp)
+              val else' = unEx(elseExp)
+          in
+          Ex (T.ESEQ( seq [test' (labelThen, labelElse)
+             , T.LABEL labelThen
+             , T.MOVE(T.TEMP r, then')
+             , T.JUMP(T.NAME labelJoin, [labelJoin])
+             , T.LABEL labelElse
+             , T.MOVE(T.TEMP r, else')
+             , T.LABEL labelJoin
+             ] , T.TEMP r))
+          end
           | (_, Nx _, _) =>
-            raise TODO
+          let
+              val then' = unNx(thenExp)
+              val else' = unNx(elseExp)
+          in
+              Nx (seq [test' (labelThen, labelElse)
+              , T.LABEL labelThen
+              , then'
+              , T.JUMP(T.NAME labelJoin, [labelJoin])
+              , T.LABEL labelElse
+              , else'
+              , T.LABEL labelJoin])
+          end
           | (_, _, Nx _) =>
-            raise TODO
+          let
+              val else' = unNx(elseExp)
+          in
+              raise TODO
+          end
           | (_, Cx _, Ex _) =>
-            raise TODO
+          let
+              val then' = unCx(thenExp)
+              val else' = unEx(elseExp)
+          in
+              (*Ex (T.ESEQ( seq [test' (labelThen, labelElse)
+              , T.LABEL labelThen
+              , then'] , T.TEMP r))*)
+              raise TODO
+          end
           | (_, Ex _, Cx _) =>
-            raise TODO
+          let
+              val then' = unEx(thenExp)
+              val else' = unCx(elseExp)
+          in
+              raise TODO
+          end
 (*          | (_, _, _) =>
             raise Bug "encountered thenBody and elseBody of different kinds"*)
     end

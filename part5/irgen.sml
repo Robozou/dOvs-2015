@@ -80,8 +80,8 @@ fun transExp (venv, extra : extra) =
                   | iter(x::xs) = trexp(x)::iter(xs)
                 in
                  (case result of
-                    Ty.UNIT => Tr.procCall2IR(level',#level extra,label,iter(args))
-                  | _       => Tr.funCall2IR(level',#level extra,label,iter(args)))
+                    Ty.UNIT => Tr.procCall2IR(#level extra, level',label,iter(args))
+                  | _       => Tr.funCall2IR(#level extra,level',label,iter(args)))
                 end
                | SOME (E.VarEntry {ty, ...}) =>
                  raise Bug "VarEntry found"
@@ -252,27 +252,28 @@ and transDec ( venv
            S.enter(env,name,funEntry)
         end) venv fundecls
         fun iter[] = []
-        |   iter({name,params,resultTy,body}::xs) = ((
+        |   iter({name,params,resultTy,body}::xs) = (
           let
-            val nameString = Temp.newLabel(S.name name)
-            fun getref (x) = !x
-            val newLevel = Tr.newLevel{ parent = #level extra,
-                                        name = nameString,
-                                     formals = true::(map getref((map #escape params)))}
+            val E.FunEntry{formals, result, label, level} =
+                (case S.look(venv',name) of
+                    SOME(e) => e
+                  | NONE    => raise Bug "No label")
+            val i = ref 0
             fun enterparam ({name,escape,ty},venv) =
     			    S.enter(venv,
                       name,
                       E.VarEntry{escape=escape,
                                  ty=ty,
-                                 access=Tr.allocLocal (#level extra) (!escape)})
+                                 access=Tr.accessOfFormal (#level extra) (i := !i + 1; !i) (!escape)
+                                 (*Tr.allocLocal (#level extra) (!escape)*)})
             val venv'' = foldl enterparam venv' params
             val body' = transExp (venv'',extra) body
             val func = case resultTy of
                       Ty.UNIT => Tr.procEntryExit
                       | _     => Tr.funEntryExit
           in
-            func({level = newLevel,body = body'})
-          end); iter(xs))
+            func({level = level,body = body'})
+          end; iter(xs))
     in
       iter(fundecls);
       ({venv = venv'}, explist) (* TODO wat do with this explist? *)
