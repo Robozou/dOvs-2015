@@ -83,6 +83,9 @@ fun errorFieldNotInRec (pos, id) =
 fun errorTypMis (pos, exp, act) =
   err pos ("type mismatch, expected " ^ exp ^ " but found " ^ act)
 
+fun errorSimpleVarBug (pos) =
+  err pos ("variable name not found")
+
 fun errorBreakNotAllowed (pos) =
   err pos ("no break allowed here")
 
@@ -124,7 +127,7 @@ fun errorNotAssignable (pos, var) =
 fun errorDuplicateField (pos, field) =
   err pos ("duplicate field '" ^ S.name field ^ "' in record")
 
-
+exception Bug of string
 
 (* Write additional error messages here *)
 
@@ -340,8 +343,9 @@ fun transExp (venv, tenv, extra : extra) =
 				       {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
 				       ty = Ty.INT}
 				       | Ty.NIL =>
-					 {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
-					  ty = Ty.INT}
+					 ((err pos "expected record type but found nil");
+					  {exp = TAbs.ErrorExp,
+					  ty = Ty.INT})
 				     | t => (errorTypMis(pos, PT.asString(Ty.NIL), PT.asString(t));
 					     {exp = TAbs.OpExp{left = lexp, oper = bop, right = ERROR},
 					    ty = Ty.INT})))
@@ -394,16 +398,19 @@ fun transExp (venv, tenv, extra : extra) =
 	  end
         | trexp (A.AssignExp {var = v,exp = e, pos}) =
 	  let val extrarec as {break = _, assign = asslist} = extra
+	      fun actualVar (A.SimpleVar(s,p)) = s
+		| actualVar (A.FieldVar(v,s,p)) = s
+		| actualVar (A.SubscriptVar(v,e,p)) = actualVar v
 	      val actualvar = (case v of A.SimpleVar(s,p) => s
 				      | A.FieldVar(v,s,p) => s
-				      | A.SubscriptVar(v,e,p) => S.symbol("_")) (* HACK: ID invalid *)
+				      | A.SubscriptVar(v,e,p) => actualVar(v))
 	      val tvar as {exp = tyvar, ty = varty} = trvar v
 	      val texp as {exp = tyexp, ty = expty} = trexp e
           in
 	      (compareTypes(varty, actualTy expty pos, pos);
 	       let val actvar =
 		       (case tyvar of (TAbs.VarExp {var = var', ty = ty'}) => {var = var', ty = ty'}
-				   | _ => {var = TAbs.SimpleVar(S.symbol("_")), ty = Ty.ERROR})
+				   | _ => raise Bug "Should be var expression here")
 		   val actexp =
 		       (case expty of Ty.UNIT => (errorUnitNotAllowed(pos);ERROR)
 				   | _ => texp)
@@ -449,7 +456,8 @@ fun transExp (venv, tenv, extra : extra) =
 	  end
         | trexp (A.WhileExp {test,body,pos}) =
 	  let val test' as {exp = _, ty = tty} = trexp test
-              val body' as {exp = _, ty = bty} = transExp (venv, tenv, {break = true, assign = NONE}) body
+              val body' as {exp = _, ty = bty} = transExp (venv, tenv, {break = true,
+									assign = #assign extra}) body
 	  in
 	      (compareTypes(Ty.INT, actualTy tty pos, pos);
 	       compareTypes(Ty.UNIT, actualTy bty pos, pos);
@@ -474,9 +482,12 @@ fun transExp (venv, tenv, extra : extra) =
 	  end
         | trexp (A.LetExp {decls,body,pos = _}) =
 	  let
-	      val {decls=decls', tenv=tenv', venv=venv'} = transDecs(venv, tenv, decls, {break = false,
-											 assign = NONE})
-	      val bexp as {exp = _, ty = bty} = transExp(venv',tenv', {break = false, assign = NONE}) body
+	      val {decls=decls', tenv=tenv', venv=venv'} = transDecs(venv,
+								     tenv,
+								     decls,
+								     {break = false, assign = #assign extra})
+	      val bexp as {exp = _, ty = bty} = transExp(venv',tenv',
+							 {break = false, assign = #assign extra}) body
           in	      
 	       {exp = TAbs.LetExp {decls = decls', body = bexp},
 	       ty = bty}
@@ -508,13 +519,16 @@ fun transExp (venv, tenv, extra : extra) =
         | trvar (A.FieldVar (var, id, pos)) = 
 	  let val tvar as {exp = varex, ty = vty} = trvar var
 	      val actvty = actualTy vty pos
+	      fun actualVar (A.SimpleVar(s,p)) = s
+		| actualVar (A.FieldVar(v,s,p)) = s
+		| actualVar (A.SubscriptVar(v,e,p)) = actualVar v
 	  in
 	      (case actvty of
 		   Ty.RECORD(fields,u) =>
 		   (let val varTy = checkIfFieldExists(fields,id,pos)
 			val typedVar =
 			    (case varex of (TAbs.VarExp {var = var', ty = _}) => var'
-					| _ => TAbs.SimpleVar(S.symbol "_")) (* <= ERROR*)
+					| _ => raise Bug "Should be var expression here")
 		    in 
 			{exp = TAbs.VarExp {var = TAbs.FieldVar ({var = typedVar, ty = actvty}, id),
 					    ty = varTy}
@@ -531,7 +545,7 @@ fun transExp (venv, tenv, extra : extra) =
 			   transExp(venv,tenv,{break = false, assign = NONE}) exp
 		       val typedVar =
 			   (case varex of (TAbs.VarExp {var = var', ty = _}) => var'
-				       | _ => TAbs.SimpleVar(S.symbol "_")) (* <= ERROR*)
+				       | _ => raise Bug "Should be var expression here") (* <= ERROR*)
 		   in
 		       (case ty' of
 			    Ty.INT =>
@@ -656,7 +670,7 @@ and getSeqFromExps (venv, tenv, exps, inp, extra : extra) =
 		       end
 and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra : extra) =
     let
-        val {exp, ty} = transExp(venv, tenv, {break = false, assign = NONE}) init
+        val {exp, ty} = transExp(venv, tenv, {break = true, assign = NONE}) init
     in
 	case ty of
 	    Ty.NIL => (errorNil(pos,name); {decl = makeVarDec(name,escape,Ty.ERROR,
@@ -674,7 +688,7 @@ and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra 
   | transDec ( venv, tenv
                , A.VarDec {name, escape, typ = SOME (s, pos), init, pos=pos1}, extra) =
     let
-	val {exp, ty} = transExp(venv, tenv, {break = false, assign = NONE}) init
+	val {exp, ty} = transExp(venv, tenv, {break = true, assign = NONE}) init
     in
 	case S.look(tenv,s) of
 	    NONE =>     (errorTypUnd(pos,s);
@@ -709,7 +723,7 @@ and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra 
     end
 
   | transDec (venv, tenv, A.FunctionDec fundecls, extra) =
-    let val fundecs = makeFunDecs(fundecls,tenv, venv)
+    let val fundecs = makeFunDecs(fundecls,tenv, venv,extra)
     in
 	(checkdup(map #name fundecls, map #pos fundecls);
 	 fundecs)
@@ -732,7 +746,7 @@ and checkcycle (tenv, cur, seen, pos) =
 				else errorCycleFound(pos,n,seen))
        | NONE => ()
        | _ => ())
-and makeFunDecs (decls, tenv, venv) = (* Maybe literally the ugliest function we have ever made *)
+and makeFunDecs (decls, tenv, venv, extra) = (* Maybe literally the ugliest function we have ever made *)
     let val venv'
 	    = foldl (fn ({name, params, result, body,pos}, venv) =>
 			let val resultTy = (case result of
@@ -763,7 +777,7 @@ and makeFunDecs (decls, tenv, venv) = (* Maybe literally the ugliest function we
 				    E.VarEntry{ty=ty})
 			  val venv'' = foldl enterparam venv' params'
 			  val body' as {exp = _, ty = bty} = transExp(venv'',tenv, {break = false,
-										    assign = NONE}) body
+										    assign = #assign extra}) body
 		      in
 			  venv
 		      end) venv decls
@@ -783,10 +797,18 @@ and makeFunDecs (decls, tenv, venv) = (* Maybe literally the ugliest function we
 		 S.enter(venv,name,
 			 E.VarEntry{ty= actualTy ty pos})
 	       val venv'' = foldl enterparam venv' params'
-	       val body' as {exp = _, ty = bty} = transExp(venv'', tenv, {break = false, assign = NONE}) body
+	       val body' as {exp = _, ty = bty} = transExp(venv'', tenv, {break = false, assign = #assign extra}) body
 	       val res'' = (if (actualTy bty pos) = (actualTy res' pos)
 			    then res'
-			    else (errorTypMis(pos,PT.asString(res'),PT.asString(bty)); Ty.ERROR))
+			    else case (actualTy res' pos) of
+				     Ty.RECORD(s,u) => if (actualTy bty pos) = Ty.NIL
+						       then res'
+						       else (errorTypMis(pos,PT.asString(res'),
+									 PT.asString(bty));
+							     Ty.ERROR)
+				  |  _ => (errorTypMis(pos,PT.asString(res'),
+						       PT.asString(bty));
+					   Ty.ERROR))
 	   in
 	       case S.look(venv',name) of
 		   SOME s => {name = name, params = params', resultTy = res'', body = body'}
