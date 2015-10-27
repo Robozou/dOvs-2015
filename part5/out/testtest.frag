@@ -1,4 +1,16 @@
-PROC {name = tigermain, formals = t, locals = 0}
+PROC {name = tigermain, formals = t, locals = 2}
+SEQ(
+  EXP(
+    CONST 0),
+  SEQ(
+    EXP(
+      CONST 0),
+    SEQ(
+      LABEL L3_mtseq,
+      EXP(
+        CONST 0))))
+
+PROC {name = L2_lel, formals = tttt, locals = 0}
 SEQ(
   EXP(
     CONST 0),
@@ -8,17 +20,17 @@ SEQ(
     SEQ(
       MOVE(
         RV,
-        CALL(
-          NAME ord,
+        BINOP(PLUS,
           MEM(
             BINOP(PLUS,
-              CONST 8,
-              FP)),
-          NAME L1_string)),
+              FP,
+              CONST ~4)),
+          MEM(
+            BINOP(PLUS,
+              FP,
+              CONST ~8)))),
       EXP(
         CONST 0))))
-
-STRING L1_string = "fak"
 
 STRING L0_string = "DefaultString"
 

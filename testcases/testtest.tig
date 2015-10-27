@@ -1,5 +1,5 @@
 let
-   
+   function lel(n: int, x: int): int = n+x
 in   
-   ord("fak")
+   
 end

@@ -240,23 +240,42 @@ and transDec ( venv
       val venv' = foldl (fn({name,params,resultTy,body},env) =>
         let
            val nameString = Temp.newLabel(S.name name)
-           fun getrefs (x) = !x
-           val newLevel = Tr.newLevel{parent = #level extra,
-                                      name = nameString,
-                                      formals = true::(map getrefs((map #escape params)))}
-           val funEntry = E.FunEntry{formals = map #ty params,
-                                     result = resultTy,
-                                     label = nameString,
-                                     level = newLevel}
+           fun getref (x) = !x
+           val newLevel = Tr.newLevel{ parent = #level extra,
+                                         name = nameString,
+                                      formals = true::(map getref((map #escape params)))}
+           val funEntry = E.FunEntry{ formals = map #ty params,
+                                       result = resultTy,
+                                        label = nameString,
+                                        level = newLevel}
          in
            S.enter(env,name,funEntry)
         end) venv fundecls
-        (* MY AWESOME ITERATOR lel kek 
-        fun iter [] = []
-        | iter(x::xs) = func(x)::iter(xs)
-        *)
+        fun iter[] = []
+        |   iter({name,params,resultTy,body}::xs) = ((
+          let
+            val nameString = Temp.newLabel(S.name name)
+            fun getref (x) = !x
+            val newLevel = Tr.newLevel{ parent = #level extra,
+                                        name = nameString,
+                                     formals = true::(map getref((map #escape params)))}
+            fun enterparam ({name,escape,ty},venv) =
+    			    S.enter(venv,
+                      name,
+                      E.VarEntry{escape=escape,
+                                 ty=ty,
+                                 access=Tr.allocLocal (#level extra) (!escape)})
+            val venv'' = foldl enterparam venv' params
+            val body' = transExp (venv'',extra) body
+            val func = case resultTy of
+                      Ty.UNIT => Tr.procEntryExit
+                      | _     => Tr.funEntryExit
+          in
+            func({level = newLevel,body = body'})
+          end); iter(xs))
     in
-      ({venv = venv'}, explist)
+      iter(fundecls);
+      ({venv = venv'}, explist) (* TODO wat do with this explist? *)
     end
 
 and transDecs (venv, decls, extra) =
