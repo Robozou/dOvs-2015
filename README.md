@@ -15,7 +15,7 @@ Ok part 4.
 
 **FIXED** I laver break om til ErrorExp i vardecls
 
-I giver arrays forkert type, når der bruges subscript på dem.
+**DIXXED** I giver arrays forkert type, når der bruges subscript på dem.
 
 
 
