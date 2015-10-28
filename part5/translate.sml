@@ -86,7 +86,7 @@ fun unEx (Ex e) = e
 fun unNx (Ex e) = T.EXP e
   | unNx (Cx genstm) =
     let
-	val t = Temp.newLabel "true"
+	val t = Temp.newLabel "true" (* TODO Spørg Casper *)
     in
 	genstm(t,t); T.LABEL t
     end
@@ -106,9 +106,14 @@ fun levelEq (Level (_, u1), Level (_, u2)) = (u1 = u2)
   | levelEq _ = false
 
 fun followStaticLink toLevel (fromLevel as Level ({frame, parent}, _)) =
-    if levelEq (toLevel, fromLevel)
-    then T.TEMP F.FP
-    else T.MEM(T.BINOP(T.PLUS,T.CONST(F.staticLinkOffset frame), followStaticLink toLevel parent))
+    let
+      val sloffset = hd (F.formals(frame)) (* How to get int from F.access? *)
+    in
+      if levelEq (toLevel, fromLevel)
+      then T.TEMP F.FP
+      else F.exp (sloffset) (followStaticLink toLevel parent)
+      (* T.MEM(T.BINOP(T.PLUS,T.CONST(sloffset), followStaticLink toLevel parent))*)
+    end
   | followStaticLink _ Top =
     T.TEMP F.FP (* delivered to built-in functions like chr,ord,.. *)
 
@@ -118,12 +123,17 @@ fun simpleVar (acc, fromLevel) =
       val frp = followStaticLink l fromLevel
       val test = F.exp f frp
   in
-      Ex (test) (* TODO *)
+      Ex (test) (* TODO - Spørg Casper*)
   end
 
 fun fieldVar (var, offset) =
-    (* must return Ex (TEMP _) or Ex (MEM _) *)
-  raise TODO
+(* must return Ex (TEMP _) or Ex (MEM _) *)
+let
+    val var' = unEx var
+in
+  Ex (T.MEM(T.BINOP(T.PLUS,T.MEM(var'),T.BINOP(T.MUL,T.CONST(offset),T.CONST(F.wordSize)))))
+end
+
 
 fun assign2IR (var, exp) =
     let
@@ -159,7 +169,15 @@ fun ifThen2IR (test, thenExp) =
                 , unNx(thenExp)
                 , T.LABEL labelEnd])
           | (_, Ex ex) =>
-            raise TODO
+          let
+              val r = Temp.newtemp () (* suggested on page 162 *)
+              val then' = unEx(thenExp)
+          in
+            Ex (T.ESEQ(seq [test' (labelThen, labelEnd)
+                     , T.LABEL labelThen
+                     , T.MOVE(T.TEMP r, then')
+                     , T.LABEL labelEnd],T.TEMP r))
+          end
     end
 
 fun ifThenElse2IR (test, thenExp, elseExp) =
@@ -216,26 +234,47 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
           end
           | (_, _, Nx _) =>
           let
+              val then' = unNx(thenExp)
               val else' = unNx(elseExp)
           in
-              raise TODO
+              Nx (seq [test' (labelThen, labelElse)
+              , T.LABEL labelThen
+              , then'
+              , T.JUMP(T.NAME labelJoin, [labelJoin])
+              , T.LABEL labelElse
+              , else'
+              , T.LABEL labelJoin])
+              (* Is this just the same as above? *)
           end
           | (_, Cx _, Ex _) =>
           let
               val then' = unCx(thenExp)
               val else' = unEx(elseExp)
           in
-              (*Ex (T.ESEQ( seq [test' (labelThen, labelElse)
+              Cx (fn (t,f) =>
+              seq [test' (labelThen, labelElse)
               , T.LABEL labelThen
-              , then'] , T.TEMP r))*)
-              raise TODO
+              , then' (t,f)
+              , T.JUMP(T.NAME labelJoin, [labelJoin])
+              , T.LABEL labelElse
+              , T.EXP else'   (* Casper it's weird like this, now it's a statement, but it's supposed to be an exp *)
+              , T.LABEL labelJoin
+               ])
           end
           | (_, Ex _, Cx _) =>
           let
               val then' = unEx(thenExp)
               val else' = unCx(elseExp)
           in
-              raise TODO
+          Cx (fn (t,f) =>
+          seq [test' (labelThen, labelElse)
+          , T.LABEL labelThen
+          , T.EXP then'   (* Casper it's weird like this, now it's a statement, but it's supposed to be an exp *)
+          , T.JUMP(T.NAME labelJoin, [labelJoin])
+          , T.LABEL labelElse
+          , else' (t,f)
+          , T.LABEL labelJoin
+           ])
           end
 (*          | (_, _, _) =>
             raise Bug "encountered thenBody and elseBody of different kinds"*)
@@ -271,7 +310,7 @@ fun intOp2IR (TAbs.PlusOp, left, right)     = binop2IR (T.PLUS, left, right)
 
 
 fun let2IR ([], body) = body
-  | let2IR (decls, body) = (print(Int.toString(List.length(decls))); Ex (T.ESEQ (seq (map unNx decls), unEx body)))
+  | let2IR (decls, body) = Ex (T.ESEQ (seq (map unNx decls), unEx body))
 
 fun eseq2IR [] = raise Bug "attempt to eseq2IR an empty sequence"
   | eseq2IR (exp :: exps) =
@@ -322,8 +361,8 @@ fun while2IR (test, body, done) =
     in
         Nx(seq [ T.LABEL labelTest
                , test'(labelBody,done)
-	       , body'
-	       , T.JUMP(T.NAME labelTest, [labelTest])
+	             , body'
+	             , T.JUMP(T.NAME labelTest, [labelTest])
                , T.LABEL done])
     end
 
@@ -338,8 +377,17 @@ fun for2IR (var, done, lo, hi, body) =
         val bodyL = Temp.newLabel "for_body"
         val nextL = Temp.newLabel "for_next"
     in
-        raise TODO
-    end
+        Nx(seq [ T.MOVE(T.TEMP loT, lo')
+               , T.MOVE(T.TEMP hiT, hi')
+               , T.MOVE(var',T.TEMP(loT))
+               , T.LABEL nextL
+               , T.CJUMP(T.LE, var', T.TEMP(hiT), bodyL, done)
+               , T.LABEL bodyL
+               , body'
+               , T.JUMP(T.NAME nextL, [nextL])
+               , T.LABEL done
+                ])
+    end (* Maybe this is correct. Maybe it's not, yolo or TODO? *)
 
 fun funCall2IR ( toLevel as Level ({frame, parent}, _)
                , fromLevel

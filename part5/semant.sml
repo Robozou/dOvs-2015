@@ -38,7 +38,7 @@ fun listprint (seen, init) =
 
 fun listprintprime (seen) =
   foldl (fn (x,l) => l ^ S.name x ^ " ") "[ " seen
-		     
+
 type extra = {break : bool, assign : S.symbol list option}
 
 
@@ -227,14 +227,14 @@ fun typEq (t1,t2,ty,pos) =
       (errorTypMis(pos,PT.asString(ty),PT.asString(t2));())
   else ()
 
-fun transTy (tenv, t) = 
+fun transTy (tenv, t) =
   case t of A.NameTy(s,p) => (case S.look(tenv,s) of SOME(t) => t
 						   | NONE => (errorTypUnd(p,s); Ty.ERROR))
           | A.ArrayTy(s,p) => (case S.look(tenv,s) of SOME(t) => Ty.ARRAY(t, ref())
                                                     | NONE => (errorTypUnd(p,s); Ty.ERROR))
           | A.RecordTy(fields) => (if (checkFieldDuplicates(fields))
 				  then Ty.RECORD(recList(fields, tenv), ref())
-				  else Ty.ERROR) 
+				  else Ty.ERROR)
 and checkFieldDuplicates (fields) =
     (case fields of
 	[] => true
@@ -317,7 +317,7 @@ fun transExp (venv, tenv, extra : extra) =
 					   {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
 					    ty = Ty.INT}
 					|  _ => {exp = TAbs.OpExp{left = lexp, oper = bop, right = ERROR},
-						 ty = Ty.INT}))				      
+						 ty = Ty.INT}))
 		      | Ty.ARRAY(t,u) => (compareTypes(Ty.ARRAY(t,u),actualTy rty pos,pos);
 					  (case rty of
 					       Ty.ARRAY(t,u) =>
@@ -354,7 +354,7 @@ fun transExp (venv, tenv, extra : extra) =
 			       ty = Ty.ERROR}))
 	      else if (bop = TAbs.PlusOp orelse bop = TAbs.MinusOp
 		       orelse bop = TAbs.TimesOp orelse bop = TAbs.ExponentOp)
-	      then 
+	      then
 		  (typEq(actualTy lty pos, actualTy rty pos,Ty.INT,pos);
 		   {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
 		    ty = Ty.INT})
@@ -375,7 +375,7 @@ fun transExp (venv, tenv, extra : extra) =
 					 | _ =>
 					   {exp = TAbs.OpExp{left = lexp, oper = bop, right = ERROR},
 					    ty = Ty.INT}))
-		      | t => (errorTypMis(pos, " int or string ", PT.asString(t)); ERROR)) 
+		      | t => (errorTypMis(pos, " int or string ", PT.asString(t)); ERROR))
 	  end
         | trexp (A.RecordExp {fields,typ,pos}) =
 	  (case S.look(tenv, typ) of
@@ -431,7 +431,7 @@ fun transExp (venv, tenv, extra : extra) =
 				      ty = Ty.UNIT})
 				  else checkVar(xs))
 			       | checkVar([]) = {exp = TAbs.AssignExp {var = actvar, exp = actexp},
-				      ty = Ty.UNIT} 
+				      ty = Ty.UNIT}
 			 in
 			     checkVar(x)
 			 end))
@@ -463,7 +463,7 @@ fun transExp (venv, tenv, extra : extra) =
 	       compareTypes(Ty.UNIT, actualTy bty pos, pos);
 	       {exp = TAbs.WhileExp {test = test', body = body'}, ty = Ty.UNIT})
 	  end
-        | trexp (A.ForExp {var, escape, lo, hi, body, pos}) = 
+        | trexp (A.ForExp {var, escape, lo, hi, body, pos}) =
 	  let val tlo as {exp = _, ty = tylo} = trexp lo
 	      val thi as {exp = _, ty = tyhi} = trexp hi
 	      val venv' = S.enter(venv, var, E.VarEntry{ty = Ty.INT})
@@ -488,7 +488,7 @@ fun transExp (venv, tenv, extra : extra) =
 								     {break = false, assign = #assign extra})
 	      val bexp as {exp = _, ty = bty} = transExp(venv',tenv',
 							 {break = false, assign = #assign extra}) body
-          in	      
+          in
 	       {exp = TAbs.LetExp {decls = decls', body = bexp},
 	       ty = bty}
 	  end
@@ -516,7 +516,7 @@ fun transExp (venv, tenv, extra : extra) =
 	       (errorFoundNeed(pos, "function", "var", id);ERROR)
 	     | SOME (E.VarEntry{ty}) =>
 	       {exp = TAbs.VarExp {var = TAbs.SimpleVar(id), ty = actualTy ty pos}, ty = actualTy ty pos})
-        | trvar (A.FieldVar (var, id, pos)) = 
+        | trvar (A.FieldVar (var, id, pos)) =
 	  let val tvar as {exp = varex, ty = vty} = trvar var
 	      val actvty = actualTy vty pos
 	      fun actualVar (A.SimpleVar(s,p)) = s
@@ -529,7 +529,7 @@ fun transExp (venv, tenv, extra : extra) =
 			val typedVar =
 			    (case varex of (TAbs.VarExp {var = var', ty = _}) => var'
 					| _ => raise Bug "Should be var expression here")
-		    in 
+		    in
 			{exp = TAbs.VarExp {var = TAbs.FieldVar ({var = typedVar, ty = actvty}, id),
 					    ty = varTy}
 			,ty = actualTy varTy pos}
@@ -543,21 +543,21 @@ fun transExp (venv, tenv, extra : extra) =
 		   Ty.ARRAY(ty,u) =>
 		   let val exp' as {exp = exp, ty = ty'} =
 			   transExp(venv,tenv,{break = false, assign = NONE}) exp
-		       val typedVar =
-			   (case varex of (TAbs.VarExp {var = var', ty = _}) => var'
+		       val (typedVar,ty'') =
+			   (case varex of (TAbs.VarExp {var = var', ty = ty''}) => (var',ty'')
 				       | _ => raise Bug "Should be var expression here") (* <= ERROR*)
 		   in
 		       (case ty' of
 			    Ty.INT =>
 			    {exp = TAbs.VarExp {var =
 						TAbs.SubscriptVar(
-						    {var = typedVar, ty = ty},exp'),
-						ty = ty}, 
+						    {var = typedVar, ty = ty''},exp'),
+						ty = ty},
 			     ty = ty}
 			 |  t => ERROR)
 		   end
 		 | t => (errorTypMis(pos, "array", PT.asString(t)); ERROR))
-	  end	      
+	  end
   in
       trexp
   end
@@ -604,7 +604,7 @@ and checkshit (pos,cur,ex,fields,tenv,venv,extra) =
 					      | t => if (e = ty')
 						     then ()
 						     else errorRecfieldTypeWrong(pos,cur,e,ty'))
-				       end)) 
+				       end))
 		   | ((s,e)::fs) =>  (if (cur <> s) then checkshit(pos,cur,ex,fs,tenv,venv,extra)
 				      else let val texp as {exp = _, ty = ty'} = transExp(venv,tenv,extra) ex
 					   in
@@ -630,8 +630,8 @@ and checkIfFieldExists(fields,id,pos) =
     (case fields of
 	 [] => (errorFieldNotInRec(pos,id); Ty.ERROR)
        | 	[(s,t)] => if(s = id) then t else (errorFieldNotInRec(pos,id); Ty.ERROR)
-       |  ((s,t)::xs) => if(s = id) then t else checkIfFieldExists(xs, id, pos))			 
-and checkformals (forms, args, pos) = 
+       |  ((s,t)::xs) => if(s = id) then t else checkIfFieldExists(xs, id, pos))
+and checkformals (forms, args, pos) =
     let val lenf = length forms
 	val lena = length args
     in if (lenf <> lena)
@@ -830,9 +830,9 @@ and makeTypDec (decls, tenv, venv) =
 	 fun transDecls{name,ty,pos} =
 	   case S.look(tenv'',name) of
 	       SOME t => {name = name, ty = t}
-	     | NONE => {name = name, ty = Ty.ERROR} 
+	     | NONE => {name = name, ty = Ty.ERROR}
 	 val newData = map transDecls decls
-     in {decl = TAbs.TypeDec newData, tenv = tenv'', venv = venv} end)			    
+     in {decl = TAbs.TypeDec newData, tenv = tenv'', venv = venv} end)
 and transDecs (venv, tenv, decls, extra : extra) =
     let fun visit venv tenv decls result =
           case decls

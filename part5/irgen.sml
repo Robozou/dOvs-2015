@@ -80,8 +80,8 @@ fun transExp (venv, extra : extra) =
                   | iter(x::xs) = trexp(x)::iter(xs)
                 in
                  (case result of
-                    Ty.UNIT => Tr.procCall2IR(#level extra, level',label,iter(args))
-                  | _       => Tr.funCall2IR(#level extra,level',label,iter(args)))
+                    Ty.UNIT => Tr.procCall2IR(level',#level extra,label,iter(args))
+                  | _       => Tr.funCall2IR(level',#level extra,label,iter(args)))
                 end
                | SOME (E.VarEntry {ty, ...}) =>
                  raise Bug "VarEntry found"
@@ -144,8 +144,19 @@ fun transExp (venv, extra : extra) =
                 Tr.assign2IR(var', exp') (* using Tr.assign2IR, checkAssignable *)
             end
 
-          | trexp {exp = TAbs.ForExp {var, escape, lo, hi, body}, ty} =
-            TODO (* using Tr.newBreakPoint, Tr.allocLocal, Tr.forIR *)
+          | trexp {exp = TAbs.ForExp {var, escape = ref esc, lo, hi, body}, ty} =
+            let
+              val tlo = trexp lo
+              val thi = trexp hi
+              val acc = Tr.allocLocal(#level extra) esc
+              val var' = Tr.simpleVar (acc, #level extra)
+              val venv' = S.enter( venv,var,(E.VarEntry{ access = acc
+                                                       , ty = Ty.INT
+                                                       , escape = ref esc}))
+              val tbody = transExp(venv',extra) body
+            in
+              Tr.for2IR(var',Tr.newBreakPoint "done", tlo, thi, tbody)
+            end
 
           | trexp {exp = TAbs.BreakExp, ty} =
             let
@@ -200,7 +211,12 @@ fun transExp (venv, extra : extra) =
 	  (* using Tr.simpleVar *)
               | trvar {var=TAbs.FieldVar (var, id), ty} : Tr.exp =
             (* ignore 'mutationRequested': all record fields are mutable *)
-            TODO (* using Tr.fieldVar *)
+
+            let
+              val tvar = trvar var
+            in
+            Tr.fieldVar(tvar, 4) (* What is "constant field offset?" *)
+            end
 
           | trvar {var=TAbs.SubscriptVar (var, exp), ty} : Tr.exp =
             (* ignore 'mutationRequested': all array entries are mutable *)
@@ -243,7 +259,7 @@ and transDec ( venv
            fun getref (x) = !x
            val newLevel = Tr.newLevel{ parent = #level extra,
                                          name = nameString,
-                                      formals = true::(map getref((map #escape params)))}
+                                      formals = (map getref((map #escape params)))}
            val funEntry = E.FunEntry{ formals = map #ty params,
                                        result = resultTy,
                                         label = nameString,
