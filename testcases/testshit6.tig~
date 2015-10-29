@@ -1,6 +1,0 @@
-let
-	type b = int
-	var b = b
-
-in
-end

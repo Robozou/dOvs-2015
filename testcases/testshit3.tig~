@@ -1,6 +1,0 @@
-let
-	type rec1 = {name : string, name : int}
-
-
-in
-end

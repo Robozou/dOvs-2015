@@ -193,25 +193,32 @@ fun transExp (venv, extra : extra) =
          *)
 
         and trvar {var=TAbs.SimpleVar id, ty} : Tr.exp =
-	    (* Implementation a bit weird TODO
-	       - Do we want "true"? Or actual escape sent?
-	       - AllocLocal each time? what about for assignments?
-	     *)
   	    (case S.look(venv,id) of
   		      SOME(E.VarEntry {access, ty, escape}) =>
   		        Tr.simpleVar(access, #level extra)
   	      | SOME(E.FunEntry {formals, ...}) =>
-  		        TODO
+  		        raise Bug "should be variable entry"
   	      | NONE => Tr.simpleVar(Tr.allocLocal(#level extra) true, #level extra))
-	  (* using Tr.simpleVar *)
 
-          | trvar {var=TAbs.FieldVar (var, id), ty} : Tr.exp =
+          | trvar {var=TAbs.FieldVar (var as {var = var', ty = ty'}, id), ty} : Tr.exp =
             (* ignore 'mutationRequested': all record fields are mutable *)
 
             let
-              val tvar = trvar var
+		val tvar = trvar var
+		val fields = case ty' of
+				 Ty.RECORD(f,u) => f
+			       | _ => raise Bug "should be record type"
+		fun findOffset ([],_) = 0
+		  | findOffset ([(s,t)],i) = if(s <> id)
+					 then raise Bug "field not in record"
+					 else i
+		  | findOffset (((s,t)::xs),i) = if(s = id)
+					     then i
+					     else findOffset(xs,i+1)
+		val offset = findOffset(fields,0) (* TODO: Make sure field is actually in list *)
+
             in
-              Tr.fieldVar(tvar, 1) (* What is "constant field offset?" TODO *)
+              Tr.fieldVar(tvar, offset) 
             end
 
           | trvar {var=TAbs.SubscriptVar (var, exp), ty} : Tr.exp =
@@ -263,7 +270,6 @@ and transDec ( venv
          in
            S.enter(env,name,funEntry)
         end) venv fundecls
-        val explist' = ref explist
         fun iter[] = []
         |   iter({name,params,resultTy,body}::xs) = (
           let
@@ -282,14 +288,14 @@ and transDec ( venv
             val venv'' = foldl enterparam venv' params
             val body' = transExp (venv'',{level = level, break = #break extra}) body
             val func = case resultTy of
-                      Ty.UNIT => Tr.procEntryExit
-                      | _     => Tr.funEntryExit
+			   Ty.UNIT => Tr.procEntryExit
+			 | _     => Tr.funEntryExit
           in
-            (func({level = level,body = body'})(*;explist' := !explist' @ (body' :: [])*))
+              (func({level = level,body = body'}))
           end; iter(xs))
     in
-      iter(fundecls);
-      ({venv = venv'}, !explist') (* TODO wat do with this explist? *)
+	iter(fundecls);
+	({venv = venv'}, explist) 
     end
 
 and transDecs (venv, decls, extra) =

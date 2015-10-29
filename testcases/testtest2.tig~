@@ -1,5 +1,0 @@
-let
-   type rec = {}
-   function () : rec = nil
-in
-end

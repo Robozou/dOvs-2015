@@ -1,5 +1,0 @@
-let
-	var a := ()
-in
-	a
-end

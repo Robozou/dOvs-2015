@@ -86,7 +86,7 @@ fun unEx (Ex e) = e
 fun unNx (Ex e) = T.EXP e
   | unNx (Cx genstm) =
     let
-	val t = Temp.newLabel "true" (* TODO Spørg Casper - made a sequence, now it looks better *)
+	val t = Temp.newLabel "true" 
     in
 	    T.SEQ(genstm(t,t), T.LABEL t)
     end
@@ -111,7 +111,7 @@ fun followStaticLink toLevel (fromLevel as Level ({frame, parent}, _)) =
     in
       if levelEq (toLevel, fromLevel)
       then T.TEMP F.FP
-      else F.exp (sloffset) (followStaticLink toLevel parent) (* Is this the root of our troubles? TODO *)
+      else T.MEM(T.BINOP(T.PLUS,T.CONST(F.staticLinkOffset frame), followStaticLink toLevel parent))
     end
   | followStaticLink _ Top =
     T.TEMP F.FP (* delivered to built-in functions like chr,ord,.. *)
@@ -119,17 +119,26 @@ fun followStaticLink toLevel (fromLevel as Level ({frame, parent}, _)) =
 fun simpleVar ((toLevel, fFrame), fromLevel) =
   let
       val frp = followStaticLink toLevel fromLevel
-      val test = F.exp fFrame frp
+      val sVar = F.exp fFrame frp
   in
-      Ex (test) (* TODO - (Spørg Casper). This feels very simple, no pun *)
+      Ex (sVar) 
   end
 
 fun fieldVar (var, offset) =
-(* must return Ex (TEMP _) or Ex (MEM _)  TODO Are we supposed to return TEMP?*)
+
 let
     val var' = unEx var
+    val nilL = Temp.newLabel "field_nil"
+    val nonNilL = Temp.newLabel "field_nonNil"
+    val addressT = Temp.newtemp ()
 in
-  Ex (T.MEM(T.BINOP(T.PLUS,T.MEM(var'),T.BINOP(T.MUL,T.CONST(offset),T.CONST(F.wordSize)))))
+  Ex (T.ESEQ(seq [T.CJUMP(T.EQ,var', T.CONST(0), nilL, nonNilL)
+		 , T.LABEL nilL
+		 , T.EXP (F.externalCall("recFieldError", [])) (* No JUMP because exit(1) is called *)
+		 , T.LABEL nonNilL
+		 , T.MOVE(T.TEMP addressT, T.BINOP(T.PLUS, var',
+						   (T.BINOP(T.MUL,T.CONST(offset), T.CONST(F.wordSize)))))]
+	   ,T.MEM(T.TEMP addressT)))
 end
 
 
@@ -168,7 +177,7 @@ fun ifThen2IR (test, thenExp) =
                 , T.LABEL labelEnd])
           | (_, Ex ex) =>
           let
-              val r = Temp.newtemp () (* suggested on page 162. Should we use r again? TODO *)
+              val r = Temp.newtemp () (* suggested on page 162.*)
               val then' = unEx(thenExp)
           in
             Ex (T.ESEQ(seq [test' (labelThen, labelEnd)
@@ -192,7 +201,7 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
              val then' = unCx(thenExp)
              val else' = unCx(elseExp)
           in
-             Cx (fn(t, f) =>        (* TODO, these are confuzzeling *)
+             Cx (fn(t, f) =>        
                 seq [test' (labelThen, labelElse)
                 , T.LABEL labelThen
                 , then' (t,f)
@@ -217,7 +226,7 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
              , T.LABEL labelJoin
              ] , T.TEMP r))
           end
-          | (_, Nx _, _) => (* TODO Why aren't these two cases the same? *)
+          | (_, Nx _, _) => 
           let
               val then' = unNx(thenExp)
               val else' = unNx(elseExp)
@@ -241,50 +250,49 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
               , T.JUMP(T.NAME labelJoin, [labelJoin])
               , T.LABEL labelElse
               , else'
-              , T.LABEL labelJoin])
-              (* Is this just the same as above? TODO *)
+              , T.LABEL labelJoin])		 
           end
           | (_, Cx _, Ex _) =>
-          let
-              val then' = unCx(thenExp)
-              val else' = unEx(elseExp)
-          in
-              Cx (fn (t,f) =>
-              seq [test' (labelThen, labelElse)
-              , T.LABEL labelThen
-              , then' (t,f)
-              , T.JUMP(T.NAME labelJoin, [labelJoin])
-              , T.LABEL labelElse
-              , T.EXP else'   (* Casper it's weird like this, now it's a statement, but it's supposed to be an exp TODO *)
-              , T.LABEL labelJoin
-               ])
-          end
+            let
+		val r = Temp.newtemp ()
+		val then' = unEx(thenExp)
+		val else' = unEx(elseExp)
+            in
+		Ex (T.ESEQ( seq [test' (labelThen, labelElse)
+				, T.LABEL labelThen
+				, T.MOVE(T.TEMP r, then')
+				, T.JUMP(T.NAME labelJoin, [labelJoin])
+				, T.LABEL labelElse
+				, T.MOVE(T.TEMP r, else')
+				, T.LABEL labelJoin
+				] , T.TEMP r))
+            end
           | (_, Ex _, Cx _) =>
-          let
-              val then' = unEx(thenExp)
-              val else' = unCx(elseExp)
-          in
-          Cx (fn (t,f) =>
-          seq [test' (labelThen, labelElse)
-          , T.LABEL labelThen
-          , T.EXP then'   (* Casper it's weird like this, now it's a statement, but it's supposed to be an exp TODO *)
-          , T.JUMP(T.NAME labelJoin, [labelJoin])
-          , T.LABEL labelElse
-          , else' (t,f)
-          , T.LABEL labelJoin
-           ])
-          end
-(*          | (_, _, _) =>
+	    let
+		val r = Temp.newtemp ()
+		val then' = unEx(thenExp)
+		val else' = unEx(elseExp)
+            in
+		Ex (T.ESEQ( seq [test' (labelThen, labelElse)
+				, T.LABEL labelThen
+				, T.MOVE(T.TEMP r, then')
+				, T.JUMP(T.NAME labelJoin, [labelJoin])
+				, T.LABEL labelElse
+				, T.MOVE(T.TEMP r, else')
+				, T.LABEL labelJoin
+				] , T.TEMP r))
+            end
+    (*          | (_, _, _) =>
             raise Bug "encountered thenBody and elseBody of different kinds"*)
     end
 
 fun binop2IR (oper, left, right) =
-    let
-	val unleft = unEx(left)
-	val unright = unEx(right)
-    in
-	Ex (T.BINOP(oper,unleft,unright))
-    end
+  let
+      val unleft = unEx(left)
+      val unright = unEx(right)
+  in
+      Ex (T.BINOP(oper,unleft,unright))
+  end
 
 fun relop2IR (oper, left, right) =
   let
@@ -297,8 +305,8 @@ fun relop2IR (oper, left, right) =
 fun intOp2IR (TAbs.PlusOp, left, right)     = binop2IR (T.PLUS, left, right)
   | intOp2IR (TAbs.MinusOp, left, right)    = binop2IR (T.MINUS, left, right)
   | intOp2IR (TAbs.TimesOp, left, right)    = binop2IR (T.MUL, left, right)
-  | intOp2IR (TAbs.DivideOp, left, right)   = binop2IR (T.DIV, left, right)
-  | intOp2IR (TAbs.ExponentOp, left, right) = raise TODO (* External C call TODO how to? *)
+  | intOp2IR (TAbs.DivideOp, left, right)   = binop2IR (T.DIV, left, right) (* unEx in exponent? *)
+  | intOp2IR (TAbs.ExponentOp, left, right) = Ex(F.externalCall("exponent", [unEx(left),unEx(right)])) 
   | intOp2IR (TAbs.EqOp, left, right)       = relop2IR (T.EQ, left, right)
   | intOp2IR (TAbs.NeqOp, left, right)      = relop2IR (T.NE, left, right)
   | intOp2IR (TAbs.LtOp, left, right)       = relop2IR (T.LT, left, right)
@@ -375,45 +383,52 @@ fun for2IR (var, done, lo, hi, body) =
         val hiT = Temp.newtemp ()
         val bodyL = Temp.newLabel "for_body"
         val nextL = Temp.newLabel "for_next"
+	val beginL = Temp.newLabel "for_begin"
     in
         Nx(seq [ T.MOVE(T.TEMP loT, lo')
                , T.MOVE(T.TEMP hiT, hi')
+	       , T.CJUMP(T.GT, T.TEMP loT, T.TEMP hiT, done, beginL)			 
                , T.MOVE(var',T.TEMP(loT))
                , T.LABEL nextL
                , T.CJUMP(T.LE, var', T.TEMP(hiT), bodyL, done)
                , T.LABEL bodyL
                , body'
+	       , T.MOVE(var', T.BINOP(T.PLUS, var', T.CONST(1)))
                , T.JUMP(T.NAME nextL, [nextL])
                , T.LABEL done
                 ])
-    end (* Maybe this is correct. Maybe it's not, yolo or TODO? We just used everything lel *)
+    end 
 
 fun funCall2IR ( toLevel as Level ({frame, parent}, _)
                , fromLevel
                , label
                , exps) =
     let
+	val str = Symbol.name label
         val sl = followStaticLink parent fromLevel
         fun iter [] = []
         | iter(x::xs) = unEx(x)::iter(xs)
     in
-        Ex (T.CALL (T.NAME label, sl :: iter(exps)))
+	case parent of
+	    Top => Ex (F.externalCall(str, iter(exps)))
+	  | _   => Ex (T.CALL (T.NAME label, sl :: iter(exps)))
     end
   | funCall2IR (Top, _, _, _) =
     raise Bug "called function seems to have above-top-level context"
 
-fun procCall2IR ( toLevel as Level ({frame, parent}, _) (* TODO is external call same as top level *)
+fun procCall2IR ( toLevel as Level ({frame, parent}, _) 
                 , fromLevel
-                , label
+                , label 
                 , exps) =
     let
+	val str = Symbol.name label
         val sl = followStaticLink parent fromLevel
         fun iter [] = []
         | iter(x::xs) = unEx(x)::iter(xs)
     in
-      (*  case parent of Top
-            =>  Nx (T.EXP (F.externalCall(label, sl :: iter(exps)))) (* this looks identical? TODO *)
-         | _=> *) Nx (T.EXP (T.CALL (T.NAME label, sl :: iter(exps))))
+        case parent of Top
+            =>  Nx (T.EXP (F.externalCall(str, iter(exps)))) 
+         | _=>  Nx (T.EXP (T.CALL (T.NAME label, sl :: iter(exps))))
     end
   | procCall2IR (Top, _, _, _) =
     raise Bug "called procedure seems to have above-top-level context"
@@ -423,8 +438,8 @@ fun array2IR (size, init) =
       val unsize = unEx(size)
       val uninit = unEx(init)
   in
-    Ex (T.CALL ( T.NAME (Temp.namedLabel "initArray")
-               , [unsize,uninit]))
+      Ex (F.externalCall("initArray", [unsize,uninit]))
+
   end
 
 fun record2IR explist =
@@ -432,7 +447,7 @@ fun record2IR explist =
         val size = T.CONST (length explist)
         val r = Temp.newtemp ()
         val setup = T.MOVE ( T.TEMP r
-                           , T.CALL(T.NAME(Temp.namedLabel("allocRecord")),[size]))
+			   , F.externalCall("allocRecord", [size]))                          
         fun step (exp, n) =
             T.MOVE (T.MEM(T.BINOP(T.PLUS, T.TEMP r, T.CONST (n * F.wordSize)))
                    , unEx exp)
@@ -443,28 +458,33 @@ fun record2IR explist =
     end
 
 fun subscript2IR (array, offset) =
-    (* must return Ex (TEMP _) or Ex (MEM _) *)
     let
-        val offsetT = Temp.newtemp () (* <- Ask Casper TODO *)
-        val arrayT = Temp.newtemp () (* <- Ask Casper TODO *)
-        val addressT = Temp.newtemp () (* <- Ask Casper TODO *)
-        val maxInxT = Temp.newtemp () (* <- Ask Casper TODO *)
-        val negativeL = Temp.newLabel "subs_neg" (* <- Ask Casper TODO *)
-        val nonNegativeL = Temp.newLabel "subs_nneg" (* <- Ask Casper TODO *)
-        val overflowL = Temp.newLabel "subs_ovf" (* <- Ask Casper TODO *)
-        val noOverflowL = Temp.newLabel "subs_novf" (* <- Ask Casper TODO *)
-        val array' = unEx array
-        val offset' = unEx offset
+        val offsetT = Temp.newtemp () 
+        val arrayT = Temp.newtemp () 
+        val addressT = Temp.newtemp () 
+        val maxInxT = Temp.newtemp () 
+        val negativeL = Temp.newLabel "subs_neg" 
+        val nonNegativeL = Temp.newLabel "subs_nneg" 
+        val overflowL = Temp.newLabel "subs_ovf" 
+        val noOverflowL = Temp.newLabel "subs_novf"
+        val array' = unEx array (* address *)
+        val offset' = unEx offset (* value *)
     in
-	Ex (T.MEM(T.ESEQ(seq [T.MOVE(T.TEMP offsetT,offset'), (* <- Ask Casper TODO, TEMP or MEM? *)
-		   T.MOVE(T.TEMP arrayT,array'),
-		   T.MOVE(T.TEMP addressT,T.BINOP(T.MUL,offset',T.CONST(F.wordSize))),
-		   T.EXP(T.TEMP maxInxT),
-		   T.LABEL negativeL,
-		   T.LABEL nonNegativeL,
-		   T.LABEL overflowL,
-		   T.LABEL noOverflowL],
-	    T.MEM(T.BINOP(T.PLUS,T.MEM(array'),T.BINOP(T.MUL,offset',T.CONST(F.wordSize)))))))
+	Ex ((T.ESEQ(seq [T.MOVE(T.TEMP offsetT,offset')
+			, T.MOVE(T.TEMP arrayT,array')
+			, T.MOVE(T.TEMP maxInxT, T.BINOP(T.MINUS, T.CONST(F.wordSize), T.TEMP arrayT))
+			, T.CJUMP(T.GE, T.TEMP offsetT, T.CONST(0), nonNegativeL, negativeL)
+			, T.LABEL negativeL
+			, T.EXP (F.externalCall("arrInxError", [offset']))
+			, T.LABEL nonNegativeL
+			, T.CJUMP(T.LE, T.TEMP offsetT, T.TEMP maxInxT,
+				  noOverflowL, overflowL)
+			, T.LABEL overflowL
+			, T.EXP (F.externalCall("arrInxError", [offset']))
+			, T.LABEL noOverflowL
+			, T.MOVE(T.TEMP addressT,T.BINOP(T.PLUS,array', T.BINOP(
+						     T.MUL,offset',T.CONST(F.wordSize))))]
+		   , T.MEM(T.TEMP addressT))))
     end
 
 fun funEntryExit {level = Level ({frame, parent}, _), body = body} =
