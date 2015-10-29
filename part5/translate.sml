@@ -86,9 +86,9 @@ fun unEx (Ex e) = e
 fun unNx (Ex e) = T.EXP e
   | unNx (Cx genstm) =
     let
-	val t = Temp.newLabel "true" (* TODO Spørg Casper *)
+	val t = Temp.newLabel "true" (* TODO Spørg Casper - made a sequence, now it looks better *)
     in
-	genstm(t,t); T.LABEL t
+	    T.SEQ(genstm(t,t), T.LABEL t)
     end
   | unNx (Nx s) = s
 
@@ -107,11 +107,11 @@ fun levelEq (Level (_, u1), Level (_, u2)) = (u1 = u2)
 
 fun followStaticLink toLevel (fromLevel as Level ({frame, parent}, _)) =
     let
-      val sloffset = hd (F.formals(frame)) (* How to get int from F.access? *)
+      val sloffset = hd (F.formals(frame))
     in
       if levelEq (toLevel, fromLevel)
       then T.TEMP F.FP
-      else F.exp (sloffset) (followStaticLink toLevel parent)
+      else F.exp (sloffset) (followStaticLink toLevel parent) (* Is this the root of our troubles? TODO *)
       (* T.MEM(T.BINOP(T.PLUS,T.CONST(sloffset), followStaticLink toLevel parent))*)
     end
   | followStaticLink _ Top =
@@ -123,11 +123,11 @@ fun simpleVar (acc, fromLevel) =
       val frp = followStaticLink l fromLevel
       val test = F.exp f frp
   in
-      Ex (test) (* TODO - Spørg Casper*)
+      Ex (test) (* TODO - (Spørg Casper). This feels very simple, no pun *)
   end
 
 fun fieldVar (var, offset) =
-(* must return Ex (TEMP _) or Ex (MEM _) *)
+(* must return Ex (TEMP _) or Ex (MEM _)  TODO Are we supposed to return TEMP?*)
 let
     val var' = unEx var
 in
@@ -170,7 +170,7 @@ fun ifThen2IR (test, thenExp) =
                 , T.LABEL labelEnd])
           | (_, Ex ex) =>
           let
-              val r = Temp.newtemp () (* suggested on page 162 *)
+              val r = Temp.newtemp () (* suggested on page 162. Should we use r again? TODO *)
               val then' = unEx(thenExp)
           in
             Ex (T.ESEQ(seq [test' (labelThen, labelEnd)
@@ -194,7 +194,7 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
              val then' = unCx(thenExp)
              val else' = unCx(elseExp)
           in
-             Cx (fn(t, f) =>
+             Cx (fn(t, f) =>        (* TODO, these are confuzzeling *)
                 seq [test' (labelThen, labelElse)
                 , T.LABEL labelThen
                 , then' (t,f)
@@ -219,7 +219,7 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
              , T.LABEL labelJoin
              ] , T.TEMP r))
           end
-          | (_, Nx _, _) =>
+          | (_, Nx _, _) => (* TODO Why aren't these two cases the same? *)
           let
               val then' = unNx(thenExp)
               val else' = unNx(elseExp)
@@ -244,7 +244,7 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
               , T.LABEL labelElse
               , else'
               , T.LABEL labelJoin])
-              (* Is this just the same as above? *)
+              (* Is this just the same as above? TODO *)
           end
           | (_, Cx _, Ex _) =>
           let
@@ -257,7 +257,7 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
               , then' (t,f)
               , T.JUMP(T.NAME labelJoin, [labelJoin])
               , T.LABEL labelElse
-              , T.EXP else'   (* Casper it's weird like this, now it's a statement, but it's supposed to be an exp *)
+              , T.EXP else'   (* Casper it's weird like this, now it's a statement, but it's supposed to be an exp TODO *)
               , T.LABEL labelJoin
                ])
           end
@@ -269,7 +269,7 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
           Cx (fn (t,f) =>
           seq [test' (labelThen, labelElse)
           , T.LABEL labelThen
-          , T.EXP then'   (* Casper it's weird like this, now it's a statement, but it's supposed to be an exp *)
+          , T.EXP then'   (* Casper it's weird like this, now it's a statement, but it's supposed to be an exp TODO *)
           , T.JUMP(T.NAME labelJoin, [labelJoin])
           , T.LABEL labelElse
           , else' (t,f)
@@ -300,7 +300,7 @@ fun intOp2IR (TAbs.PlusOp, left, right)     = binop2IR (T.PLUS, left, right)
   | intOp2IR (TAbs.MinusOp, left, right)    = binop2IR (T.MINUS, left, right)
   | intOp2IR (TAbs.TimesOp, left, right)    = binop2IR (T.MUL, left, right)
   | intOp2IR (TAbs.DivideOp, left, right)   = binop2IR (T.DIV, left, right)
-  | intOp2IR (TAbs.ExponentOp, left, right) = raise TODO (* External C call *)
+  | intOp2IR (TAbs.ExponentOp, left, right) = raise TODO (* External C call TODO how to? *)
   | intOp2IR (TAbs.EqOp, left, right)       = relop2IR (T.EQ, left, right)
   | intOp2IR (TAbs.NeqOp, left, right)      = relop2IR (T.NE, left, right)
   | intOp2IR (TAbs.LtOp, left, right)       = relop2IR (T.LT, left, right)
@@ -361,6 +361,7 @@ fun while2IR (test, body, done) =
     in
         Nx(seq [ T.LABEL labelTest
                , test'(labelBody,done)
+               , T.LABEL labelBody
 	             , body'
 	             , T.JUMP(T.NAME labelTest, [labelTest])
                , T.LABEL done])
@@ -387,7 +388,7 @@ fun for2IR (var, done, lo, hi, body) =
                , T.JUMP(T.NAME nextL, [nextL])
                , T.LABEL done
                 ])
-    end (* Maybe this is correct. Maybe it's not, yolo or TODO? *)
+    end (* Maybe this is correct. Maybe it's not, yolo or TODO? We just used everything lel *)
 
 fun funCall2IR ( toLevel as Level ({frame, parent}, _)
                , fromLevel
@@ -403,7 +404,7 @@ fun funCall2IR ( toLevel as Level ({frame, parent}, _)
   | funCall2IR (Top, _, _, _) =
     raise Bug "called function seems to have above-top-level context"
 
-fun procCall2IR ( toLevel as Level ({frame, parent}, _)
+fun procCall2IR ( toLevel as Level ({frame, parent}, _) (* TODO is external call same as top level *)
                 , fromLevel
                 , label
                 , exps) =
@@ -412,7 +413,9 @@ fun procCall2IR ( toLevel as Level ({frame, parent}, _)
         fun iter [] = []
         | iter(x::xs) = unEx(x)::iter(xs)
     in
-        Nx (T.EXP (T.CALL (T.NAME label, sl :: iter(exps))))
+      (*  case parent of Top
+            =>  Nx (T.EXP (F.externalCall(label, sl :: iter(exps)))) (* this looks identical? TODO *)
+         | _=> *) Nx (T.EXP (T.CALL (T.NAME label, sl :: iter(exps))))
     end
   | procCall2IR (Top, _, _, _) =
     raise Bug "called procedure seems to have above-top-level context"
@@ -455,7 +458,7 @@ fun subscript2IR (array, offset) =
         val array' = unEx array
         val offset' = unEx offset
     in
-	Ex (T.MEM(T.ESEQ(seq [T.MOVE(T.TEMP offsetT,offset'), (* <- Ask Casper TODO *)
+	Ex (T.MEM(T.ESEQ(seq [T.MOVE(T.TEMP offsetT,offset'), (* <- Ask Casper TODO, TEMP or MEM? *)
 		   T.MOVE(T.TEMP arrayT,array'),
 		   T.MOVE(T.TEMP addressT,T.BINOP(T.MUL,offset',T.CONST(F.wordSize))),
 		   T.EXP(T.TEMP maxInxT),

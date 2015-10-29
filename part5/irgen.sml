@@ -26,14 +26,6 @@ val TODO = Tr.bogus
 
 fun transExp (venv, extra : extra) =
     let
-        (*fun trexp {exp=TAbs.NilExp, ty} = {exp=Tr.nil2IR (), ty=ty}
-          | trexp _ = TODO*)
-
-        (* The below code suggest how to translate depending what case
-        you are in, however, uncommenting the section would result in
-        type-errors. You will have to write the rest of the cases your
-        selves.*)
-
         fun trexp {exp=TAbs.NilExp,ty}  =
             Tr.nil2IR ()
 
@@ -55,7 +47,7 @@ fun transExp (venv, extra : extra) =
 		val func = case (lty, rty) of
 			       (Ty.INT, Ty.INT) => Tr.intOp2IR
 			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR
-			     | (_ , _) => raise Bug "failed type checking in compiler"
+			     | (_ , _) => raise Bug "failed type checking in compiler" (* Is this a bug or no TODO*)
 	    in
 		case oper of
 		    TAbs.PlusOp => func(TAbs.PlusOp,leftexp,rightexp)
@@ -86,40 +78,40 @@ fun transExp (venv, extra : extra) =
                | SOME (E.VarEntry {ty, ...}) =>
                  raise Bug "VarEntry found"
                | NONE =>
-                 raise Bug "Function does not exist VERY DANGER")
+                 raise Bug "Function does not exist")
 
           | trexp {exp = TAbs.IfExp {test, thn, els}, ty} =
             let
-		val test' = trexp test
-		val thn' = trexp thn
+		           val test' = trexp test
+		           val thn' = trexp thn
             in
-		case els of
+            		case els of
                     NONE => Tr.ifThen2IR(test',thn')
-		  | SOME els =>
-		    let
-			val els' = trexp els
-		    in
-			Tr.ifThenElse2IR(test',thn',els')
-		    end
+            		  | SOME els =>
+            		    let
+            			     val els' = trexp els
+            		    in
+            			     Tr.ifThenElse2IR(test',thn',els')
+            		    end
             end
 
           | trexp {exp = TAbs.WhileExp {test, body}, ty} =
             let
-		val ttest = trexp test
-		val done = Tr.newBreakPoint "done_label"
-		val tbody = transExp (venv, {level = #level extra, break = SOME done}) body
-	    in
-		Tr.while2IR(ttest,tbody, done)
-	    end
-	    (* using Tr.newBreakPoint, Tr.while2IR *)
+            		val ttest = trexp test
+            		val done = Tr.newBreakPoint "done_label"
+            		val tbody = transExp (venv, {level = #level extra, break = SOME done}) body
+	          in
+        	      Tr.while2IR(ttest,tbody, done)
+            end
+    (* using Tr.newBreakPoint, Tr.while2IR *)
 
           | trexp {exp = aexp as TAbs.RecordExp {fields}, ty} =
-	    let
-		fun transExps (s,e) = trexp e
-		val exps = map transExps fields
-	    in
-		Tr.record2IR(exps)
-	    end
+      	    let
+          		fun transExps (s,e) = trexp e
+          		val exps = map transExps fields
+          	in
+      		    Tr.record2IR(exps)
+      	    end
 
           | trexp {exp = TAbs.SeqExp [], ty} =
             (* ensure there is some expression if the SeqExp is empty *)
@@ -127,21 +119,21 @@ fun transExp (venv, extra : extra) =
 
           | trexp {exp = TAbs.SeqExp (aexps as (aexp'::aexps')), ty} =
             let
-		val func = case ty of
-			       Ty.UNIT => Tr.seq2IR
-			     | _ => Tr.eseq2IR
-		fun transexps [] = []
-		  | transexps (x::xs) = trexp x :: transexps xs
-	    in
-		func(transexps(aexps))
-	    end
+		          val func = case ty of
+			           Ty.UNIT => Tr.seq2IR
+			           |  _    => Tr.eseq2IR
+		          fun transexps [] = []
+		            | transexps (x::xs) = trexp x :: transexps xs
+	          in
+		          func(transexps(aexps))
+	          end
 
           | trexp {exp = TAbs.AssignExp {var, exp}, ty} =
             let
-		val var' = trvar var
-		val exp' = trexp exp
+          	  val var' = trvar var
+          	  val exp' = trexp exp
             in
-                Tr.assign2IR(var', exp') (* using Tr.assign2IR, checkAssignable *)
+              Tr.assign2IR(var', exp') (* using Tr.assign2IR, checkAssignable *)
             end
 
           | trexp {exp = TAbs.ForExp {var, escape = ref esc, lo, hi, body}, ty} =
@@ -162,28 +154,29 @@ fun transExp (venv, extra : extra) =
             let
               val xtra as {level, break = brk} = extra
             in
-		case brk of
-		    SOME sym => Tr.break2IR sym (* using Tr.break2IR *)
-		  | NONE => Tr.break2IR (S.symbol "break") (* Is this right? *)
+          		case brk of
+          		    SOME sym => Tr.break2IR sym (* using Tr.break2IR *)
+          		  | NONE => Tr.break2IR (S.symbol "break") (* Is this right? *)
             end
 
           | trexp {exp = term as TAbs.LetExp {decls, body}, ty} =
              let
-		 val ({venv = venv'}, decls') = transDecs(venv, decls, extra)
-		 val body' = transExp (venv', extra) body
+          		 val ({venv = venv'}, decls') = transDecs(venv, decls, extra)
+          		 val body' = transExp (venv', extra) body
              in
-		 Tr.let2IR(decls', body')
+          		 Tr.let2IR(decls', body')
              end
               (* using transDecs, transExp, Tr.let2IR *)
 
           | trexp {exp = TAbs.ArrayExp {size, init}, ty} =
-	    let
-		val tsize = trexp size
-		val tinit = trexp init
-	    in
-		Tr.array2IR(tsize,tinit)
-	    end
-	  | trexp _ = TODO
+        	   let
+            	 val tsize = trexp size
+            	 val tinit = trexp init
+        	   in
+        		   Tr.array2IR(tsize,tinit)
+        	   end
+
+          | trexp _ = raise Bug "Unknown expression"
 
         (* NB: trvar must generate a tree describing the given
          * variable such that it will work for both evaluation and
@@ -202,35 +195,36 @@ fun transExp (venv, extra : extra) =
 	       - Do we want "true"? Or actual escape sent?
 	       - AllocLocal each time? what about for assignments?
 	     *)
-	    (case S.look(venv,id) of
-		SOME(E.VarEntry {access, ty, escape}) =>
-		Tr.simpleVar(access, #level extra)
-	      | SOME(E.FunEntry {formals, ...}) =>
-		TODO
-	      | NONE => Tr.simpleVar(Tr.allocLocal(#level extra) true, #level extra))
+  	    (case S.look(venv,id) of
+  		      SOME(E.VarEntry {access, ty, escape}) =>
+  		        Tr.simpleVar(access, #level extra)
+  	      | SOME(E.FunEntry {formals, ...}) =>
+  		        TODO
+  	      | NONE => Tr.simpleVar(Tr.allocLocal(#level extra) true, #level extra))
 	  (* using Tr.simpleVar *)
-              | trvar {var=TAbs.FieldVar (var, id), ty} : Tr.exp =
+
+          | trvar {var=TAbs.FieldVar (var, id), ty} : Tr.exp =
             (* ignore 'mutationRequested': all record fields are mutable *)
 
             let
               val tvar = trvar var
             in
-            Tr.fieldVar(tvar, 4) (* What is "constant field offset?" *)
+              Tr.fieldVar(tvar, 1) (* What is "constant field offset?" TODO *)
             end
 
           | trvar {var=TAbs.SubscriptVar (var, exp), ty} : Tr.exp =
             (* ignore 'mutationRequested': all array entries are mutable *)
-	    let
-		val tvar = trvar var
-		val texp = trexp exp
-	    in
-		Tr.subscript2IR(tvar,texp)
-	    end
+      	    let
+          		val tvar = trvar var
+          		val texp = trexp exp
+      	    in
+          		Tr.subscript2IR(tvar,texp)
+      	    end
              (* using Tr.subscript2IR *)
 
-    in
-        trexp
-    end
+      in
+          trexp
+      end
 
 and transDec ( venv
              , TAbs.VarDec {name,escape=ref esc,ty,init}
@@ -267,6 +261,7 @@ and transDec ( venv
          in
            S.enter(env,name,funEntry)
         end) venv fundecls
+        val explist' = ref explist
         fun iter[] = []
         |   iter({name,params,resultTy,body}::xs) = (
           let
@@ -281,18 +276,18 @@ and transDec ( venv
                       E.VarEntry{escape=escape,
                                  ty=ty,
                                  access=Tr.accessOfFormal (#level extra) (i := !i + 1; !i) (!escape)
-                                 (*Tr.allocLocal (#level extra) (!escape)*)})
+                                 }) (* Another way to count formals? TODO *)
             val venv'' = foldl enterparam venv' params
             val body' = transExp (venv'',extra) body
             val func = case resultTy of
                       Ty.UNIT => Tr.procEntryExit
                       | _     => Tr.funEntryExit
           in
-            func({level = level,body = body'})
+            (func({level = level,body = body'});explist' := !explist' @ (body' :: []))
           end; iter(xs))
     in
       iter(fundecls);
-      ({venv = venv'}, explist) (* TODO wat do with this explist? *)
+      ({venv = venv'}, !explist') (* TODO wat do with this explist? *)
     end
 
 and transDecs (venv, decls, extra) =
@@ -306,9 +301,8 @@ and transDecs (venv, decls, extra) =
 	      in
 		  visit venv' ds res
 	      end
-(*	val res' as ({venv},res) = visit venv decls []*)
     in
-	visit venv decls [] (* TODO *)
+	visit venv decls []
     end
 fun transProg (tabsyn as {exp,ty}) : Tr.frag list  =
     let
