@@ -44,9 +44,11 @@ fun transExp (venv, extra : extra) =
 	    let
 		val leftexp = trexp left
 		val rightexp = trexp right
-		val func = case (lty, rty) of
+		val func = case (actualTy lty, actualTy rty) of
 			       (Ty.INT, Ty.INT) => Tr.intOp2IR
-			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR
+			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR (* Compare Array and record TODO? *)
+			     | (Ty.ARRAY(_,_),Ty.ARRAY(_,_)) => Tr.intOp2IR
+			     | (Ty.RECORD(_,_),Ty.RECORD(_,_)) => Tr.intOp2IR
 			     | (_ , _) => raise Bug "failed type checking in compiler" (* Is this a bug or no TODO*)
 	    in
 		case oper of
@@ -275,15 +277,15 @@ and transDec ( venv
                       name,
                       E.VarEntry{escape=escape,
                                  ty=ty,
-                                 access=Tr.accessOfFormal (#level extra) (i := !i + 1; !i) (!escape)
+                                 access=Tr.accessOfFormal level (i := !i + 1; !i) (!escape)
                                  }) (* Another way to count formals? TODO *)
             val venv'' = foldl enterparam venv' params
-            val body' = transExp (venv'',extra) body
+            val body' = transExp (venv'',{level = level, break = #break extra}) body
             val func = case resultTy of
                       Ty.UNIT => Tr.procEntryExit
                       | _     => Tr.funEntryExit
           in
-            (func({level = level,body = body'});explist' := !explist' @ (body' :: []))
+            (func({level = level,body = body'})(*;explist' := !explist' @ (body' :: [])*))
           end; iter(xs))
     in
       iter(fundecls);

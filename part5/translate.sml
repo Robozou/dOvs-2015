@@ -107,21 +107,19 @@ fun levelEq (Level (_, u1), Level (_, u2)) = (u1 = u2)
 
 fun followStaticLink toLevel (fromLevel as Level ({frame, parent}, _)) =
     let
-      val sloffset = hd (F.formals(frame))
+      val sloffset =  hd (F.formals(frame))
     in
       if levelEq (toLevel, fromLevel)
       then T.TEMP F.FP
       else F.exp (sloffset) (followStaticLink toLevel parent) (* Is this the root of our troubles? TODO *)
-      (* T.MEM(T.BINOP(T.PLUS,T.CONST(sloffset), followStaticLink toLevel parent))*)
     end
   | followStaticLink _ Top =
     T.TEMP F.FP (* delivered to built-in functions like chr,ord,.. *)
 
-fun simpleVar (acc, fromLevel) =
+fun simpleVar ((toLevel, fFrame), fromLevel) =
   let
-      val (l,f) = acc
-      val frp = followStaticLink l fromLevel
-      val test = F.exp f frp
+      val frp = followStaticLink toLevel fromLevel
+      val test = F.exp fFrame frp
   in
       Ex (test) (* TODO - (Spørg Casper). This feels very simple, no pun *)
   end
