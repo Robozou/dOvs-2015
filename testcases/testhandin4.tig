@@ -1,8 +1,0 @@
-/* valid for and let with breaks */
-let
-    var x := 1
-in 
-    for i := 0 to 100 do (break; ());
-    while (1) do (if x then break else ());1;
-    while (while (1) do (if x then break else ());1) do ()
-end

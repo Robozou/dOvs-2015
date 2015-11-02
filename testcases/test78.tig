@@ -1,6 +1,0 @@
-/* error: syntax error, arguments in function declarations need a type */
-let
-    function try(c) =
-       nil
-    in
-end

@@ -1,5 +1,0 @@
-let
-	var flag := (1<3 | 2<1)
-in   
-	   
-end

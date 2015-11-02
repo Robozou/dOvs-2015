@@ -118,7 +118,7 @@ fun followStaticLink toLevel (fromLevel as Level ({frame, parent}, _)) =
 
 fun simpleVar ((toLevel, fFrame), fromLevel) =
   let
-      val frp = followStaticLink toLevel fromLevel
+      val frp = followStaticLink  toLevel fromLevel 
       val sVar = F.exp fFrame frp
   in
       Ex (sVar) 
@@ -255,8 +255,8 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
           | (_, Cx _, Ex _) =>
             let
 		val r = Temp.newtemp ()
-		val then' = unEx(thenExp)
-		val else' = unEx(elseExp)
+		val then' = unEx(thenExp) (* May cause tangle of jumps *)
+		val else' = unEx(elseExp) 
             in
 		Ex (T.ESEQ( seq [test' (labelThen, labelElse)
 				, T.LABEL labelThen
@@ -271,7 +271,7 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
 	    let
 		val r = Temp.newtemp ()
 		val then' = unEx(thenExp)
-		val else' = unEx(elseExp)
+		val else' = unEx(elseExp) (* May cause tangle of jumps *)
             in
 		Ex (T.ESEQ( seq [test' (labelThen, labelElse)
 				, T.LABEL labelThen
@@ -387,7 +387,8 @@ fun for2IR (var, done, lo, hi, body) =
     in
         Nx(seq [ T.MOVE(T.TEMP loT, lo')
                , T.MOVE(T.TEMP hiT, hi')
-	       , T.CJUMP(T.GT, T.TEMP loT, T.TEMP hiT, done, beginL)			 
+	       , T.CJUMP(T.GT, T.TEMP loT, T.TEMP hiT, done, beginL)
+	       , T.LABEL beginL			 
                , T.MOVE(var',T.TEMP(loT))
                , T.LABEL nextL
                , T.CJUMP(T.LE, var', T.TEMP(hiT), bodyL, done)

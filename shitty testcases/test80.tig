@@ -1,2 +1,2 @@
-"This is an unclosed string, resulting in an error :("
-"Why didn't you close meeee
+/* error: syntax error, If-statements cannot have two else */
+if (10 > 20) then if 20 then 2 else 3 else 4 else 40

@@ -1,8 +1,0 @@
-/* illegal: Duplicate field definition in record */
-let
-	type rectype1 = {name : string, name : int}
-	var rec1 := rectype1 {name = "hej", name = 5}
-
-in
-	rec1.name := 5
-end

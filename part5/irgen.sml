@@ -22,7 +22,7 @@ exception Bug of string
 fun actualTy (Ty.NAME (_, ref (SOME ty))) = actualTy ty
   | actualTy t = t
 
-val TODO = Tr.bogus
+val BOGUS = Tr.bogus
 
 fun transExp (venv, extra : extra) =
     let
@@ -46,10 +46,12 @@ fun transExp (venv, extra : extra) =
 		val rightexp = trexp right
 		val func = case (actualTy lty, actualTy rty) of
 			       (Ty.INT, Ty.INT) => Tr.intOp2IR
-			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR (* Compare Array and record TODO? *)
+			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR 
 			     | (Ty.ARRAY(_,_),Ty.ARRAY(_,_)) => Tr.intOp2IR
 			     | (Ty.RECORD(_,_),Ty.RECORD(_,_)) => Tr.intOp2IR
-			     | (_ , _) => raise Bug "failed type checking in compiler" (* Is this a bug or no TODO*)
+			     | (Ty.RECORD(_,_),Ty.NIL) => Tr.intOp2IR
+			     | (Ty.NIL, Ty.RECORD(_,_)) => Tr.intOp2IR
+			     | (_ , _) => raise Bug "failed type checking in compiler"
 	    in
 		case oper of
 		    TAbs.PlusOp => func(TAbs.PlusOp,leftexp,rightexp)
@@ -277,15 +279,20 @@ and transDec ( venv
                 (case S.look(venv',name) of
                     SOME(e) => e
                   | NONE    => raise Bug "No label")
-            val i = ref 0
-            fun enterparam ({name,escape,ty},venv) =
-    			    S.enter(venv,
-                      name,
-                      E.VarEntry{escape=escape,
-                                 ty=ty,
-                                 access=Tr.accessOfFormal level (i := !i + 1; !i) (!escape)
-                                 }) (* Another way to count formals? TODO *)
-            val venv'' = foldl enterparam venv' params
+	    val accesses = Tr.formals level
+	    fun enterparams ([],_,env) = env
+	      | enterparams (_,[],env) = env
+	      | enterparams (({name,escape,ty}::vs),(ac::acs),env) =
+		enterparams(vs,
+			    acs,
+			    S.enter(env,
+				    name,
+				    E.VarEntry{escape=escape,
+					       ty=ty,
+					       access=ac}))
+            val venv'' = if length accesses > 0 then
+			     enterparams  (params, tl accesses, venv')
+			 else venv'
             val body' = transExp (venv'',{level = level, break = #break extra}) body
             val func = case resultTy of
 			   Ty.UNIT => Tr.procEntryExit

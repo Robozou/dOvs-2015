@@ -1,7 +1,1 @@
-/* No types in function declaration parameters */
-
-let
-   function fun(x,y) = x + y
-   in
-      print(fun(6,7))
-   end
+if 2 then 3 else 4

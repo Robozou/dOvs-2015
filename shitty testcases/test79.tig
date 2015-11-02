@@ -1,6 +1,4 @@
-/*  This is
-*   how
-*   I
-    Handle
-*   Multiline
-*   Comments */
+/* error: syntax error, variable declarations needs var-keyword */
+let kek : x := 5
+  in
+end

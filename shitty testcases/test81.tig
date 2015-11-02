@@ -1,4 +1,2 @@
-"Look at all the escapes! \
-\  \n \t \\ \" YOU CAN'T ESCAPE! \\\\\\"
-"\^A \020"
-"Okay, you've escaped"
+/* error: syntax error, subscript expressions cannot end with a dot */
+Q.W.E.R.T.Y.

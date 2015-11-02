@@ -305,21 +305,21 @@ fun transExp (venv, tenv, extra : extra) =
 	  in  if (bop = TAbs.EqOp orelse bop = TAbs.NeqOp)
               then (case actualTy lty pos of
 			Ty.INT => (compareTypes(Ty.INT, actualTy rty pos,pos);
-				   (case rty of
+				   (case actualTy rty pos of
 					Ty.INT =>
 					{exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
 					 ty = Ty.INT}
 				     |  _ => {exp = TAbs.OpExp{left = lexp, oper = bop, right = ERROR},
 					      ty = Ty.INT}))
 		      | Ty.STRING => (compareTypes(Ty.STRING, actualTy rty pos,pos);
-				      (case rty of
+				      (case actualTy rty pos of
 					   Ty.STRING =>
 					   {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
 					    ty = Ty.INT}
 					|  _ => {exp = TAbs.OpExp{left = lexp, oper = bop, right = ERROR},
 						 ty = Ty.INT}))
 		      | Ty.ARRAY(t,u) => (compareTypes(Ty.ARRAY(t,u),actualTy rty pos,pos);
-					  (case rty of
+					  (case actualTy rty pos of
 					       Ty.ARRAY(t,u) =>
 					       {exp = TAbs.OpExp{left = lexp, oper = bop, right = rexp},
 						ty = Ty.INT}
@@ -701,9 +701,9 @@ and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra 
 	    let val acttyp = actualTy typ pos
             in
 		(case ty of
-		     Ty.NIL => {decl = makeVarDec(name,escape,ty,{exp = exp, ty = typ}),
+		     Ty.NIL => {decl = makeVarDec(name,escape,typ,{exp = exp, ty = ty}),
 				tenv = tenv,
-				venv = S.enter(venv, name, E.VarEntry{ty = ty})}
+				venv = S.enter(venv, name, E.VarEntry{ty = typ})}
 		   | Ty.UNIT => {decl = makeVarDec(name, escape,Ty.ERROR,{exp = exp, ty = Ty.ERROR}),
 				tenv = tenv,
 				venv = S.enter(venv, name, E.VarEntry{ty = Ty.ERROR})}
