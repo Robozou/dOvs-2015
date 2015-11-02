@@ -1,0 +1,9 @@
+let
+
+	type rectyp1 = {id : int}
+	type array1 = array of rectyp1
+	type rectyp2 = {arr : array1}
+in
+
+end
+    

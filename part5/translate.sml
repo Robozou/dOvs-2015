@@ -440,7 +440,6 @@ fun array2IR (size, init) =
       val uninit = unEx(init)
   in
       Ex (F.externalCall("initArray", [unsize,uninit]))
-
   end
 
 fun record2IR explist =
@@ -473,7 +472,7 @@ fun subscript2IR (array, offset) =
     in
 	Ex ((T.ESEQ(seq [T.MOVE(T.TEMP offsetT,offset')
 			, T.MOVE(T.TEMP arrayT,array')
-			, T.MOVE(T.TEMP maxInxT, T.BINOP(T.MINUS, T.CONST(F.wordSize), T.TEMP arrayT))
+			, T.MOVE(T.TEMP maxInxT, T.BINOP(T.MINUS, T.TEMP arrayT, T.CONST(F.wordSize)))
 			, T.CJUMP(T.GE, T.TEMP offsetT, T.CONST(0), nonNegativeL, negativeL)
 			, T.LABEL negativeL
 			, T.EXP (F.externalCall("arrInxError", [offset']))

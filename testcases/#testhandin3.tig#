@@ -1,0 +1,12 @@
+let
+
+	type rectyp1 = {id : int}
+	type array1 = array of rectyp1
+	type rectyp2 = {arr : array1}
+	var rec1 := rectyp1 {id = 5}
+	var arr1 := array1 [5] of rec1
+	var rec2 := rectyp2 {arr = arr1}
+in
+	rec2.arr[2]
+end
+    

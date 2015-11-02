@@ -1,0 +1,7 @@
+let
+	type array1 = array of int
+	var arr1 := arrary1 [5] of array1
+
+in
+
+end

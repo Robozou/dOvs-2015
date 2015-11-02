@@ -384,7 +384,7 @@ fun transExp (venv, tenv, extra : extra) =
 			  in
 			      (case act of
 				   Ty.RECORD(tfs,u) => (
-				    let val defFields = convertRecFields(tenv, venv, fields)
+				    let val defFields = convertRecFields(tenv, venv, fields,pos)
 				    in
 					(compareRecfields(tfs,fields,pos,tenv,venv,extra);
 					 {exp = TAbs.RecordExp {fields = defFields}, ty = t})
@@ -561,7 +561,7 @@ fun transExp (venv, tenv, extra : extra) =
   in
       trexp
   end
-and convertRecFields(venv, tenv, fields) =
+and convertRecFields(venv, tenv, fields,pos) =
     let val newFields =
 	    foldl (fn ((s,e,p),l) =>
 		      let val trexp as {exp = exp, ty = ty'} =
@@ -578,13 +578,13 @@ and compareRecfields(tfs,fs,pos,tenv,venv,extra) =
     in
 	if(lengfs <> lengtfs) then (errorFormalMismatch(pos,lengfs,lengtfs);()) else
 	(let fun test([]) = ()
-	       | test [(sy,ex,po)] = (checkshit(pos,sy,ex,tfs,tenv,venv,extra))
-	       | test ((sy,ex,pos)::ts) = (checkshit(pos,sy,ex,tfs,tenv,venv,extra);test(ts))
+	       | test [(sy,ex,po)] = (checkRecFields(pos,sy,ex,tfs,tenv,venv,extra))
+	       | test ((sy,ex,pos)::ts) = (checkRecFields(pos,sy,ex,tfs,tenv,venv,extra);test(ts))
 	in
 	    test(fs)
 	end)
     end
-and checkshit (pos,cur,ex,fields,tenv,venv,extra) =
+and checkRecFields (pos,cur,ex,fields,tenv,venv,extra) =
     let val res = case fields of
 		      [] => (errorRecFieldNotFound(pos,cur))
 		   | [(s,e)] => (if cur <> s
@@ -596,16 +596,16 @@ and checkshit (pos,cur,ex,fields,tenv,venv,extra) =
 						(case actualTy ty' pos of
 						     Ty.RECORD(f,u) => ()
 						   | Ty.NIL => ()
-						   | _ => errorRecfieldTypeWrong(pos,cur,e,ty'))
+						   | _ => errorRecfieldTypeWrong(pos,cur,actualTy e pos,actualTy ty' pos))
 					      | Ty.NAME(n,r) =>
 						(case actualTy ty' pos of
 						     Ty.NIL => ()
-						   | _ => errorRecfieldTypeWrong(pos,cur,e,ty'))
-					      | t => if (e = ty')
+						   | _ => errorRecfieldTypeWrong(pos,cur,actualTy e pos,actualTy ty' pos))
+					      | _ => if (actualTy e pos = actualTy ty' pos)
 						     then ()
-						     else errorRecfieldTypeWrong(pos,cur,e,ty'))
+						     else errorRecfieldTypeWrong(pos,cur,actualTy e pos,actualTy ty' pos))
 				       end))
-		   | ((s,e)::fs) =>  (if (cur <> s) then checkshit(pos,cur,ex,fs,tenv,venv,extra)
+		   | ((s,e)::fs) =>  (if (cur <> s) then checkRecFields(pos,cur,ex,fs,tenv,venv,extra)
 				      else let val texp as {exp = _, ty = ty'} = transExp(venv,tenv,extra) ex
 					   in
 					       (case actualTy e pos of
@@ -614,14 +614,14 @@ and checkshit (pos,cur,ex,fields,tenv,venv,extra) =
 							 Ty.RECORD(f,u) =>
 							 ()
 						       | Ty.NIL => ()
-						       | _ => errorRecfieldTypeWrong(pos,cur,e,ty'))
+						       | _ => errorRecfieldTypeWrong(pos,cur,actualTy e pos,actualTy ty' pos))
 						  | Ty.NAME(n,r) =>
 						    (case actualTy ty' pos of
 							 Ty.NIL => ()
-						       | _ => errorRecfieldTypeWrong(pos,cur,e,ty'))
-						  | t => if (e = ty')
+						       | _ => errorRecfieldTypeWrong(pos,cur,actualTy e pos,actualTy ty' pos))
+						  | t => if (actualTy e pos = actualTy ty' pos)
 							 then ()
-							 else errorRecfieldTypeWrong(pos,cur,e,ty'))
+							 else errorRecfieldTypeWrong(pos,cur,actualTy e pos,actualTy ty' pos))
 					   end)
     in
 	()
@@ -672,7 +672,7 @@ and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra 
     let
         val {exp, ty} = transExp(venv, tenv, {break = true, assign = NONE}) init
     in
-	case ty of
+	case actualTy ty pos of
 	    Ty.NIL => (errorNil(pos,name); {decl = makeVarDec(name,escape,Ty.ERROR,
 							      {exp = exp, ty = Ty.ERROR}),
 					    tenv = tenv,
@@ -681,9 +681,9 @@ and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra 
 								     {exp = exp, ty = Ty.ERROR}),
 						   tenv = tenv,
 						   venv = S.enter(venv, name, E.VarEntry{ty = Ty.ERROR})})
-	  | _ => {decl = makeVarDec(name,escape,ty,{exp = exp, ty = ty}),
+	  | _ => {decl = makeVarDec(name,escape,actualTy ty pos,{exp = exp, ty = actualTy ty pos}),
 			  tenv = tenv,
-			  venv = S.enter(venv, name, E.VarEntry{ty = ty})}
+			  venv = S.enter(venv, name, E.VarEntry{ty = actualTy ty pos})}
     end
   | transDec ( venv, tenv
                , A.VarDec {name, escape, typ = SOME (s, pos), init, pos=pos1}, extra) =

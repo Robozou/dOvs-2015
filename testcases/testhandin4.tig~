@@ -1,0 +1,9 @@
+let
+	function doneit(n : int) : int = doneit2 ("hej")
+	function doneit2(s : string) : int = doneit3()
+	function doneit3() : int = 5
+	
+in
+	doneit(7)
+end
+    

@@ -1,0 +1,8 @@
+let
+    var a : int := 5
+    var b : int := 8
+    var c : string := "Hej"
+    var d : string := "Nej"
+in
+    if (a = 5) then if a < b then c else d else "Måske"
+end

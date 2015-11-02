@@ -1,0 +1,18 @@
+let
+	
+	function doneit(n : int) : int = doneit2 ("hej")
+	function doneit2(s : string) : int =
+	   if s <> "nej" then doneit3() else doneit(8)
+	function doneit3() : int =
+	  let
+	      type array1 = array of int
+	      var arr1 := array1 [7] of 5
+	  in
+	      arr1[0]
+	  end
+	  
+	
+in
+	doneit(7)
+end
+    
