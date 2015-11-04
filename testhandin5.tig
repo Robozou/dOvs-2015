@@ -1,0 +1,8 @@
+let 
+	type rectype = {name : string}
+	var rec1 : rectype := nil
+in
+	rec1 := rectype{name = "Hej"};
+	rec1 = nil;
+	rec1 = rec1  
+end

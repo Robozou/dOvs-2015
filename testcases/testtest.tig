@@ -1,6 +1,6 @@
 let
-	type array1 = array of int
-	var arr1 := array1 [5] of 7
+	
+
 in
-        arr1[4]
+	while 1 do (let function test () = break in test end)
 end
