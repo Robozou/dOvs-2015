@@ -271,32 +271,42 @@ fun spillAllTemps toMap body =
             if isRegister s0 then
                 if isRegister s1 then [i]
                 else (* s0 register, s1 other temp *)
-                    raise TODO
+                    (print("A");raise TODO)
             else if isRegister s1 then
                 (* s0 other temp, s1 register *)
-                raise TODO
+                (print("B");raise TODO)
             else (* s0,s1 other temps *)
-                raise TODO
+                (print("C");raise TODO)
           | expand (i as A.OPER {assem, src=[], dst=(d0::ds), jump, doc}) =
             if isRegister d0 then [i]
             else (* d0 other temp *)
-                raise TODO
+                [ A.OPER { assem = "\tmovl " ^ ofs d0 ^ "(%ebp), `d0"
+                         , src = []
+                         , dst = [EBX]
+                         , jump = NONE
+                         , doc = doc ^ " x86frame:287"}
+                , A.OPER { assem = assem
+                         , src = []
+                         , dst = [EBX]
+                         , jump = jump
+                         , doc = doc ^ " x86frame:292"}
+                ]
           | expand (i as A.OPER {assem, src=[s0], dst=(d0::ds), jump, doc}) =
             if isRegister s0 then
                 if isRegister d0 then [i]
                 else (* s0 register, d0 other temp *)
-                    raise TODO
+                    (print("E");raise TODO)
             else if isRegister d0 then
                 (* s0 other temp, d0 register *)
-                raise TODO
+                (print("F");raise TODO)
             else (* s0,d0 other temp *)
                 (* OLD_R_OPTIMIZATION *)
                 if s0=d0 then
                     (* instruction uses old-d0, and "`s0" is
                      * not used in assem; must preload d0 *)
-                    raise TODO
+                    (print("G");raise TODO)
                 else (* s0<>d0, and instruction does not use old-d0 *)
-                    raise TODO
+                    (print("H");raise TODO)
           | expand (i as A.OPER { assem, src=(s0::s1::ss)
                                 , dst=(d0::ds), jump, doc}) =
             if isRegister s0 then
@@ -304,38 +314,38 @@ fun spillAllTemps toMap body =
                     if isRegister d0 then [i]
                     else (* s0,s1 register, d0 other temp *)
                         (* OLD_R_OPTIMIZATION: s0<>d0, no pre-load needed *)
-                        raise TODO
+                        (print("I");raise TODO)
                 else (* s0 register, s1 other temp *)
                     if isRegister d0 then
                         (* s0 register, s1 other temp, d0 register *)
-                        raise TODO
+                        (print("J");raise TODO)
                     else (* s0 register, s1,d0 other temp *)
                         (* OLD_R_OPTIMIZATION: s0<>d0, no pre-load needed *)
-                        raise TODO
+                        (print("K");raise TODO)
             else (* s0 other temp *)
                 if isRegister s1 then
                     if isRegister d0 then
                         (* s0 other temp, s1,d0 register *)
-                        raise TODO
+                        (print("L");raise TODO)
                     else (* s0 other temp, s1 register, d0 other temp *)
                         (* OLD_R_OPTIMIZATION *)
                         if s0=d0 then
                             (* instruction uses old-d0, and "`s0" is
                              * not used in assem; must preload d0 *)
-                            raise TODO
+                            (print("M");raise TODO)
                         else (* s0<>d0, and instruction does not use old-d0 *)
-                            raise TODO
+                            (print("N");raise TODO)
                 else if isRegister d0 then
                     (* s0,s1 other temp, d0 register *)
-                    raise TODO
+                    (print("O");raise TODO)
                 else (* s0,s1,d0 other temp *)
                     (* OLD_R_OPTIMIZATION *)
                     if s0=d0 then
                         (* instruction uses old-d0, and "`s0" is
                          * not used in assem; must preload d0 *)
-                        raise TODO
+                        (print("P");raise TODO)
                      else (* s0<>d0, and instruction does not use old-d0 *)
-                         raise TODO
+                         (print("Q");raise TODO)
           | expand (i as (A.LABEL _)) =
             [i]
           | expand (i as A.MOVE {assem, src, dst, doc}) =
@@ -344,13 +354,31 @@ fun spillAllTemps toMap body =
             if isRegister src then
                 if isRegister dst then [i]
                 else (* src register, dst other temp *)
-                    raise TODO
+                [A.OPER { assem = "\tmovl " ^ ofs dst ^ "(%ebp), `d0"
+                          , src = []
+                          , dst = [EBX]
+                          , jump = NONE
+                          , doc = doc ^ " x86frame:364"
+                          }
+              , A.MOVE {assem = assem
+                          , src = src
+                          , dst = EBX
+                          , doc = doc ^ " x86frame:366"}]
             else if isRegister dst then
                 (* src other temp, dst register *)
-                raise TODO
+                [A.OPER { assem = "\tmovl " ^ ofs src ^ "(%ebp), `d0"
+                          , src = []
+                          , dst = [EBX]
+                          , jump = NONE
+                          , doc = doc ^ " x86frame:373"
+                          }
+              , A.MOVE {assem = assem
+                          , src = EBX
+                          , dst = dst
+                          , doc = doc ^ " x86frame:378"}]
             else
                 (* src, dst other temp *)
-                raise TODO
+                (print("T");raise TODO)
     in
         List.concat (map expand body)
     end

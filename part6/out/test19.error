@@ -1,0 +1,4 @@
+../testcases/test19.tig:8.22:var a is undefined
+../testcases/test19.tig:8.10:type mismatch, expected INT but found ERROR
+../testcases/test19.tig:8.22:var a is undefined
+../testcases/test19.tig:8.10:type mismatch, expected INT but found ERROR

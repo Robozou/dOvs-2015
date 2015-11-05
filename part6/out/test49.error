@@ -1,0 +1,3 @@
+../testcases/test49.tig:5.22:syntax error: inserting  PLUS
+../testcases/test49.tig:5.14:var rectype is undefined
+../testcases/test49.tig:5.14:type mismatch, expected INT but found ERROR

@@ -1,6 +1,1 @@
-let
-	
-
-in
-	while 1 do (let function test () = break in test end)
-end
+5

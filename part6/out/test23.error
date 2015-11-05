@@ -1,0 +1,2 @@
+../testcases/test23.tig:6.5:type mismatch, expected STRING but found INT
+../testcases/test23.tig:7.5:type mismatch, expected INT but found STRING

@@ -65,59 +65,108 @@ fun codegen frame stm =
                            , src = munchArgs args
                            , dst = F.calldefs
                            , jump = NONE
-                           , doc = "x86gen:68"})
+                           , doc = "x86gen:68"}) (* Check line number TODO *)
             ; emit (freeArgs (length args))
-            ; emit (moveInstr F.EAX t "70"))
+            ; emit (moveInstr F.EAX t "70"))(* Check line number TODO *)
 
           | munchStm (T.MOVE (T.MEM e1, T.CALL (T.NAME l, args))) =
-            let 
+            let
                 val t = Tm.newtemp ()
-            in  
+            in
                 emit (A.OPER { assem = "\tcall " ^ S.name l
                              , src = munchArgs args
                              , dst = F.calldefs
                              , jump = NONE
-                             , doc = "x86gen:80"});
-                raise TODO
+                             , doc = "x86gen:80"}) (* Check line number TODO *)
+              ; emit (freeArgs (length args))
+              ; emit (moveInstr F.EAX t "82") (* Check line number TODO *)
+                (* Maybe? TODO *)
             end
 
           | munchStm (T.MOVE (T.MEM (T.BINOP (T.PLUS, e1, T.CONST i)), e2)) =
-            raise TODO
+            ( emit (A.OPER { assem = "\tmovl `s1, " ^ int i ^ "(`s0)"
+                             , src = [munchExp e1, munchExp e2]
+                             , dst = []
+                             , jump = NONE
+                             , doc = "x86gen:94" })) (* Check line number TODO *)
 
           | munchStm (T.MOVE (T.MEM (T.BINOP (T.PLUS, T.CONST i, e1)), e2)) =
-            raise TODO
+            ( emit (A.OPER { assem = "\tmovl `s1, " ^ int i ^ "(`s0)"
+                             , src = [munchExp e1, munchExp e2]
+                             , dst = []
+                             , jump = NONE
+                             , doc = "x86gen:98" })) (* Check line number TODO *)
 
           | munchStm (T.MOVE (T.MEM (T.CONST i), e2)) =
-            raise TODO
-
+          let
+              val t = Tm.newtemp ()
+          in
+            ( emit (A.OPER { assem = "\tmovl " ^ int i ^ "`d0"
+                             , src = []
+                             , dst = [t]
+                             , jump = NONE
+                             , doc = "x86gen:107"})
+              ; emit (A.OPER { assem = "\tmovl `s0, (`s1)"
+                             , src = [munchExp e2, t]
+                             , dst = []
+                             , jump = NONE
+                             , doc = "x86gen:113" })) (* Hopefully we'll never use this case *)
+          end
           | munchStm (T.MOVE (T.MEM e1, e2)) =
-            raise TODO
+            ( emit (A.OPER { assem = "\tmovl `s1, (`s0)"
+                             , src = [munchExp e1, munchExp e2]
+                             , dst = []
+                             , jump = NONE
+                             , doc = "x86gen:120" })) (* Check line number TODO *)
 
           | munchStm (T.MOVE (T.TEMP i, e2)) =
-            raise TODO
+            ( emit (moveInstr (munchExp e2) i  "123")) (* Check line number TODO  SPØRG CASPER*)
 
           | munchStm (T.LABEL lab) =
-            raise TODO
+            ( emit (A.LABEL { assem = S.name lab^":\n", lab=lab
+                              , doc = "x86gen:127" }))
 
           (* JUMP *)
           | munchStm (T.CJUMP (oper, T.CONST i, e2, lab1, lab2)) =
-            raise TODO
+            ( emit (A.OPER {assem = "\tcmpl $" ^ int i ^ ", `s0\n\t"
+                                    ^ (operator2jump(oper)) ^ " `j0\n\t"
+                                    ^ "jmp `j1"
+                            , src = [munchExp e2]
+                            , dst = []
+                            , jump = SOME [lab1, lab2]
+                            , doc = "x86gen:137" })) (* Casper said we should split it up *)
 
           | munchStm (T.CJUMP (oper, e1, T.CONST i, lab1, lab2)) =
-            raise TODO
+            ( emit (A.OPER {assem = "\tcmpl `s0, $" ^ int i ^ "\n\t"
+                                    ^ (operator2jump(oper)) ^ " `j0\n\t"
+                                    ^ "jmp `j1"
+                            , src = [munchExp e1]
+                            , dst = []
+                            , jump = SOME [lab1, lab2]
+                            , doc = "x86gen:146" }))
 
           | munchStm (T.CJUMP (oper, e1, e2, lab1, lab2)) =
-            raise TODO
+            ( emit (A.OPER {assem = "\tcmpl `s0, `s1\n\t"
+                                    ^ (operator2jump(oper)) ^ " `j0\n\t"
+                                    ^ "jmp `j1"
+                            , src = [munchExp e1, munchExp e2]
+                            , dst = []
+                            , jump = SOME [lab1, lab2]
+                            , doc = "x86gen:155" }))
 
           | munchStm (T.JUMP (T.NAME lab, llst)) =
-            raise TODO
+            ( emit (A.OPER {assem = "\tjmp "^ S.name lab
+                            , src = []
+                            , dst = []
+                            , jump = SOME llst
+                            , doc = "x86gen:162" }))
 
           (* EXP *)
           | munchStm (T.EXP (T.CALL (T.NAME lab, args))) =
-            raise TODO
-            
+            print("2")
+
           | munchStm (T.EXP exp) =
-            raise TODO
+            ( munchExp exp; ())
 
           (* If no match so far, complain *)
           | munchStm (T.JUMP a) =
@@ -137,7 +186,7 @@ fun codegen frame stm =
             (* in the simple approach used here, we pass all args in memory *)
             let val rargs = rev args (* push args right-to-left *)
                 fun munchArgs1 [] = []
-                  | munchArgs1 (ah::at) = raise TODO
+                  | munchArgs1 (ah::at) = (print("3"); raise TODO)
             in  munchArgs1 rargs
             end
 
@@ -151,38 +200,38 @@ fun codegen frame stm =
                                          , doc = "x86gen:151"}))
 
           | munchExp (T.MEM (T.BINOP (T.PLUS, T.CONST n, e))) =
-            result (fn r => raise TODO)
+            result (fn r => (print("4");raise TODO))
 
           | munchExp (T.MEM (T.BINOP (T.MINUS, e, T.CONST n))) =
-            result (fn r => raise TODO)
+            result (fn r => (print("5");raise TODO))
 
           | munchExp (T.MEM e) =
-            result (fn r => raise TODO)
+            result (fn r => (print("6");raise TODO))
 
           (* PLUS *)
           | munchExp (T.BINOP (T.PLUS, e1, T.CONST i)) =
-            result (fn r => raise TODO)
+            result (fn r => (print("7");raise TODO))
 
           | munchExp (T.BINOP (T.PLUS, T.CONST i, e1)) =
-            result (fn r => raise TODO)
+            result (fn r => (print("8");raise TODO))
 
           | munchExp (T.BINOP (T.PLUS, e1, e2)) =
             (* Hint, p203: use src=[r,_] and do not use `s0,
              * which specifies that r is used *)
-            result (fn r => raise TODO)
+            result (fn r => (print("9");raise TODO))
 
           (* MINUS *)
           | munchExp (T.BINOP (T.MINUS, e1, T.CONST i)) =
-            result (fn r => raise TODO)
+            result (fn r => (print("10");raise TODO))
 
           | munchExp (T.BINOP (T.MINUS, T.CONST 0, e1)) =
-            result (fn r => raise TODO)
+            result (fn r => (print("11");raise TODO))
 
           | munchExp (T.BINOP (T.MINUS, T.CONST i, e1)) =
-            result (fn r => raise TODO)
+            result (fn r => (print("12");raise TODO))
 
           | munchExp (T.BINOP (T.MINUS, e1, e2)) =
-            result (fn r => raise TODO)
+            result (fn r => (print("13");raise TODO))
 
           (* MULTIPLY *)
           | munchExp (T.BINOP (T.MUL, e1, e2)) =
@@ -228,13 +277,18 @@ fun codegen frame stm =
           (* Other constructs *)
           | munchExp (T.TEMP t) = t
 
-          | munchExp (T.ESEQ (s, e)) = raise TODO
+          | munchExp (T.ESEQ (s, e)) = (print("15");raise TODO)
 
           | munchExp (T.NAME label) =
-            result (fn r => raise TODO)
+            result (fn r => (print("16");raise TODO))
 
           | munchExp (T.CONST n) =
-            result (fn r => raise TODO)
+            result (fn r =>
+                    emit (A.OPER { assem = "\tmovl $" ^ int n ^ ", `d0"
+                                  , src = []
+                                  , dst = [r]
+                                  , jump = NONE
+                                  , doc = "x86gen:287"}))
 
           (* If no match so far, complain *)
           | munchExp (tr as T.CALL (_, _)) =
@@ -262,4 +316,3 @@ fun codegen frame stm =
     end
 
 end (* X86Gen *)
-
