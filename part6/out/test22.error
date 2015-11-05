@@ -1,2 +1,0 @@
-../testcases/test22.tig:6.5:field 'nam' not in record
-../testcases/test22.tig:6.5:type mismatch, expected ERROR but found STRING

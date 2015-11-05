@@ -1,7 +1,0 @@
-../testcases/test28.tig:6.15:type mismatch, expected RECORD
-  name: STRING
-  id: INT
-END but found RECORD
-  name: STRING
-  id: INT
-END
