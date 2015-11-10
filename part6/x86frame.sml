@@ -267,16 +267,52 @@ fun spillAllTemps toMap body =
                          , dst = []
                          , jump = jump
                          , doc = doc ^ " x86frame:269"}]
+
           | expand (i as A.OPER {assem, src=(s0::s1::ss), dst=[], jump, doc}) =
             if isRegister s0 then
                 if isRegister s1 then [i]
                 else (* s0 register, s1 other temp *)
-                    (print("A");raise TODO)
+                    [ A.OPER { assem = "\tmovl " ^ ofs s1 ^ "(%ebp), `d0"
+                             , src = []
+                             , dst = [EBX]
+                             , jump = NONE
+                             , doc = doc ^ " x86frame:278"}
+                    , A.OPER { assem = assem
+                             , src = (s0::EBX::ss)
+                             , dst = []
+                             , jump = jump
+                             , doc = doc ^ " x86frame:283"}]
+
             else if isRegister s1 then
                 (* s0 other temp, s1 register *)
-                (print("B");raise TODO)
+                [ A.OPER { assem = "\tmovl " ^ ofs s0 ^ "(%ebp), `d0"
+                         , src = []
+                         , dst = [EBX]
+                         , jump = NONE
+                         , doc = doc ^ " x86frame:290"}
+                , A.OPER { assem = assem
+                         , src = (EBX::s1::ss)
+                         , dst = []
+                         , jump = jump
+                         , doc = doc ^ " x86frame:295"}]
+
             else (* s0,s1 other temps *)
-                (print("C");raise TODO)
+                [ A.OPER { assem = "\tmovl " ^ ofs s0 ^ "(%ebp), `d0"
+                         , src = []
+                         , dst = [EBX]
+                         , jump = NONE
+                         , doc = doc ^ " x86frame:301"}
+                , A.OPER { assem = "\tmovl " ^ ofs s1 ^ "(%ebp), `d0"
+                         , src = []
+                         , dst = [ECX]
+                         , jump = NONE
+                         , doc = doc ^ " x86frame:306"}
+                , A.OPER { assem = assem
+                         , src = (EBX::ECX::ss)
+                         , dst = []
+                         , jump = jump
+                         , doc = doc ^ " x86frame:311"}]
+
           | expand (i as A.OPER {assem, src=[], dst=(d0::ds), jump, doc}) =
             if isRegister d0 then [i]
             else (* d0 other temp *)
@@ -284,29 +320,74 @@ fun spillAllTemps toMap body =
                          , src = []
                          , dst = [EBX]
                          , jump = NONE
-                         , doc = doc ^ " x86frame:287"}
+                         , doc = doc ^ " x86frame:319"}
                 , A.OPER { assem = assem
                          , src = []
                          , dst = [EBX]
                          , jump = jump
-                         , doc = doc ^ " x86frame:292"}
-                ]
+                         , doc = doc ^ " x86frame:324"}]
+
           | expand (i as A.OPER {assem, src=[s0], dst=(d0::ds), jump, doc}) =
             if isRegister s0 then
                 if isRegister d0 then [i]
                 else (* s0 register, d0 other temp *)
-                    (print("E");raise TODO)
+                [A.OPER { assem = "\tmovl " ^ ofs d0 ^ "(%ebp), `d0"
+                        , src = []
+                        , dst = [EBX]
+                        , jump = NONE
+                        , doc = doc ^ " x86frame:334"}
+               , A.OPER { assem = assem
+                        , src = [s0]
+                        , dst = (EBX::ds)
+                        , jump = jump
+                        , doc = doc ^ " x86frame:339"}]
+
             else if isRegister d0 then
                 (* s0 other temp, d0 register *)
-                (print("F");raise TODO)
+                [A.OPER { assem = "\tmovl " ^ ofs s0 ^ "(%ebp), `d0"
+                        , src = []
+                        , dst = [EBX]
+                        , jump = NONE
+                        , doc = doc ^ " x86frame:347"}
+               , A.OPER { assem = assem
+                        , src = [EBX]
+                        , dst = (d0::ds)
+                        , jump = jump
+                        , doc = doc ^ " x86frame:352"}]
+
             else (* s0,d0 other temp *)
-                (* OLD_R_OPTIMIZATION *)
+                (* OLD_R_OPTIMIZATION *) (* CASPER WHAT DOES THIS MEAN? TODO *)
                 if s0=d0 then
                     (* instruction uses old-d0, and "`s0" is
                      * not used in assem; must preload d0 *)
-                    (print("G");raise TODO)
+                    [A.OPER { assem = "\tmovl " ^ ofs d0 ^ "(%ebp), `d0"
+                            , src = []
+                            , dst = [EBX]
+                            , jump = NONE
+                            , doc = doc ^ " x86gen:367"}
+                   , A.OPER { assem = assem
+                            , src = [EBX]
+                            , dst = (EBX::ds)
+                            , jump = jump
+                            , doc = doc ^ " x86frame:372"}]
+
                 else (* s0<>d0, and instruction does not use old-d0 *)
-                    (print("H");raise TODO)
+                    [A.OPER { assem = "\tmovl " ^ofs s0 ^ "(%ebp), `d0"
+                            , src = []
+                            , dst = [EBX]
+                            , jump = NONE
+                            , doc = doc ^ " x86gen:379"}
+                   , A.OPER { assem = "\tmovl " ^ofs d0 ^ "(%ebp), `d0"
+                            , src = []
+                            , dst = [ECX]
+                            , jump = NONE
+                            , doc = doc ^ " x86gen:384"}
+                   , A.OPER { assem = assem
+                            , src = [EBX]
+                            , dst = (ECX::ds)
+                            , jump = jump
+                            , doc = doc ^ " x86frame:389"}]
+
           | expand (i as A.OPER { assem, src=(s0::s1::ss)
                                 , dst=(d0::ds), jump, doc}) =
             if isRegister s0 then
@@ -318,7 +399,17 @@ fun spillAllTemps toMap body =
                 else (* s0 register, s1 other temp *)
                     if isRegister d0 then
                         (* s0 register, s1 other temp, d0 register *)
-                        (print("J");raise TODO)
+                        [A.OPER { assem = "\tmovl " ^ ofs s1 ^ "(%ebp), `d0"
+                                , src = []
+                                , dst = [EBX]
+                                , jump = NONE
+                                , doc = doc ^ " x86frame:381" }
+                       , A.OPER { assem = assem
+                                , src = (s0::EBX::ss)
+                                , dst = (d0::ds)
+                                , jump = jump
+                                , doc = doc ^ " x86frame:386"}]
+
                     else (* s0 register, s1,d0 other temp *)
                         (* OLD_R_OPTIMIZATION: s0<>d0, no pre-load needed *)
                         (print("K");raise TODO)
@@ -326,7 +417,17 @@ fun spillAllTemps toMap body =
                 if isRegister s1 then
                     if isRegister d0 then
                         (* s0 other temp, s1,d0 register *)
-                        (print("L");raise TODO)
+                        [A.OPER { assem = "\tmovl " ^ ofs s0 ^ "(%ebp), `d0"
+                                , src = []
+                                , dst = [EBX]
+                                , jump = NONE
+                                , doc = doc ^ " x86frame:399" }
+                       , A.OPER { assem = assem
+                                , src = (EBX::s1::ss)
+                                , dst = (d0::ds)
+                                , jump = jump
+                                , doc = doc ^ " x86frame:404"}]
+
                     else (* s0 other temp, s1 register, d0 other temp *)
                         (* OLD_R_OPTIMIZATION *)
                         if s0=d0 then
@@ -337,13 +438,36 @@ fun spillAllTemps toMap body =
                             (print("N");raise TODO)
                 else if isRegister d0 then
                     (* s0,s1 other temp, d0 register *)
-                    (print("O");raise TODO)
+                    [A.OPER { assem = "\tmovl " ^ ofs s0 ^ "(%ebp), `d0"
+                            , src = []
+                            , dst = [EBX]
+                            , jump = NONE
+                            , doc = doc ^ " x86frame:420" }
+                   , A.OPER { assem = "\tmovl " ^ ofs s1 ^ "(%ebp), `d0"
+                           , src = []
+                           , dst = [ECX]
+                           , jump = NONE
+                           , doc = doc ^ " x86frame:425" }
+                   , A.OPER { assem = assem
+                            , src = (EBX::ECX::ss)
+                            , dst = (d0::ds)
+                            , jump = jump
+                            , doc = doc ^ " x86frame:420"}]
                 else (* s0,s1,d0 other temp *)
                     (* OLD_R_OPTIMIZATION *)
                     if s0=d0 then
                         (* instruction uses old-d0, and "`s0" is
                          * not used in assem; must preload d0 *)
-                        (print("P");raise TODO)
+                         [A.OPER { assem = "\tmovl " ^ ofs d0 ^ "(%ebp), `d0"
+                                 , src = []
+                                 , dst = [EBX]
+                                 , jump = NONE
+                                 , doc = doc ^ " x86frame:465"}
+                        , A.OPER { assem = assem
+                                 , src = (EBX::s1::ss)
+                                 , dst = (EBX::ds)
+                                 , jump = jump
+                                 , doc = doc ^ " x86frame:470"}]
                      else (* s0<>d0, and instruction does not use old-d0 *)
                          (print("Q");raise TODO)
           | expand (i as (A.LABEL _)) =
@@ -358,27 +482,44 @@ fun spillAllTemps toMap body =
                           , src = []
                           , dst = [EBX]
                           , jump = NONE
-                          , doc = doc ^ " x86frame:364"
+                          , doc = doc ^ " x86frame:451"
                           }
               , A.MOVE {assem = assem
                           , src = src
                           , dst = EBX
-                          , doc = doc ^ " x86frame:366"}]
+                          , doc = doc ^ " x86frame:456"}]
+
             else if isRegister dst then
                 (* src other temp, dst register *)
                 [A.OPER { assem = "\tmovl " ^ ofs src ^ "(%ebp), `d0"
                           , src = []
                           , dst = [EBX]
                           , jump = NONE
-                          , doc = doc ^ " x86frame:373"
+                          , doc = doc ^ " x86frame:464"
                           }
               , A.MOVE {assem = assem
                           , src = EBX
                           , dst = dst
-                          , doc = doc ^ " x86frame:378"}]
+                          , doc = doc ^ " x86frame:469"}]
+
             else
                 (* src, dst other temp *)
-                (print("T");raise TODO)
+                [A.OPER { assem = "\tmovl " ^ ofs src ^ "(%ebp), `d0"
+                        , src = []
+                        , dst = [EBX]
+                        , jump = NONE
+                        , doc = doc ^ " x86frame:477"
+                          }
+               , A.OPER { assem = "\tmovl " ^ ofs dst ^ "(%ebp), `d0"
+                        , src = []
+                        , dst = [ECX]
+                        , jump = NONE
+                        , doc = doc ^ " x86frame:483"
+                        }
+              , A.MOVE {assem = assem
+                      , src = EBX
+                      , dst = ECX
+                      , doc = doc ^ " x86frame:488"}]
     in
         List.concat (map expand body)
     end
