@@ -6,7 +6,7 @@ structure TAbs = TAbsyn
 structure T = Tree
 structure PT = PrintTree(F)
 
-exception Bug 
+exception Bug
 
 val err = ErrorMsg.error
 
@@ -86,7 +86,7 @@ fun unEx (Ex e) = e
 fun unNx (Ex e) = T.EXP e
   | unNx (Cx genstm) =
     let
-	val t = Temp.newLabel "true" 
+	val t = Temp.newLabel "true"
     in
 	    T.SEQ(genstm(t,t), T.LABEL t)
     end
@@ -118,10 +118,10 @@ fun followStaticLink toLevel (fromLevel as Level ({frame, parent}, _)) =
 
 fun simpleVar ((toLevel, fFrame), fromLevel) =
   let
-      val frp = followStaticLink  toLevel fromLevel 
+      val frp = followStaticLink  toLevel fromLevel
       val sVar = F.exp fFrame frp
   in
-      Ex (sVar) 
+      Ex (sVar)
   end
 
 fun fieldVar (var, offset) =
@@ -201,7 +201,7 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
              val then' = unCx(thenExp)
              val else' = unCx(elseExp)
           in
-             Cx (fn(t, f) =>        
+             Cx (fn(t, f) =>
                 seq [test' (labelThen, labelElse)
                 , T.LABEL labelThen
                 , then' (t,f)
@@ -226,7 +226,7 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
              , T.LABEL labelJoin
              ] , T.TEMP r))
           end
-          | (_, Nx _, _) => 
+          | (_, Nx _, _) =>
           let
               val then' = unNx(thenExp)
               val else' = unNx(elseExp)
@@ -250,13 +250,13 @@ fun ifThenElse2IR (test, thenExp, elseExp) =
               , T.JUMP(T.NAME labelJoin, [labelJoin])
               , T.LABEL labelElse
               , else'
-              , T.LABEL labelJoin])		 
+              , T.LABEL labelJoin])
           end
           | (_, Cx _, Ex _) =>
             let
 		val r = Temp.newtemp ()
 		val then' = unEx(thenExp) (* May cause tangle of jumps *)
-		val else' = unEx(elseExp) 
+		val else' = unEx(elseExp)
             in
 		Ex (T.ESEQ( seq [test' (labelThen, labelElse)
 				, T.LABEL labelThen
@@ -306,7 +306,7 @@ fun intOp2IR (TAbs.PlusOp, left, right)     = binop2IR (T.PLUS, left, right)
   | intOp2IR (TAbs.MinusOp, left, right)    = binop2IR (T.MINUS, left, right)
   | intOp2IR (TAbs.TimesOp, left, right)    = binop2IR (T.MUL, left, right)
   | intOp2IR (TAbs.DivideOp, left, right)   = binop2IR (T.DIV, left, right) (* unEx in exponent? *)
-  | intOp2IR (TAbs.ExponentOp, left, right) = Ex(F.externalCall("exponent", [unEx(left),unEx(right)])) 
+  | intOp2IR (TAbs.ExponentOp, left, right) = Ex(F.externalCall("exponent", [unEx(left),unEx(right)]))
   | intOp2IR (TAbs.EqOp, left, right)       = relop2IR (T.EQ, left, right)
   | intOp2IR (TAbs.NeqOp, left, right)      = relop2IR (T.NE, left, right)
   | intOp2IR (TAbs.LtOp, left, right)       = relop2IR (T.LT, left, right)
@@ -388,7 +388,7 @@ fun for2IR (var, done, lo, hi, body) =
         Nx(seq [ T.MOVE(T.TEMP loT, lo')
                , T.MOVE(T.TEMP hiT, hi')
 	       , T.CJUMP(T.GT, T.TEMP loT, T.TEMP hiT, done, beginL)
-	       , T.LABEL beginL			 
+	       , T.LABEL beginL
                , T.MOVE(var',T.TEMP(loT))
                , T.LABEL nextL
                , T.CJUMP(T.LE, var', T.TEMP(hiT), bodyL, done)
@@ -398,7 +398,7 @@ fun for2IR (var, done, lo, hi, body) =
                , T.JUMP(T.NAME nextL, [nextL])
                , T.LABEL done
                 ])
-    end 
+    end
 
 fun funCall2IR ( toLevel as Level ({frame, parent}, _)
                , fromLevel
@@ -411,15 +411,15 @@ fun funCall2IR ( toLevel as Level ({frame, parent}, _)
         | iter(x::xs) = unEx(x)::iter(xs)
     in
 	case parent of
-	    Top => Ex (F.externalCall(str, iter(exps)))
+	    Top => Ex (F.externalCall(str, sl :: iter(exps)))
 	  | _   => Ex (T.CALL (T.NAME label, sl :: iter(exps)))
     end
   | funCall2IR (Top, _, _, _) =
     raise Bug "called function seems to have above-top-level context"
 
-fun procCall2IR ( toLevel as Level ({frame, parent}, _) 
+fun procCall2IR ( toLevel as Level ({frame, parent}, _)
                 , fromLevel
-                , label 
+                , label
                 , exps) =
     let
 	val str = Symbol.name label
@@ -428,7 +428,7 @@ fun procCall2IR ( toLevel as Level ({frame, parent}, _)
         | iter(x::xs) = unEx(x)::iter(xs)
     in
         case parent of Top
-            =>  Nx (T.EXP (F.externalCall(str, iter(exps)))) 
+            =>  Nx (T.EXP (F.externalCall(str, sl :: iter(exps))))
          | _=>  Nx (T.EXP (T.CALL (T.NAME label, sl :: iter(exps))))
     end
   | procCall2IR (Top, _, _, _) =
@@ -447,7 +447,7 @@ fun record2IR explist =
         val size = T.CONST (length explist)
         val r = Temp.newtemp ()
         val setup = T.MOVE ( T.TEMP r
-			   , F.externalCall("allocRecord", [size]))                          
+			   , F.externalCall("allocRecord", [size]))
         fun step (exp, n) =
             T.MOVE (T.MEM(T.BINOP(T.PLUS, T.TEMP r, T.CONST (n * F.wordSize)))
                    , unEx exp)
@@ -459,13 +459,13 @@ fun record2IR explist =
 
 fun subscript2IR (array, offset) =
     let
-        val offsetT = Temp.newtemp () 
-        val arrayT = Temp.newtemp () 
-        val addressT = Temp.newtemp () 
-        val maxInxT = Temp.newtemp () 
-        val negativeL = Temp.newLabel "subs_neg" 
-        val nonNegativeL = Temp.newLabel "subs_nneg" 
-        val overflowL = Temp.newLabel "subs_ovf" 
+        val offsetT = Temp.newtemp ()
+        val arrayT = Temp.newtemp ()
+        val addressT = Temp.newtemp ()
+        val maxInxT = Temp.newtemp ()
+        val negativeL = Temp.newLabel "subs_neg"
+        val nonNegativeL = Temp.newLabel "subs_nneg"
+        val overflowL = Temp.newLabel "subs_ovf"
         val noOverflowL = Temp.newLabel "subs_novf"
         val array' = unEx array (* address *)
         val offset' = unEx offset (* value *)
