@@ -103,6 +103,7 @@ fun transExp (venv, extra : extra) =
 	    in
         	Tr.while2IR(ttest,tbody, done)
             end
+
           | trexp {exp = aexp as TAbs.RecordExp {fields}, ty} =
       	    let
           	fun transExps (s,e) = trexp e
@@ -110,6 +111,7 @@ fun transExp (venv, extra : extra) =
             in
       		Tr.record2IR(exps)
       	    end
+
           | trexp {exp = TAbs.SeqExp [], ty} =
             Tr.seq2IR []
           | trexp {exp = TAbs.SeqExp (aexps as (aexp'::aexps')), ty} =
@@ -130,6 +132,7 @@ fun transExp (venv, extra : extra) =
             in
 		Tr.assign2IR(var', exp') (* using Tr.assign2IR, checkAssignable *)
             end
+
           | trexp {exp = TAbs.ForExp {var, escape = ref esc, lo, hi, body}, ty} =
             let
 		val tlo = trexp lo
@@ -139,9 +142,10 @@ fun transExp (venv, extra : extra) =
               val venv' = S.enter( venv,var,(E.VarEntry{ access = acc
                                                        , ty = Ty.INT
                                                        , escape = ref esc}))
-              val tbody = transExp(venv',extra) body
+	      val done = Tr.newBreakPoint "done"
+              val tbody = transExp(venv',{level = #level extra, break = SOME done}) body
             in
-              Tr.for2IR(var',Tr.newBreakPoint "done", tlo, thi, tbody)
+              Tr.for2IR(var',done, tlo, thi, tbody)
             end
 
           | trexp {exp = TAbs.BreakExp, ty} =

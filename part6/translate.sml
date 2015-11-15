@@ -319,7 +319,7 @@ fun let2IR ([], body) = body
   | let2IR (decls, body) = Ex (T.ESEQ (seq (map unNx decls), unEx body))
 
 fun eseq2IR [] = raise Bug "attempt to eseq2IR an empty sequence"
-  | eseq2IR (exp :: exps) =
+  | eseq2IR (exp :: exps) = 
     let
         fun eseq2IR' exp [] = unEx exp
           | eseq2IR' exp (exp'::exps') =
@@ -390,12 +390,12 @@ fun for2IR (var, done, lo, hi, body) =
 	       , T.CJUMP(T.GT, T.TEMP loT, T.TEMP hiT, done, beginL)
 	       , T.LABEL beginL
                , T.MOVE(var',T.TEMP(loT))
-               , T.LABEL nextL
-               , T.CJUMP(T.LE, var', T.TEMP(hiT), bodyL, done)
+	       , T.JUMP (T.NAME nextL, [nextL])
                , T.LABEL bodyL
                , body'
 	       , T.MOVE(var', T.BINOP(T.PLUS, var', T.CONST(1)))
-               , T.JUMP(T.NAME nextL, [nextL])
+	       , T.LABEL nextL
+	       , T.CJUMP(T.LE, var', T.TEMP(hiT), bodyL, done)
                , T.LABEL done
                 ])
     end
@@ -428,7 +428,7 @@ fun procCall2IR ( toLevel as Level ({frame, parent}, _)
         | iter(x::xs) = unEx(x)::iter(xs)
     in
         case parent of Top
-            =>  Nx (T.EXP (F.externalCall(str, sl :: iter(exps))))
+            =>  Nx (T.EXP (F.externalCall(str, (T.TEMP F.FP) :: iter(exps))))
          | _=>  Nx (T.EXP (T.CALL (T.NAME label, sl :: iter(exps))))
     end
   | procCall2IR (Top, _, _, _) =
@@ -472,12 +472,13 @@ fun subscript2IR (array, offset) =
     in
 	Ex ((T.ESEQ(seq [T.MOVE(T.TEMP offsetT,offset')
 			, T.MOVE(T.TEMP arrayT,array')
-			, T.MOVE(T.TEMP maxInxT, T.BINOP(T.MINUS, T.TEMP arrayT, T.CONST(F.wordSize)))
+			, T.MOVE(T.TEMP maxInxT,
+				 T.MEM(T.BINOP(T.PLUS,T.TEMP arrayT, T.CONST(F.wordSize))))
 			, T.CJUMP(T.GE, T.TEMP offsetT, T.CONST(0), nonNegativeL, negativeL)
 			, T.LABEL negativeL
 			, T.EXP (F.externalCall("arrInxError", [offset']))
 			, T.LABEL nonNegativeL
-			, T.CJUMP(T.LE, T.TEMP offsetT, T.TEMP maxInxT,
+			, T.CJUMP(T.LT, T.TEMP offsetT, T.BINOP(T.MINUS, T.TEMP maxInxT,T.CONST(1)),
 				  noOverflowL, overflowL)
 			, T.LABEL overflowL
 			, T.EXP (F.externalCall("arrInxError", [offset']))

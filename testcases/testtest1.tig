@@ -1,0 +1,11 @@
+/* correct declarations */
+let
+
+    type rec = {id : int}
+    var rec1 := rec{id = 5}
+    type arr = array of rec
+    var arr1 := arr [10] of rec{id = 7}
+
+in
+	arr1[2].id
+end
