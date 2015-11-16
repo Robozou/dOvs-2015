@@ -352,12 +352,13 @@ fun codegen frame stm =
 
           (* MULTIPLY *)
           | munchExp (T.BINOP (T.MUL, e1, e2)) = (* move e1 to EAX *)
-            result (fn r => (emit (moveInstr (munchExp e1) F.EAX "333")
-                         ; (emit (A.OPER { assem = "\timull `d0"
-                                         , src = [r, munchExp e2]
-                                         , dst = [r]
+            result (fn r => (emit (moveInstr (munchExp e1) F.EAX "355")
+                          ; (emit (A.OPER { assem = "\timull `s0"
+                                         , src = [munchExp e2]
+                                         , dst = []
                                          , jump = NONE
-                                         , doc = "x86gen:338"}))))
+                                         , doc = "x86gen:360"}))
+                          ; (emit (moveInstr F.EAX r "361"))))
 
           (* DIVIDE *)
 
