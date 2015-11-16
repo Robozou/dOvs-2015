@@ -411,7 +411,7 @@ fun funCall2IR ( toLevel as Level ({frame, parent}, _)
         | iter(x::xs) = unEx(x)::iter(xs)
     in
 	case parent of
-	    Top => Ex (F.externalCall(str, (T.TEMP F.FP) :: iter(exps)))
+	    Top => Ex (F.externalCall(str, sl :: iter(exps)))
 	  | _   => Ex (T.CALL (T.NAME label, sl :: iter(exps)))
     end
   | funCall2IR (Top, _, _, _) =
