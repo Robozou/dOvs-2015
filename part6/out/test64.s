@@ -10,18 +10,18 @@ tigermain:
 	movl %esp, %ebp
 	subl $8, %esp
 	# SP, FP, calleesaves, argregs have values
-L11_blocks:                                       # x86gen:131
+L11_blocks:                                       # x86gen:128
 	movl -8(%ebp), %ebx                       # x86gen:448 x86frame:323
 	movl $L1_string, %ebx                     # x86gen:448 x86frame:328
 	movl %ebx, -8(%ebp)                       # x86gen:448 x86frame:333
-	movl -8(%ebp), %ebx                       # x86gen:95 x86frame:278
-	movl %ebx, -4(%ebp)                       # x86gen:95 x86frame:283
+	movl -8(%ebp), %ebx                       # x86gen:91 x86frame:279
+	movl %ebx, -4(%ebp)                       # x86gen:91 x86frame:284
 	pushl %ebp                                # x86gen:228
 	call L2_isdigit                           # x86gen:68
 	addl $4, %esp                             # x86gen:55
 	movl %eax, %eax                           # x86gen:70
 	jmp L10_block_done                        # x86gen:191
-L10_block_done:                                   # x86gen:131
+L10_block_done:                                   # x86gen:128
 	# FP, SP, RV, calleesaves still live
 	leave
 	ret
@@ -42,20 +42,19 @@ L2_isdigit:
 	movl %esp, %ebp
 	subl $68, %esp
 	# SP, FP, calleesaves, argregs have values
-L13_blocks:                                       # x86gen:131
-	movl %ebp, -4(%ebp)                       # x86gen:246 x86frame:558
-	movl -4(%ebp), %ebx                       # x86gen:239 x86frame:379
-	movl -4(%ebx), %ecx                       # x86gen:239 x86frame:389
-	movl %ecx, -8(%ebp)                       # x86gen:239 x86frame:384
+L13_blocks:                                       # x86gen:128
+	movl %ebp, -4(%ebp)                       # x86gen:246 x86frame:602
+	movl -4(%ebp), %ebx                       # x86gen:239 x86frame:394
+	movl -4(%ebx), %ecx                       # x86gen:239 x86frame:399
+	movl %ecx, -8(%ebp)                       # x86gen:239 x86frame:404
 	movl -8(%ebp), %ebx                       # x86gen:228 x86frame:264
 	pushl %ebx                                # x86gen:228 x86frame:269
 	pushl %ebp                                # x86gen:228
 	call ord                                  # x86gen:68
 	addl $8, %esp                             # x86gen:55
-	movl %eax, -12(%ebp)                      # x86gen:70 x86frame:558
-	movl %ebx, -12(%ebp)                      # x86gen:127 x86frame:573
-	movl -12(%ebp), %ebx                      # x86gen:127 x86frame:577
-	movl %ebx, -20(%ebp)                      # x86gen:127 x86frame:581
+	movl %eax, -12(%ebp)                      # x86gen:70 x86frame:602
+	movl -12(%ebp), %ebx                      # x86gen:123 x86frame:616
+	movl %ebx, -20(%ebp)                      # x86gen:123 x86frame:620
 	movl -16(%ebp), %ebx                      # x86gen:448 x86frame:323
 	movl $L3_string, %ebx                     # x86gen:448 x86frame:328
 	movl %ebx, -16(%ebp)                      # x86gen:448 x86frame:333
@@ -64,43 +63,40 @@ L13_blocks:                                       # x86gen:131
 	pushl %ebp                                # x86gen:228
 	call ord                                  # x86gen:68
 	addl $8, %esp                             # x86gen:55
-	movl %eax, -24(%ebp)                      # x86gen:70 x86frame:558
-	movl -20(%ebp), %ebx                      # x86gen:174 x86frame:301
-	movl -24(%ebp), %ecx                      # x86gen:174 x86frame:306
-	cmpl %ebx, %ecx                           # x86gen:174 x86frame:311
+	movl %eax, -24(%ebp)                      # x86gen:70 x86frame:602
+	movl -20(%ebp), %ebx                      # x86gen:174 x86frame:304
+	movl -24(%ebp), %ecx                      # x86gen:174 x86frame:309
+	cmpl %ecx, %ebx                           # x86gen:174 x86frame:314
 	jge L5_if_then                            # x86gen:179
 L14_fallthrough:                                  # x86gen:171
 	jmp L6_if_else                            # x86gen:184
-L6_if_else:                                       # x86gen:131
+L6_if_else:                                       # x86gen:128
 	movl -28(%ebp), %ebx                      # x86gen:456 x86frame:323
 	movl $0, %ebx                             # x86gen:456 x86frame:328
 	movl %ebx, -28(%ebp)                      # x86gen:456 x86frame:333
-	movl %ebx, -28(%ebp)                      # x86gen:127 x86frame:573
-	movl -28(%ebp), %ebx                      # x86gen:127 x86frame:577
-	movl %ebx, -64(%ebp)                      # x86gen:127 x86frame:581
-L7_if_join:                                       # x86gen:131
-	movl -64(%ebp), %eax                      # x86gen:127 x86frame:560
+	movl -28(%ebp), %ebx                      # x86gen:123 x86frame:616
+	movl %ebx, -64(%ebp)                      # x86gen:123 x86frame:620
+L7_if_join:                                       # x86gen:128
+	movl -64(%ebp), %eax                      # x86gen:123 x86frame:609
 	jmp L12_block_done                        # x86gen:191
-L5_if_then:                                       # x86gen:131
+L5_if_then:                                       # x86gen:128
 	movl -32(%ebp), %ebx                      # x86gen:456 x86frame:323
 	movl $1, %ebx                             # x86gen:456 x86frame:328
 	movl %ebx, -32(%ebp)                      # x86gen:456 x86frame:333
-	movl %ebx, -32(%ebp)                      # x86gen:127 x86frame:573
-	movl -32(%ebp), %ebx                      # x86gen:127 x86frame:577
-	movl %ebx, -68(%ebp)                      # x86gen:127 x86frame:581
-	movl %ebp, -36(%ebp)                      # x86gen:246 x86frame:558
-	movl -36(%ebp), %ebx                      # x86gen:239 x86frame:379
-	movl -4(%ebx), %ecx                       # x86gen:239 x86frame:389
-	movl %ecx, -40(%ebp)                      # x86gen:239 x86frame:384
+	movl -32(%ebp), %ebx                      # x86gen:123 x86frame:616
+	movl %ebx, -68(%ebp)                      # x86gen:123 x86frame:620
+	movl %ebp, -36(%ebp)                      # x86gen:246 x86frame:602
+	movl -36(%ebp), %ebx                      # x86gen:239 x86frame:394
+	movl -4(%ebx), %ecx                       # x86gen:239 x86frame:399
+	movl %ecx, -40(%ebp)                      # x86gen:239 x86frame:404
 	movl -40(%ebp), %ebx                      # x86gen:228 x86frame:264
 	pushl %ebx                                # x86gen:228 x86frame:269
 	pushl %ebp                                # x86gen:228
 	call ord                                  # x86gen:68
 	addl $8, %esp                             # x86gen:55
-	movl %eax, -44(%ebp)                      # x86gen:70 x86frame:558
-	movl %ebx, -44(%ebp)                      # x86gen:127 x86frame:573
-	movl -44(%ebp), %ebx                      # x86gen:127 x86frame:577
-	movl %ebx, -52(%ebp)                      # x86gen:127 x86frame:581
+	movl %eax, -44(%ebp)                      # x86gen:70 x86frame:602
+	movl -44(%ebp), %ebx                      # x86gen:123 x86frame:616
+	movl %ebx, -52(%ebp)                      # x86gen:123 x86frame:620
 	movl -48(%ebp), %ebx                      # x86gen:448 x86frame:323
 	movl $L4_string, %ebx                     # x86gen:448 x86frame:328
 	movl %ebx, -48(%ebp)                      # x86gen:448 x86frame:333
@@ -109,26 +105,24 @@ L5_if_then:                                       # x86gen:131
 	pushl %ebp                                # x86gen:228
 	call ord                                  # x86gen:68
 	addl $8, %esp                             # x86gen:55
-	movl %eax, -56(%ebp)                      # x86gen:70 x86frame:558
-	movl -52(%ebp), %ebx                      # x86gen:174 x86frame:301
-	movl -56(%ebp), %ecx                      # x86gen:174 x86frame:306
-	cmpl %ebx, %ecx                           # x86gen:174 x86frame:311
+	movl %eax, -56(%ebp)                      # x86gen:70 x86frame:602
+	movl -52(%ebp), %ebx                      # x86gen:174 x86frame:304
+	movl -56(%ebp), %ecx                      # x86gen:174 x86frame:309
+	cmpl %ecx, %ebx                           # x86gen:174 x86frame:314
 	jle L8_unEx_t                             # x86gen:179
 L15_fallthrough:                                  # x86gen:171
 	jmp L9_unEx_f                             # x86gen:184
-L9_unEx_f:                                        # x86gen:131
+L9_unEx_f:                                        # x86gen:128
 	movl -60(%ebp), %ebx                      # x86gen:456 x86frame:323
 	movl $0, %ebx                             # x86gen:456 x86frame:328
 	movl %ebx, -60(%ebp)                      # x86gen:456 x86frame:333
-	movl %ebx, -60(%ebp)                      # x86gen:127 x86frame:573
-	movl -60(%ebp), %ebx                      # x86gen:127 x86frame:577
-	movl %ebx, -68(%ebp)                      # x86gen:127 x86frame:581
-L8_unEx_t:                                        # x86gen:131
-	movl %ebx, -68(%ebp)                      # x86gen:127 x86frame:573
-	movl -68(%ebp), %ebx                      # x86gen:127 x86frame:577
-	movl %ebx, -64(%ebp)                      # x86gen:127 x86frame:581
+	movl -60(%ebp), %ebx                      # x86gen:123 x86frame:616
+	movl %ebx, -68(%ebp)                      # x86gen:123 x86frame:620
+L8_unEx_t:                                        # x86gen:128
+	movl -68(%ebp), %ebx                      # x86gen:123 x86frame:616
+	movl %ebx, -64(%ebp)                      # x86gen:123 x86frame:620
 	jmp L7_if_join                            # x86gen:191
-L12_block_done:                                   # x86gen:131
+L12_block_done:                                   # x86gen:128
 	# FP, SP, RV, calleesaves still live
 	leave
 	ret

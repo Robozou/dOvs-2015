@@ -10,7 +10,7 @@ tigermain:
 	movl %esp, %ebp
 	subl $24, %esp
 	# SP, FP, calleesaves, argregs have values
-L9_blocks:                                        # x86gen:131
+L9_blocks:                                        # x86gen:128
 	movl -4(%ebp), %ebx                       # x86gen:448 x86frame:323
 	movl $L6_string, %ebx                     # x86gen:448 x86frame:328
 	movl %ebx, -4(%ebp)                       # x86gen:448 x86frame:333
@@ -48,7 +48,7 @@ L9_blocks:                                        # x86gen:131
 	call L1_chk                               # x86gen:199
 	addl $16, %esp                            # x86gen:55
 	jmp L8_block_done                         # x86gen:191
-L8_block_done:                                    # x86gen:131
+L8_block_done:                                    # x86gen:128
 	# FP, SP, RV, calleesaves still live
 	leave
 	ret
@@ -77,18 +77,20 @@ L1_chk:
 	movl %esp, %ebp
 	subl $16, %esp
 	# SP, FP, calleesaves, argregs have values
-L11_blocks:                                       # x86gen:131
-	movl 12(%ebp), %ebx                       # x86gen:239 x86frame:343
-	movl %ebx, -4(%ebp)                       # x86gen:239 x86frame:348
-	movl 16(%ebp), %ebx                       # x86gen:239 x86frame:343
-	movl %ebx, -8(%ebp)                       # x86gen:239 x86frame:348
-	movl -4(%ebp), %ebx                       # x86gen:174 x86frame:301
-	movl -8(%ebp), %ecx                       # x86gen:174 x86frame:306
-	cmpl %ebx, %ecx                           # x86gen:174 x86frame:311
+L11_blocks:                                       # x86gen:128
+	movl -4(%ebp), %ebx                       # x86gen:239 x86frame:343
+	movl 12(%ebp), %ebx                       # x86gen:239 x86frame:348
+	movl %ebx, -4(%ebp)                       # x86gen:239 x86frame:353
+	movl -8(%ebp), %ebx                       # x86gen:239 x86frame:343
+	movl 16(%ebp), %ebx                       # x86gen:239 x86frame:348
+	movl %ebx, -8(%ebp)                       # x86gen:239 x86frame:353
+	movl -4(%ebp), %ebx                       # x86gen:174 x86frame:304
+	movl -8(%ebp), %ecx                       # x86gen:174 x86frame:309
+	cmpl %ecx, %ebx                           # x86gen:174 x86frame:314
 	je L3_if_then                             # x86gen:179
 L12_fallthrough:                                  # x86gen:171
 	jmp L4_if_else                            # x86gen:184
-L4_if_else:                                       # x86gen:131
+L4_if_else:                                       # x86gen:128
 	movl -12(%ebp), %ebx                      # x86gen:448 x86frame:323
 	movl $L2_string, %ebx                     # x86gen:448 x86frame:328
 	movl %ebx, -12(%ebp)                      # x86gen:448 x86frame:333
@@ -97,18 +99,19 @@ L4_if_else:                                       # x86gen:131
 	pushl %ebp                                # x86gen:228
 	call print                                # x86gen:199
 	addl $8, %esp                             # x86gen:55
-L5_if_join:                                       # x86gen:131
+L5_if_join:                                       # x86gen:128
 	jmp L10_block_done                        # x86gen:191
-L3_if_then:                                       # x86gen:131
-	movl 20(%ebp), %ebx                       # x86gen:239 x86frame:343
-	movl %ebx, -16(%ebp)                      # x86gen:239 x86frame:348
+L3_if_then:                                       # x86gen:128
+	movl -16(%ebp), %ebx                      # x86gen:239 x86frame:343
+	movl 20(%ebp), %ebx                       # x86gen:239 x86frame:348
+	movl %ebx, -16(%ebp)                      # x86gen:239 x86frame:353
 	movl -16(%ebp), %ebx                      # x86gen:228 x86frame:264
 	pushl %ebx                                # x86gen:228 x86frame:269
 	pushl %ebp                                # x86gen:228
 	call print                                # x86gen:199
 	addl $8, %esp                             # x86gen:55
 	jmp L5_if_join                            # x86gen:191
-L10_block_done:                                   # x86gen:131
+L10_block_done:                                   # x86gen:128
 	# FP, SP, RV, calleesaves still live
 	leave
 	ret

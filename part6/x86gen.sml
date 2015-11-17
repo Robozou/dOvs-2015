@@ -73,18 +73,14 @@ fun codegen frame stm =
             let
                 val t = Tm.newtemp ()
             in
-                emit (A.OPER { assem = "\tcall " ^ S.name l
+               (emit (A.OPER { assem = "\tcall " ^ S.name l
                              , src = munchArgs args
                              , dst = F.calldefs
                              , jump = NONE
                              , doc = "x86gen:80"})
+              ; emit (moveInstr (munchExp e1) t "81")
               ; emit (freeArgs (length args))
-              ; emit (moveInstr F.EAX t "82")
-              ; emit (A.OPER { assem = "\t movl `s1, (`s0)"
-                             , src = [munchExp e1, t]
-                             , dst = []
-                             , jump = NONE
-                             , doc = "x86gen:87"})
+              ; emit (moveInstr F.EAX t "83"))
             end
 
           | munchStm (T.MOVE (T.MEM (T.BINOP (T.PLUS, e1, T.CONST i)), e2)) =
@@ -92,14 +88,14 @@ fun codegen frame stm =
                              , src = [munchExp e1, munchExp e2]
                              , dst = []
                              , jump = NONE
-                             , doc = "x86gen:95" }))
+                             , doc = "x86gen:91" }))
 
           | munchStm (T.MOVE (T.MEM (T.BINOP (T.PLUS, T.CONST i, e1)), e2)) =
             ( emit (A.OPER { assem = "\tmovl `s1, " ^ int i ^ "(`s0)"
                              , src = [munchExp e1, munchExp e2]
                              , dst = []
                              , jump = NONE
-                             , doc = "x86gen:102" }))
+                             , doc = "x86gen:98" }))
 
           | munchStm (T.MOVE (T.MEM (T.CONST i), e2)) =
           let
@@ -109,50 +105,57 @@ fun codegen frame stm =
                              , src = []
                              , dst = [t]
                              , jump = NONE
-                             , doc = "x86gen:112"})
+                             , doc = "x86gen:108"})
               ; emit (A.OPER { assem = "\tmovl `s0, (`s1)"
                              , src = [munchExp e2, t]
                              , dst = []
                              , jump = NONE
-                             , doc = "x86gen:117" })) (* Hopefully we'll never use this case *)
+                             , doc = "x86gen:113" })) (* Hopefully we'll never use this case *)
           end
           | munchStm (T.MOVE (T.MEM e1, e2)) =
             ( emit (A.OPER { assem = "\tmovl `s1, (`s0)"
                              , src = [munchExp e1, munchExp e2]
                              , dst = []
                              , jump = NONE
-                             , doc = "x86gen:124" }))
+                             , doc = "x86gen:120" }))
 
           | munchStm (T.MOVE (T.TEMP i, e2)) =
-            ( emit (moveInstr (munchExp e2) i  "127")) (*  TODO  SPØRG CASPER*)
+            ( emit (moveInstr (munchExp e2) i  "123"))
 
           | munchStm (T.LABEL lab) =
-            ( emit (A.LABEL { assem = S.name lab^":", lab=lab
-                              , doc = "x86gen:131" }))
+            ( emit (A.LABEL { assem = S.name lab ^ ":"
+                              , lab = lab
+                              , doc = "x86gen:128" }))
 
           (* JUMP *)
           | munchStm (T.CJUMP (oper, T.CONST i, e2, lab1, lab2)) =
             let
               val lab = Tm.newLabel "fallthrough"
+              val t = Tm.newtemp()
             in
-              ( emit (A.OPER {assem = "\tcmpl $" ^ int i ^ ", `s0"
-                              , src = [munchExp e2]
+              ( emit (A.OPER {assem = "\tmovl $" ^ int i ^", `d0"
+                              , src = []
+                              , dst = [t]
+                              , jump = NONE
+                              , doc = "x86gen:143"})
+              ; emit (A.OPER {assem = "\tcmpl `s0, `s1"
+                              , src = [munchExp e2, t]
                               , dst = []
                               , jump = NONE
-                              , doc = "x86gen:139" })
+                              , doc = "x86gen:148" })
               ; emit (A.OPER {assem = "\t" ^(operator2jump(oper)) ^ " `j0"
                               , src = []
                               , dst = []
                               , jump = SOME [lab1, lab]
-                              , doc = "x86gen:144" })
+                              , doc = "x86gen:153" })
               ; emit (A.LABEL {assem = S.name lab ^ ":" (* fallthough label *)
                               , lab = lab
-                              , doc = "x86gen:147"})
+                              , doc = "x86gen:156"})
               ; emit (A.OPER {assem = "\tjmp `j0"
-                            , src = []
-                            , dst = []
-                            , jump = SOME [lab2]
-                            , doc = "x86gen:149" }) )
+                              , src = []
+                              , dst = []
+                              , jump = SOME [lab2]
+                              , doc = "x86gen:161" }) )
             end
 
           | munchStm (T.CJUMP (oper, e1, T.CONST i, lab1, lab2)) =
@@ -183,7 +186,7 @@ fun codegen frame stm =
             let
               val lab = Tm.newLabel "fallthrough"
             in
-              ( emit (A.OPER {assem = "\tcmpl `s0, `s1"
+              ( emit (A.OPER {assem = "\tcmpl `s1, `s0"
                             , src = [munchExp e1, munchExp e2]
                             , dst = []
                             , jump = NONE
@@ -298,16 +301,12 @@ fun codegen frame stm =
           | munchExp (T.BINOP (T.PLUS, e1, e2)) =
             (* Hint, p203: use src=[r,_] and do not use `s0,
              * which specifies that r is used *)
-            result (fn r => (emit (A.OPER { assem = "\tmovl `s1, `d0"
-                                         , src = [r, munchExp e1]
+            result (fn r => (emit (moveInstr (munchExp e1) r "304")
+                          ; emit (A.OPER { assem = "\taddl `s1, `d0"
+                                         , src = [r, munchExp e2]
                                          , dst = [r]
                                          , jump = NONE
-                                         , doc = "x86gen:283"})
-                          ; emit (A.OPER { assem = "\taddl `s0, `d0"
-                                         , src = [munchExp e2]
-                                         , dst = [r]
-                                         , jump = NONE
-                                         , doc = "x86gen:288"})))
+                                         , doc = "x86gen:309"})))
              (* Why does this make sense Casper? TODO what is going on *)
 
           (* MINUS *)
@@ -351,14 +350,13 @@ fun codegen frame stm =
                                          , doc = "x86gen:329"}))
 
           (* MULTIPLY *)
-          | munchExp (T.BINOP (T.MUL, e1, e2)) = (* move e1 to EAX *)
-            result (fn r => (emit (moveInstr (munchExp e1) F.EAX "355")
-                          ; (emit (A.OPER { assem = "\timull `s0"
-                                         , src = [munchExp e2]
-                                         , dst = []
+          | munchExp (T.BINOP (T.MUL, e1, e2)) =
+            result (fn r => (emit (moveInstr (munchExp e1) r "355")
+                          ; (emit (A.OPER { assem = "\timull `s1, `d0"
+                                         , src = [r, munchExp e2]
+                                         , dst = [r]
                                          , jump = NONE
-                                         , doc = "x86gen:360"}))
-                          ; (emit (moveInstr F.EAX r "361"))))
+                                         , doc = "x86gen:360"}))))
 
           (* DIVIDE *)
 
@@ -375,21 +373,18 @@ fun codegen frame stm =
              *
              * The quotient is in %eax, and the remainder is in %edx."
              *)
-            result (fn r => (emit (A.MOVE { assem = "\tmovl `s0, `d0"
-                                          , src = munchExp e1
-                                          , dst = F.EAX
-                                          , doc = "x86gen:358"})
+            result (fn r => (emit (moveInstr (munchExp e1) F.EAX "383")
                            ; emit (A.OPER { assem = "\tcltd"
                                           , src = []
                                           , dst = []
                                           , jump = NONE
-                                          , doc = "x86gen:363"})
+                                          , doc = "x86gen:388"})
                            ; emit (A.OPER { assem = "\tidivl `s0"
                                           , src = [munchExp e2]
                                           , dst = []
                                           , jump = NONE
-                                          , doc = "x86gen:373"})
-                           ; emit (moveInstr F.EAX r "369") ))
+                                          , doc = "x86gen:393"})
+                           ; emit (moveInstr F.EAX r "394") ))
 
           (* AND *)
           | munchExp (T.BINOP (T.AND, e1, T.CONST i)) =
@@ -460,7 +455,7 @@ fun codegen frame stm =
           (* Other constructs *)
           | munchExp (T.TEMP t) = t
 
-          | munchExp (T.ESEQ (s, e)) = (munchStm s; munchExp e)
+          | munchExp (T.ESEQ (s, e)) = (munchStm s; munchExp e) (* Should never happen *)
 
           | munchExp (T.NAME label) =
             result (fn r =>

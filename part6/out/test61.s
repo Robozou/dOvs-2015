@@ -10,26 +10,27 @@ tigermain:
 	movl %esp, %ebp
 	subl $16, %esp
 	# SP, FP, calleesaves, argregs have values
-L4_blocks:                                        # x86gen:131
+L4_blocks:                                        # x86gen:128
 	movl -8(%ebp), %ebx                       # x86gen:448 x86frame:323
 	movl $L1_string, %ebx                     # x86gen:448 x86frame:328
 	movl %ebx, -8(%ebp)                       # x86gen:448 x86frame:333
-	movl -8(%ebp), %ebx                       # x86gen:95 x86frame:278
-	movl %ebx, -4(%ebp)                       # x86gen:95 x86frame:283
+	movl -8(%ebp), %ebx                       # x86gen:91 x86frame:279
+	movl %ebx, -4(%ebp)                       # x86gen:91 x86frame:284
 	movl -12(%ebp), %ebx                      # x86gen:448 x86frame:323
 	movl $L2_string, %ebx                     # x86gen:448 x86frame:328
 	movl %ebx, -12(%ebp)                      # x86gen:448 x86frame:333
 	movl -12(%ebp), %ebx                      # x86gen:228 x86frame:264
 	pushl %ebx                                # x86gen:228 x86frame:269
-	movl -4(%ebp), %ebx                       # x86gen:239 x86frame:343
-	movl %ebx, -16(%ebp)                      # x86gen:239 x86frame:348
+	movl -16(%ebp), %ebx                      # x86gen:239 x86frame:343
+	movl -4(%ebp), %ebx                       # x86gen:239 x86frame:348
+	movl %ebx, -16(%ebp)                      # x86gen:239 x86frame:353
 	movl -16(%ebp), %ebx                      # x86gen:228 x86frame:264
 	pushl %ebx                                # x86gen:228 x86frame:269
 	call stringGreater                        # x86gen:68
 	addl $8, %esp                             # x86gen:55
 	movl %eax, %eax                           # x86gen:70
 	jmp L3_block_done                         # x86gen:191
-L3_block_done:                                    # x86gen:131
+L3_block_done:                                    # x86gen:128
 	# FP, SP, RV, calleesaves still live
 	leave
 	ret

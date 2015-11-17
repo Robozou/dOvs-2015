@@ -319,7 +319,7 @@ fun let2IR ([], body) = body
   | let2IR (decls, body) = Ex (T.ESEQ (seq (map unNx decls), unEx body))
 
 fun eseq2IR [] = raise Bug "attempt to eseq2IR an empty sequence"
-  | eseq2IR (exp :: exps) = 
+  | eseq2IR (exp :: exps) =
     let
         fun eseq2IR' exp [] = unEx exp
           | eseq2IR' exp (exp'::exps') =
@@ -473,12 +473,12 @@ fun subscript2IR (array, offset) =
 	Ex ((T.ESEQ(seq [T.MOVE(T.TEMP offsetT,offset')
 			, T.MOVE(T.TEMP arrayT,array')
 			, T.MOVE(T.TEMP maxInxT,
-				 T.MEM(T.BINOP(T.PLUS,T.TEMP arrayT, T.CONST(F.wordSize))))
+				 (T.MEM(T.BINOP(T.PLUS,T.TEMP arrayT, T.CONST(F.wordSize))))) (* Casper vi kan ikke få det til at virke TODO *)
 			, T.CJUMP(T.GE, T.TEMP offsetT, T.CONST(0), nonNegativeL, negativeL)
 			, T.LABEL negativeL
 			, T.EXP (F.externalCall("arrInxError", [offset']))
 			, T.LABEL nonNegativeL
-			, T.CJUMP(T.LT, T.TEMP offsetT, T.BINOP(T.MINUS, T.TEMP maxInxT,T.CONST(1)),
+			, T.CJUMP(T.LT, T.TEMP offsetT, T.TEMP maxInxT,
 				  noOverflowL, overflowL)
 			, T.LABEL overflowL
 			, T.EXP (F.externalCall("arrInxError", [offset']))

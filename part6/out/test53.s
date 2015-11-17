@@ -10,7 +10,7 @@ tigermain:
 	movl %esp, %ebp
 	subl $4, %esp
 	# SP, FP, calleesaves, argregs have values
-L3_blocks:                                        # x86gen:131
+L3_blocks:                                        # x86gen:128
 	movl -4(%ebp), %ebx                       # x86gen:456 x86frame:323
 	movl $10, %ebx                            # x86gen:456 x86frame:328
 	movl %ebx, -4(%ebp)                       # x86gen:456 x86frame:333
@@ -21,7 +21,7 @@ L3_blocks:                                        # x86gen:131
 	addl $8, %esp                             # x86gen:55
 	movl %eax, %eax                           # x86gen:70
 	jmp L2_block_done                         # x86gen:191
-L2_block_done:                                    # x86gen:131
+L2_block_done:                                    # x86gen:128
 	# FP, SP, RV, calleesaves still live
 	leave
 	ret
@@ -42,13 +42,13 @@ L1_f:
 	movl %esp, %ebp
 	subl $4, %esp
 	# SP, FP, calleesaves, argregs have values
-L5_blocks:                                        # x86gen:131
+L5_blocks:                                        # x86gen:128
 	movl -4(%ebp), %ebx                       # x86gen:456 x86frame:323
 	movl $42, %ebx                            # x86gen:456 x86frame:328
 	movl %ebx, -4(%ebp)                       # x86gen:456 x86frame:333
-	movl -4(%ebp), %eax                       # x86gen:127 x86frame:560
+	movl -4(%ebp), %eax                       # x86gen:123 x86frame:609
 	jmp L4_block_done                         # x86gen:191
-L4_block_done:                                    # x86gen:131
+L4_block_done:                                    # x86gen:128
 	# FP, SP, RV, calleesaves still live
 	leave
 	ret

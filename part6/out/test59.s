@@ -10,20 +10,21 @@ tigermain:
 	movl %esp, %ebp
 	subl $12, %esp
 	# SP, FP, calleesaves, argregs have values
-L3_blocks:                                        # x86gen:131
+L3_blocks:                                        # x86gen:128
 	movl -8(%ebp), %ebx                       # x86gen:456 x86frame:323
 	movl $0, %ebx                             # x86gen:456 x86frame:328
 	movl %ebx, -8(%ebp)                       # x86gen:456 x86frame:333
-	movl -8(%ebp), %ebx                       # x86gen:95 x86frame:278
-	movl %ebx, -4(%ebp)                       # x86gen:95 x86frame:283
+	movl -8(%ebp), %ebx                       # x86gen:91 x86frame:279
+	movl %ebx, -4(%ebp)                       # x86gen:91 x86frame:284
 	pushl %ebp                                # x86gen:228
 	call L1_f                                 # x86gen:199
 	addl $4, %esp                             # x86gen:55
-	movl -4(%ebp), %ebx                       # x86gen:239 x86frame:343
-	movl %ebx, -12(%ebp)                      # x86gen:239 x86frame:348
-	movl -12(%ebp), %eax                      # x86gen:127 x86frame:560
+	movl -12(%ebp), %ebx                      # x86gen:239 x86frame:343
+	movl -4(%ebp), %ebx                       # x86gen:239 x86frame:348
+	movl %ebx, -12(%ebp)                      # x86gen:239 x86frame:353
+	movl -12(%ebp), %eax                      # x86gen:123 x86frame:609
 	jmp L2_block_done                         # x86gen:191
-L2_block_done:                                    # x86gen:131
+L2_block_done:                                    # x86gen:128
 	# FP, SP, RV, calleesaves still live
 	leave
 	ret
@@ -44,22 +45,22 @@ L1_f:
 	movl %esp, %ebp
 	subl $16, %esp
 	# SP, FP, calleesaves, argregs have values
-L5_blocks:                                        # x86gen:131
-	movl %ebp, -12(%ebp)                      # x86gen:246 x86frame:558
-	movl %ebp, -4(%ebp)                       # x86gen:246 x86frame:558
-	movl -4(%ebp), %ebx                       # x86gen:239 x86frame:379
-	movl -4(%ebx), %ecx                       # x86gen:239 x86frame:389
-	movl %ecx, -8(%ebp)                       # x86gen:239 x86frame:384
-	movl %ebx, -8(%ebp)                       # x86gen:263 x86frame:573
-	movl -8(%ebp), %ebx                       # x86gen:263 x86frame:577
-	movl %ebx, -16(%ebp)                      # x86gen:263 x86frame:581
-	movl -16(%ebp), %ebx                      # x86gen:267 x86frame:367
-	addl $1, %ebx                             # x86gen:267 x86frame:372
-	movl -12(%ebp), %ebx                      # x86gen:95 x86frame:301
-	movl -16(%ebp), %ecx                      # x86gen:95 x86frame:306
-	movl %ecx, -4(%ebx)                       # x86gen:95 x86frame:311
+L5_blocks:                                        # x86gen:128
+	movl %ebp, -12(%ebp)                      # x86gen:246 x86frame:602
+	movl %ebp, -4(%ebp)                       # x86gen:246 x86frame:602
+	movl -4(%ebp), %ebx                       # x86gen:239 x86frame:394
+	movl -4(%ebx), %ecx                       # x86gen:239 x86frame:399
+	movl %ecx, -8(%ebp)                       # x86gen:239 x86frame:404
+	movl -8(%ebp), %ebx                       # x86gen:263 x86frame:616
+	movl %ebx, -16(%ebp)                      # x86gen:263 x86frame:620
+	movl -16(%ebp), %ebx                      # x86gen:267 x86frame:377
+	addl $1, %ebx                             # x86gen:267 x86frame:382
+	movl %ebx, -16(%ebp)                      # x86gen:267 x86frame:387
+	movl -12(%ebp), %ebx                      # x86gen:91 x86frame:304
+	movl -16(%ebp), %ecx                      # x86gen:91 x86frame:309
+	movl %ecx, -4(%ebx)                       # x86gen:91 x86frame:314
 	jmp L4_block_done                         # x86gen:191
-L4_block_done:                                    # x86gen:131
+L4_block_done:                                    # x86gen:128
 	# FP, SP, RV, calleesaves still live
 	leave
 	ret

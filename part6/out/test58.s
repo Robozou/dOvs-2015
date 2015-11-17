@@ -10,7 +10,7 @@ tigermain:
 	movl %esp, %ebp
 	subl $4, %esp
 	# SP, FP, calleesaves, argregs have values
-L3_blocks:                                        # x86gen:131
+L3_blocks:                                        # x86gen:128
 	movl -4(%ebp), %ebx                       # x86gen:448 x86frame:323
 	movl $L1_string, %ebx                     # x86gen:448 x86frame:328
 	movl %ebx, -4(%ebp)                       # x86gen:448 x86frame:333
@@ -20,7 +20,7 @@ L3_blocks:                                        # x86gen:131
 	call print                                # x86gen:199
 	addl $8, %esp                             # x86gen:55
 	jmp L2_block_done                         # x86gen:191
-L2_block_done:                                    # x86gen:131
+L2_block_done:                                    # x86gen:128
 	# FP, SP, RV, calleesaves still live
 	leave
 	ret
