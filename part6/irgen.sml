@@ -46,7 +46,7 @@ fun transExp (venv, extra : extra) =
 		val rightexp = trexp right
 		val func = case (actualTy lty, actualTy rty) of
 			       (Ty.INT, Ty.INT) => Tr.intOp2IR
-			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR 
+			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR
 			     | (Ty.ARRAY(_,_),Ty.ARRAY(_,_)) => Tr.intOp2IR
 			     | (Ty.RECORD(_,_),Ty.RECORD(_,_)) => Tr.intOp2IR
 			     | (Ty.RECORD(_,_),Ty.NIL) => Tr.intOp2IR
@@ -211,7 +211,7 @@ fun transExp (venv, extra : extra) =
 		  | findOffset (((s,t)::xs),i,b) = if(s = id)
 					     then (i,true)
 					     else findOffset(xs,i+1,b)
-		val (offset,isInRec) = findOffset(fields,0,false) 
+		val (offset,isInRec) = findOffset(fields,0,false)
             in
 		if(isInRec = true)
 		then Tr.fieldVar(tvar, offset)
@@ -297,7 +297,7 @@ and transDec ( venv
           end; iter(xs))
     in
 	iter(fundecls);
-	({venv = venv'}, explist) 
+	({venv = venv'}, explist)
     end
 
 and transDecs (venv, decls, extra) =

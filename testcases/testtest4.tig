@@ -1,0 +1,9 @@
+let
+  var a: int := 1
+  var b: int := 2
+in
+  if a<b then print("give us 5 ") else print("give us 3 ");
+  if 4<=b | b<a then print("give us 3 ") else print("please ");
+  if a>0 then print("do ") else print("give us 3 ");
+  if 1=1 & b>=a then print("it") else print("give us 3")
+end

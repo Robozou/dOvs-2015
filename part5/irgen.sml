@@ -46,7 +46,7 @@ fun transExp (venv, extra : extra) =
 		val rightexp = trexp right
 		val func = case (actualTy lty, actualTy rty) of
 			       (Ty.INT, Ty.INT) => Tr.intOp2IR
-			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR 
+			     | (Ty.STRING, Ty.STRING) => Tr.stringOp2IR
 			     | (Ty.ARRAY(_,_),Ty.ARRAY(_,_)) => Tr.intOp2IR
 			     | (Ty.RECORD(_,_),Ty.RECORD(_,_)) => Tr.intOp2IR
 			     | (Ty.RECORD(_,_),Ty.NIL) => Tr.intOp2IR
@@ -103,6 +103,7 @@ fun transExp (venv, extra : extra) =
 	    in
         	Tr.while2IR(ttest,tbody, done)
             end
+
           | trexp {exp = aexp as TAbs.RecordExp {fields}, ty} =
       	    let
           	fun transExps (s,e) = trexp e
@@ -110,6 +111,7 @@ fun transExp (venv, extra : extra) =
             in
       		Tr.record2IR(exps)
       	    end
+
           | trexp {exp = TAbs.SeqExp [], ty} =
             Tr.seq2IR []
           | trexp {exp = TAbs.SeqExp (aexps as (aexp'::aexps')), ty} =
@@ -130,6 +132,7 @@ fun transExp (venv, extra : extra) =
             in
 		Tr.assign2IR(var', exp') (* using Tr.assign2IR, checkAssignable *)
             end
+
           | trexp {exp = TAbs.ForExp {var, escape = ref esc, lo, hi, body}, ty} =
             let
 		val tlo = trexp lo
@@ -139,9 +142,10 @@ fun transExp (venv, extra : extra) =
               val venv' = S.enter( venv,var,(E.VarEntry{ access = acc
                                                        , ty = Ty.INT
                                                        , escape = ref esc}))
-              val tbody = transExp(venv',extra) body
+	      val done = Tr.newBreakPoint "done"
+              val tbody = transExp(venv',{level = #level extra, break = SOME done}) body
             in
-              Tr.for2IR(var',Tr.newBreakPoint "done", tlo, thi, tbody)
+              Tr.for2IR(var',done, tlo, thi, tbody)
             end
 
           | trexp {exp = TAbs.BreakExp, ty} =
@@ -207,7 +211,7 @@ fun transExp (venv, extra : extra) =
 		  | findOffset (((s,t)::xs),i,b) = if(s = id)
 					     then (i,true)
 					     else findOffset(xs,i+1,b)
-		val (offset,isInRec) = findOffset(fields,0,false) 
+		val (offset,isInRec) = findOffset(fields,0,false)
             in
 		if(isInRec = true)
 		then Tr.fieldVar(tvar, offset)
@@ -293,7 +297,7 @@ and transDec ( venv
           end; iter(xs))
     in
 	iter(fundecls);
-	({venv = venv'}, explist) 
+	({venv = venv'}, explist)
     end
 
 and transDecs (venv, decls, extra) =

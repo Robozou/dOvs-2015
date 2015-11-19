@@ -1,7 +1,8 @@
 let
-	var t := 0
-
+  var a: int := 1
+  var b: int := 2
 in
-	for i := 0 to 1000000 do (t := t + 5);
-	t
+  if a<b & 4/2 = 2 & 5/2 = 2 & 8/(5/2) = 4 & 4*2 = 8 & 3+2 = 5 & 6-2 = 4 & 2-6 = -4 
+	then print("hurray we can do math ") else print("give us 3 ")
+ 
 end

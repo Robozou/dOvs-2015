@@ -409,7 +409,7 @@ fun spillAllTemps toMap body =
                 if isRegister s1 then
                     if isRegister d0 then [i]
                     else (* s0,s1 register, d0 other temp *)
-                        (* OLD_R_OPTIMIZATION: s0<>d0, no pre-load needed *) (* NO PRE-LOAD? IS THIS NO PRE-LOAD? TODO *)
+                        (* OLD_R_OPTIMIZATION: s0<>d0, no pre-load needed *)
                        [ A.OPER { assem = assem
                                 , src = (s0::s1::ss)
                                 , dst = [EBX]
@@ -562,7 +562,7 @@ fun spillAllTemps toMap body =
                                  , src = [EDX]
                                  , dst = []
                                  , jump = NONE
-                                 , doc = doc ^ " x86frame:590"} ]
+                                 , doc = doc ^ " x86frame:565"} ]
           | expand (i as (A.LABEL _)) =
             [i]
           | expand (i as A.MOVE {assem, src, dst, doc}) =
@@ -574,25 +574,25 @@ fun spillAllTemps toMap body =
                 [ A.MOVE {assem = "\tmovl `s0, " ^ ofs dst ^ "(%ebp)"
                           , src = src
                           , dst = dst
-                          , doc = doc ^ " x86frame:602"}]
+                          , doc = doc ^ " x86frame:577"}]
 
             else if isRegister dst then
                 (* src other temp, dst register *)
                 [ A.MOVE {assem = "\tmovl " ^ ofs src ^ "(%ebp), `d0"
                           , src = src
                           , dst = dst
-                          , doc = doc ^ " x86frame:609"}]
+                          , doc = doc ^ " x86frame:584"}]
 
             else
                 (* src, dst other temp *)
                 [A.MOVE { assem = "\tmovl " ^ ofs src ^ "(%ebp), `d0"
                         , src = src
                         , dst = EBX
-                        , doc = doc ^ " x86frame:616"}
+                        , doc = doc ^ " x86frame:591"}
                , A.MOVE { assem = "\tmovl `s0, " ^ ofs dst ^ "(%ebp)"
                         , src = EBX
                         , dst = dst
-                        , doc = doc ^ " x86frame:620"}]
+                        , doc = doc ^ " x86frame:595"}]
     in
         List.concat (map expand body)
     end

@@ -103,6 +103,19 @@ int stringGreaterEq(struct string *s, struct string *t)
     return stringLessEq(t, s);
 }
 
+int exponent(int x, int n)
+{
+    if (n < 0) {
+        printf("Error: Your input was %d. tiger cannot handle negative exponents\n",n); 
+        exit(1);
+    }
+    int i;
+    int number = 1;
+    for (i = 0; i < n; i++)
+	number *= x;
+    return number;
+    
+}
 void print(void *static_link, struct string *s)
 {
     int i; 

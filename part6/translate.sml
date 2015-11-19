@@ -131,16 +131,17 @@ let
     val nilL = Temp.newLabel "field_nil"
     val nonNilL = Temp.newLabel "field_nonNil"
     val addressT = Temp.newtemp ()
+    val varT = Temp.newtemp ()
 in
-  Ex (T.ESEQ(seq [T.CJUMP(T.EQ,var', T.CONST(0), nilL, nonNilL)
+  Ex (T.ESEQ(seq [T.MOVE(T.TEMP varT, var')
+     , T.CJUMP(T.EQ, T.TEMP varT, T.CONST(0), nilL, nonNilL)
 		 , T.LABEL nilL
 		 , T.EXP (F.externalCall("recFieldError", [])) (* No JUMP because exit(1) is called *)
 		 , T.LABEL nonNilL
-		 , T.MOVE(T.TEMP addressT, T.BINOP(T.PLUS, var',
+		 , T.MOVE(T.TEMP addressT, T.BINOP(T.PLUS, T.TEMP varT,
 						   (T.BINOP(T.MUL,T.CONST(offset), T.CONST(F.wordSize)))))]
 	   ,T.MEM(T.TEMP addressT)))
 end
-
 
 fun assign2IR (var, exp) =
     let
@@ -305,7 +306,7 @@ fun relop2IR (oper, left, right) =
 fun intOp2IR (TAbs.PlusOp, left, right)     = binop2IR (T.PLUS, left, right)
   | intOp2IR (TAbs.MinusOp, left, right)    = binop2IR (T.MINUS, left, right)
   | intOp2IR (TAbs.TimesOp, left, right)    = binop2IR (T.MUL, left, right)
-  | intOp2IR (TAbs.DivideOp, left, right)   = binop2IR (T.DIV, left, right) (* unEx in exponent? *)
+  | intOp2IR (TAbs.DivideOp, left, right)   = binop2IR (T.DIV, left, right)
   | intOp2IR (TAbs.ExponentOp, left, right) = Ex(F.externalCall("exponent", [unEx(left),unEx(right)]))
   | intOp2IR (TAbs.EqOp, left, right)       = relop2IR (T.EQ, left, right)
   | intOp2IR (TAbs.NeqOp, left, right)      = relop2IR (T.NE, left, right)
@@ -473,18 +474,18 @@ fun subscript2IR (array, offset) =
 	Ex ((T.ESEQ(seq [T.MOVE(T.TEMP offsetT,offset')
 			, T.MOVE(T.TEMP arrayT,array')
 			, T.MOVE(T.TEMP maxInxT,
-				 (T.MEM(T.BINOP(T.PLUS,T.TEMP arrayT, T.CONST(F.wordSize))))) (* Casper vi kan ikke få det til at virke TODO *)
+				 (T.MEM(T.BINOP(T.MINUS,T.TEMP arrayT, T.CONST(F.wordSize))))) (* Casper vi kan ikke få det til at virke TODO *)
 			, T.CJUMP(T.GE, T.TEMP offsetT, T.CONST(0), nonNegativeL, negativeL)
 			, T.LABEL negativeL
-			, T.EXP (F.externalCall("arrInxError", [offset']))
+			, T.EXP (F.externalCall("arrInxError", [T.TEMP offsetT]))
 			, T.LABEL nonNegativeL
 			, T.CJUMP(T.LT, T.TEMP offsetT, T.TEMP maxInxT,
 				  noOverflowL, overflowL)
 			, T.LABEL overflowL
-			, T.EXP (F.externalCall("arrInxError", [offset']))
+			, T.EXP (F.externalCall("arrInxError", [T.TEMP offsetT]))
 			, T.LABEL noOverflowL
-			, T.MOVE(T.TEMP addressT,T.BINOP(T.PLUS,array', T.BINOP(
-						     T.MUL,offset',T.CONST(F.wordSize))))]
+			, T.MOVE(T.TEMP addressT,T.BINOP(T.PLUS,T.TEMP arrayT, T.BINOP(
+						     T.MUL,T.TEMP offsetT,T.CONST(F.wordSize))))]
 		   , T.MEM(T.TEMP addressT))))
     end
 

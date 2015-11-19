@@ -1,4 +1,4 @@
-structure IRgen_Env :> IRGEN_ENV = 
+structure IRgen_Env :> IRGEN_ENV =
 struct
 
 structure Sy = Symbol
@@ -39,42 +39,42 @@ in
                                          , result = Ty.UNIT
                                          , label =  Tm.namedLabel "flush"
                                          , level = initLevel}),
-      
+
       (Sy.symbol "getchar", FunEntry { formals = []
                                      , result = Ty.STRING
-                                     , label = Tm.namedLabel "getchar"
+                                     , label = Tm.namedLabel "getChar"
                                      , level = initLevel}),
-      
+
       (Sy.symbol "ord", FunEntry { formals = [Ty.STRING]
                                  , result = Ty.INT
                                  , label = Tm.namedLabel "ord"
                                  , level = initLevel}),
-      
+
       (Sy.symbol "chr", FunEntry { formals = [Ty.INT]
                                  , result = Ty.STRING
                                  , label = Tm.namedLabel "chr"
                                  , level = initLevel}),
-      
+
       (Sy.symbol "size", FunEntry { formals = [Ty.STRING]
                                   , result = Ty.INT
                                   , label = Tm.namedLabel "size"
                                   , level = initLevel}),
-      
+
       (Sy.symbol "substring", FunEntry { formals = [Ty.STRING, Ty.INT, Ty.INT]
                                        , result = Ty.STRING
                                        , label = Tm.namedLabel "substring"
                                        , level = initLevel}),
-      
+
       (Sy.symbol "concat", FunEntry { formals = [Ty.STRING, Ty.STRING]
                                     , result = Ty.STRING
                                     , label = Tm.namedLabel "concat"
                                     , level = initLevel}),
-      
+
       (Sy.symbol "not", FunEntry { formals = [Ty.INT]
                                  , result = Ty.INT
                                  , label = Tm.namedLabel "not"
                                  , level = initLevel}),
-      
+
       (Sy.symbol "exit", FunEntry { formals = [Ty.INT]
                                   , result = Ty.UNIT
                                   , label = Tm.namedLabel "exit"
@@ -83,4 +83,3 @@ in
 end
 
 end (* Env *)
-
