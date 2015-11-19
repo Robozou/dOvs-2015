@@ -1,0 +1,7 @@
+let
+     type list = {first: int, rest: list}
+     var list1 := list{first=5,rest=nil}
+
+in
+   print(chr(list1.first+ord("0")))
+end
