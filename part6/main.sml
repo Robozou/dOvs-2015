@@ -39,6 +39,7 @@ fun compile (infile, outfile) =
     let
         val absyn = Parse.parse infile
         val tabsyn = Semant.transProg absyn
+        val printab = PrintTAbsyn.print(TextIO.stdOut, tabsyn)
         val frags = IRgen.transProg tabsyn
         fun emitprocs out = app (emitproc out) frags
     in
@@ -50,4 +51,3 @@ fun exportedFn (self, [infile,outfile]) = (compile (infile,outfile); 0)
   | exportedFn (self, _) = (print "Expects arguments <infile> <outfile>"; ~1)
 
 end (* Main *)
-

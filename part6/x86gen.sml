@@ -280,7 +280,7 @@ fun codegen frame stm =
  * It looks like if you assign and return a value in one sequence the assignment is not properly understood
  * Somethign along those lines, but not necessarily*)
           | munchExp (T.MEM e) =
-            result (fn r => emit (A.OPER { assem = "\tmovl (`s0), `d0" 
+            result (fn r => emit (A.OPER { assem = "\tmovl (`s0), `d0"
                                            , src = [munchExp e]
                                            , dst = [r]
                                            , jump = NONE
@@ -312,7 +312,6 @@ fun codegen frame stm =
                                          , dst = [r]
                                          , jump = NONE
                                          , doc = "x86gen:312"})))
-             (* Why does this make sense Casper? TODO what is going on *)
 
           (* MINUS *)
           | munchExp (T.BINOP (T.MINUS, e1, T.CONST i)) =
@@ -329,7 +328,7 @@ fun codegen frame stm =
                                          , dst = [r]
                                          , jump = NONE
                                          , doc = "x86gen:329"})
-                           ; emit (A.OPER { assem = "\tsubl `s1, `s0"
+                           ; emit (A.OPER { assem = "\tsubl `s1, `d0"
                                          , src = [r, munchExp e1]
                                          , dst = [r]
                                          , jump = NONE
@@ -341,7 +340,7 @@ fun codegen frame stm =
                                           , dst = [r]
                                           , jump = NONE
                                           , doc = "x86gen:341"})
-                           ; emit (A.OPER { assem = "\tsubl `s1, `s0"
+                           ; emit (A.OPER { assem = "\tsubl `s1, `d0"
                                           , src = [r, munchExp e1]
                                           , dst = [r]
                                           , jump = NONE

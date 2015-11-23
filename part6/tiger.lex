@@ -12,6 +12,11 @@ val linePos = ErrorMsg.linePos
 val commentLevel = ref 0
 val currentString = ref ""
 
+(* Final code *)
+val pad3 = StringCvt.padLeft #"0" 3
+val toOct = Int.fmt StringCvt.OCT
+fun dec2oct n = pad3 (toOct n)
+
 fun err (p1,p2) = ErrorMsg.error p1
 
 fun eof () =
@@ -45,7 +50,7 @@ letter=[a-zA-Z];
 digits=[0-9]+;
 idchars=[a-zA-Z][a-zA-Z0-9_]*;
 ignore=[\t\ \n]+;
-control=\^[@A-Z\\_\^];
+control=[@A-Z\\_\^];
 ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 %s COMMENT STRING ESCAPE IGNORE;
 
@@ -117,29 +122,30 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 <STRING>\"                          => (inString := false; YYBEGIN INITIAL;
                                         dopos3 Tokens.STRING (!currentString) yypos (size(!currentString)));
 
-<STRING>"\\"                        => (YYBEGIN ESCAPE; continue());
+
+<STRING>\\                          => (YYBEGIN ESCAPE; continue());
 <STRING>\n                          => (ErrorMsg.error yypos ("Newlines should be put into ignore escape sequence in string"); continue());
 <STRING>.                           => (currentString := !currentString ^ yytext; continue());
 
-<ESCAPE>"n"                         => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING;
-					lineNum := !lineNum+1;
+<ESCAPE>n                         => (currentString := !currentString ^ "\n"; YYBEGIN STRING;
+					                              lineNum := !lineNum+1;
                                         linePos := yypos :: !linePos;  (* After feedback *)
                                         continue());
-<ESCAPE>"t"                         => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
-<ESCAPE>"\""                        => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
-<ESCAPE>"\\"                        => (currentString := !currentString ^ "\\" ^ "\\"; YYBEGIN STRING; continue());
-<ESCAPE>{ascii}                     => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
-<ESCAPE>{control}                   => (currentString := !currentString ^ "\\" ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>t                         => (currentString := !currentString ^ "\t"; YYBEGIN STRING; continue());
+<ESCAPE>\"                        => (currentString := !currentString ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>\\                          => (currentString := !currentString ^ "\\"; YYBEGIN STRING; continue());
+<ESCAPE>{ascii}                     => (currentString := !currentString ^ "\\" ^ (dec2oct(s2i yytext yypos)); YYBEGIN STRING; continue());
+<ESCAPE>{control}                   => (currentString := !currentString ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>{ignore}                    => (YYBEGIN IGNORE; continue());
 <ESCAPE>.                           => (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); YYBEGIN STRING; continue());
 
 
 <IGNORE>"\\n"                       => (lineNum := !lineNum+1;
-					linePos := yypos :: !linePos;
-					continue());
+                              					linePos := yypos :: !linePos;
+                              					continue());
 <IGNORE>"\\t"                       => (continue());
 <IGNORE>"\\f"                       => (continue());
-<IGNORE>"\\"{control}               => (continue() (* WHAT DO YOU WANT CASPER? *) ); 
+<IGNORE>"\\"{control}               => (continue());
 <IGNORE>"\\"                        => (YYBEGIN STRING; continue());
 <IGNORE>.                           => (ErrorMsg.error yypos ("Invalid character in ignore. No support for " ^ yytext); continue());
 

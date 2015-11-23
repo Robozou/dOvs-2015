@@ -1,0 +1,4 @@
+for i := 1 to 100 do 
+		if(i > 50) 
+		then print("dix\t\n") 
+		else print("fak")

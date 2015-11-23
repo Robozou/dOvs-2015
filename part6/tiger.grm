@@ -103,8 +103,8 @@ fun makeFieldData (idsym, ty, p) =
   | PLUS | MINUS | UMINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE | CARET
   | AND | OR | ASSIGN
   | BREAK | NIL
-  | FUNCTION | VAR | TYPE 
-  | DEC 
+  | FUNCTION | VAR | TYPE
+  | DEC
 
 
 
@@ -114,14 +114,18 @@ fun makeFieldData (idsym, ty, p) =
 %nonterm program of A.exp
        | exp of A.exp
        | exps of (A.exp * pos) list
+       | expTail of (A.exp * pos) list
        | seqexp of (A.exp * pos) list
+       | seqexpTail of (A.exp * pos) list
        | recfields of (S.symbol * A.exp * pos) list
+       | recTail of (S.symbol * A.exp * pos) list
        | decl of A.decl
        | decls of A.decl list
        | tydecl of A.tydecldata
        | tydecls of A.tydecldata list
        | ty of A.ty
        | tyfields of A.fielddata list
+       | tyTail of A.fielddata list
        | vardecl of A.vardecldata
        | fundecl of A.fundecldata
        | fundecls of A.fundecldata list
@@ -204,16 +208,25 @@ exp       : INT                                                (A.IntExp INT)
 
 exps      :                                                    ([]) (*Rule 30*)
    |        exp                                                ([(exp, expleft)])
-   |        exps COMMA exp                                     (exps@[(exp,expleft)])
+   |        exp COMMA expTail                                  ((exp, expleft)::expTail)
+
+expTail   : exp                                                ([(exp, expleft)])
+   |        exp COMMA expTail                                  ((exp, expleft)::expTail)
 
 seqexp    :                                                    ([])
    |        exp                                                ([(exp,expleft)])
-   |        seqexp SEMICOLON exp                               (seqexp@[(exp,expleft)]) (*Rule 35*)
+   |        exp SEMICOLON seqexpTail                           ((exp,expleft)::seqexpTail) (*Rule 35*)
+
+seqexpTail: exp                                                ([(exp, expleft)])
+   |        exp SEMICOLON seqexpTail                           ((exp, expleft)::seqexpTail)
 
 (* Record fields *)
 recfields :                                                    ([])
    |        ID EQ exp                                          ([(S.symbol(ID),exp, expleft)])
-   |        ID EQ exp COMMA recfields                          (recfields @ [(S.symbol(ID),exp, expleft)])
+   |        ID EQ exp COMMA recTail                            (recTail @ [(S.symbol(ID),exp, expleft)])
+
+recTail :   ID EQ exp                                          ([(S.symbol(ID),exp, expleft)])
+|           ID EQ exp COMMA recTail                            (recTail @ [(S.symbol(ID),exp, expleft)])
 
 (* Declarations *)
 decl      : tydecls  (*%prec DEC*)                             (A.TypeDec(tydecls))
@@ -228,7 +241,7 @@ tydecl    : TYPE ID EQ ty                                      (makeTyDec(S.symb
 
 
 tydecls   : tydecl                                             ([tydecl]) (*Rule 45*)
-   |        tydecls tydecl                                     ([tydecl] @ tydecls)       
+   |        tydecls tydecl                                     (tydecl::tydecls)
 
 
 ty        : ID                                                 (A.NameTy(S.symbol(ID),IDleft))
@@ -237,9 +250,14 @@ ty        : ID                                                 (A.NameTy(S.symbo
 
 tyfields  :                                                    (nil) (*Rule 50*)
    |        ID COLON ID                                        ([makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)])
-   |        ID COLON ID COMMA tyfields                         ([makeFieldData(S.symbol(ID1),
-									       (S.symbol(ID2),ID2left),
-									       ID1left)] @ tyfields) 
+   |        ID COLON ID COMMA tyTail                           (makeFieldData(S.symbol(ID1),
+                                      									       (S.symbol(ID2),ID2left),
+                                      									       ID1left) :: tyTail)
+
+tyTail    : ID COLON ID                                        ([makeFieldData(S.symbol(ID1), (S.symbol(ID2),ID2left),ID1left)])
+   |        ID COLON ID COMMA tyTail                           (makeFieldData(S.symbol(ID1),
+                                      									       (S.symbol(ID2),ID2left),
+                                      									       ID1left) :: tyTail)
 
 (* Variable declarations *)
 vardecl   : VAR ID ASSIGN exp                                  (makeVarDec(S.symbol(ID),NONE,exp,VARleft))
@@ -260,9 +278,9 @@ fundecl   : FUNCTION ID LPAREN tyfields RPAREN EQ exp          (makeFundecl(S.sy
 									    SOME (S.symbol(ID2),ID2left),
 									    exp,
 									    FUNCTIONleft))
-		     
+
 fundecls  : fundecl                                            ([fundecl])
-   |        fundecls fundecl                                   ([fundecl] @ fundecls) 
+   |        fundecls fundecl                                   (fundecl :: fundecls)
 
 
 (* Location values *)
@@ -273,6 +291,4 @@ lvalue    : ID lvalue_p                                        (makeLvaluePartSp
 
 lvalue_p  :                                                    ([]) (*Rule 55*)
    |	    DOT ID lvalue_p                                    (Field(S.symbol(ID))::lvalue_p)
-   |        LBRACK exp RBRACK lvalue_p                         (Subscript(exp)::lvalue_p) 
-
-
+   |        LBRACK exp RBRACK lvalue_p                         (Subscript(exp)::lvalue_p)

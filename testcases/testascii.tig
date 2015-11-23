@@ -1,0 +1,5 @@
+/* testing string literals */(print(concat("\t\"Hello,\032\\",  
+            "\n\t\\wor\
+
+                       \ld!\"\^J\
+                       \")); 0)

@@ -42,8 +42,6 @@ fun listprintprime (seen) =
 type extra = {break : bool, assign : S.symbol list option}
 
 
-
-
 (* Error messages *)
 
 val err = ErrorMsg.error
@@ -157,7 +155,6 @@ fun makeTypDecData (name, ty) =
 
 fun makeFunDecData (name, params, resultTy, body) =
   {name = name, params = params, resultTy = resultTy, body = body} : TAbs.fundecldata
-
 
 
 fun lookupTy tenv sym pos =
@@ -850,6 +847,6 @@ and transDecs (venv, tenv, decls, extra : extra) =
     end
 
 fun transProg absyn =
-  transExp (Env.baseVenv, Env.baseTenv, {break = false, assign = NONE}) absyn
+transExp (Env.baseVenv, Env.baseTenv, {break = false, assign = NONE}) absyn
 
 end (* Semant *)

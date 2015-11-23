@@ -382,21 +382,22 @@ fun for2IR (var, done, lo, hi, body) =
         val body' = unNx body
         val loT = Temp.newtemp ()
         val hiT = Temp.newtemp ()
+        val varT = Temp.newtemp ()
         val bodyL = Temp.newLabel "for_body"
         val nextL = Temp.newLabel "for_next"
-	val beginL = Temp.newLabel "for_begin"
+	      val beginL = Temp.newLabel "for_begin"
     in
         Nx(seq [ T.MOVE(T.TEMP loT, lo')
                , T.MOVE(T.TEMP hiT, hi')
-	       , T.CJUMP(T.GT, T.TEMP loT, T.TEMP hiT, done, beginL)
-	       , T.LABEL beginL
+	             , T.CJUMP(T.GT, T.TEMP loT, T.TEMP hiT, done, beginL)
+	             , T.LABEL beginL
                , T.MOVE(var',T.TEMP(loT))
-	       , T.JUMP (T.NAME nextL, [nextL])
+	             , T.JUMP (T.NAME nextL, [nextL])
                , T.LABEL bodyL
                , body'
-	       , T.MOVE(var', T.BINOP(T.PLUS, var', T.CONST(1)))
-	       , T.LABEL nextL
-	       , T.CJUMP(T.LE, var', T.TEMP(hiT), bodyL, done)
+	             , T.MOVE(var', T.BINOP(T.PLUS, var', T.CONST(1)))
+	             , T.LABEL nextL
+	             , T.CJUMP(T.LE, var', T.TEMP(hiT), bodyL, done)
                , T.LABEL done
                 ])
     end
