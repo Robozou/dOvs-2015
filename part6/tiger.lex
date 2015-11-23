@@ -50,9 +50,9 @@ letter=[a-zA-Z];
 digits=[0-9]+;
 idchars=[a-zA-Z][a-zA-Z0-9_]*;
 ignore=[\t\ \n]+;
-control=[@A-Z\\_\^];
+control=\^[@A-Z\\_\^];
 ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
-%s COMMENT STRING ESCAPE IGNORE;
+%s COMMENT STRING ESCAPE IGNORE CONTROL;
 
 %%
 
