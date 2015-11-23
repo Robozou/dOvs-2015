@@ -1,0 +1,8 @@
+let
+    type rectype = {name : string}
+    var rec1 := rectype{name = "shit",}
+
+in
+end
+
+

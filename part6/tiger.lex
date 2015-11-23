@@ -134,7 +134,7 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 <ESCAPE>t                         => (currentString := !currentString ^ "\t"; YYBEGIN STRING; continue());
 <ESCAPE>\"                        => (currentString := !currentString ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>\\                          => (currentString := !currentString ^ "\\"; YYBEGIN STRING; continue());
-<ESCAPE>{ascii}                     => (currentString := !currentString ^ "\\" ^ (dec2oct(s2i yytext yypos)); YYBEGIN STRING; continue());
+<ESCAPE>{ascii}                     => (currentString := !currentString ^ String.str(Char.chr(s2i yytext yypos)); YYBEGIN STRING; continue());
 <ESCAPE>{control}                   => (currentString := !currentString ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>{ignore}                    => (YYBEGIN IGNORE; continue());
 <ESCAPE>.                           => (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); YYBEGIN STRING; continue());
