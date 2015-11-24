@@ -382,7 +382,6 @@ fun for2IR (var, done, lo, hi, body) =
         val body' = unNx body
         val loT = Temp.newtemp ()
         val hiT = Temp.newtemp ()
-        val varT = Temp.newtemp ()
         val bodyL = Temp.newLabel "for_body"
         val nextL = Temp.newLabel "for_next"
 	      val beginL = Temp.newLabel "for_begin"

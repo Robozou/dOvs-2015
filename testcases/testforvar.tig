@@ -1,7 +1,42 @@
-for  i := 0 to 15 do
+(
+for  i := 0 to 0 do
+    (let
+	 var i := 0
+
+    in
+	print(chr(i + ord("0")))
+    end)
+;
+for  i := 1 to 0 do
+    (let
+	 var i := 1
+
+    in
+	print(chr(i + ord("0")))
+    end)
+;
+for  i := 15 to 15 do
     (let
 	 var i := 2
 
     in
 	print(chr(i + ord("0")))
     end)
+;
+for  i := 16 to 15 do
+    (let
+	 var i := 3
+
+    in
+	print(chr(i + ord("0")))
+    end)
+;
+for  i := 1073741823 to 1073741823 do
+    (let
+	 var i := 4
+
+    in
+	print("Very large")
+    end)
+
+)
