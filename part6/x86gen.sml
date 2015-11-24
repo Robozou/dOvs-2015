@@ -276,7 +276,7 @@ fun codegen frame stm =
                                          , dst = [r]
                                          , jump = NONE
                                          , doc = "x86gen:278"}))
-(* TODO REMEMBER: Merge is fucked. Test merge and take a look at sequence and assignments in one
+(* TODO REMEMBER: Merge is not working. Test merge and take a look at sequence and assignments in one
  * It looks like if you assign and return a value in one sequence the assignment is not properly understood
  * Somethign along those lines, but not necessarily*)
           | munchExp (T.MEM e) =

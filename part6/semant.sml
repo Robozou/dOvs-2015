@@ -125,6 +125,9 @@ fun errorNotAssignable (pos, var) =
 fun errorDuplicateField (pos, field) =
   err pos ("duplicate field '" ^ S.name field ^ "' in record")
 
+fun errorNilOnly (pos) =
+  err pos ("program cannot only be nil")
+
 exception Bug of string
 
 (* Write additional error messages here *)
@@ -846,7 +849,7 @@ and transDecs (venv, tenv, decls, extra : extra) =
         visit venv tenv decls []
     end
 
-fun transProg absyn =
-transExp (Env.baseVenv, Env.baseTenv, {break = false, assign = NONE}) absyn
+fun transProg absyn = case absyn of A.NilExp => (errorNilOnly (0); {exp = TAbs.ErrorExp, ty = Ty.ERROR})
+| _ => transExp (Env.baseVenv, Env.baseTenv, {break = false, assign = NONE}) absyn
 
 end (* Semant *)
