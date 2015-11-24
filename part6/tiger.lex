@@ -127,15 +127,15 @@ ascii=0[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5];
 <STRING>\n                          => (ErrorMsg.error yypos ("Newlines should be put into ignore escape sequence in string"); continue());
 <STRING>.                           => (currentString := !currentString ^ yytext; continue());
 
-<ESCAPE>n                         => (currentString := !currentString ^ "\n"; YYBEGIN STRING;
+<ESCAPE>n                           => (currentString := !currentString ^ "\n"; YYBEGIN STRING;
 					                              lineNum := !lineNum+1;
                                         linePos := yypos :: !linePos;  (* After feedback *)
                                         continue());
-<ESCAPE>t                         => (currentString := !currentString ^ "\t"; YYBEGIN STRING; continue());
-<ESCAPE>\"                        => (currentString := !currentString ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>t                           => (currentString := !currentString ^ "\t"; YYBEGIN STRING; continue());
+<ESCAPE>\"                          => (currentString := !currentString ^ yytext; YYBEGIN STRING; continue());
 <ESCAPE>\\                          => (currentString := !currentString ^ "\\"; YYBEGIN STRING; continue());
-<ESCAPE>{ascii}                     => (currentString := !currentString ^ String.str(Char.chr(s2i yytext yypos)); YYBEGIN STRING; continue());
-<ESCAPE>{control}                   => (currentString := !currentString ^ yytext; YYBEGIN STRING; continue());
+<ESCAPE>{ascii}                     => (currentString := !currentString ^ valOf(String.fromString("\\" ^ yytext)); YYBEGIN STRING; continue());
+<ESCAPE>{control}                   => (currentString := !currentString ^ valOf(String.fromString("\\" ^ yytext)); YYBEGIN STRING; continue());
 <ESCAPE>{ignore}                    => (YYBEGIN IGNORE; continue());
 <ESCAPE>.                           => (ErrorMsg.error yypos ("Invalid escape character " ^ yytext); YYBEGIN STRING; continue());
 

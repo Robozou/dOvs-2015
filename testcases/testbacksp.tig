@@ -1,5 +1,5 @@
 let
    
 in
-print("qwo\008\008\008\008\008\^J \n")
+print("qwo \048 \049 \050  ")
 end
