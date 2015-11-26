@@ -126,7 +126,10 @@ fun errorDuplicateField (pos, field) =
   err pos ("duplicate field '" ^ S.name field ^ "' in record")
 
 fun errorNilOnly (pos) =
-  err pos ("program cannot only be nil")
+  err pos ("top-level type cannot be nil only")
+
+fun errorNilSeq (pos) =
+  err pos ("cannot have nil before end of sequence")
 
 exception Bug of string
 
@@ -660,23 +663,29 @@ and getTypExps (venv, tenv, exps) =
 and getSeqFromExps (venv, tenv, exps, inp, extra : extra) =
     case exps of
         []      => {exp = TAbs.SeqExp(inp), ty = Ty.UNIT}
-     |  [(x,p)] => let val texp as {exp = _, ty = typ} = transExp(venv, tenv, extra) x
-		   in
-		       {exp = TAbs.SeqExp(inp @ [texp]), ty = typ}
-		   end
-     |  ((x,p)::xs) => let val texp as {exp = _, ty = typ} = transExp(venv,tenv, extra) x
-		       in
-			   getSeqFromExps(venv, tenv, xs, inp @ [texp], extra)
-		       end
+     |  [(x,p)] =>
+      let
+      val texp as {exp = _, ty = typ} = transExp(venv, tenv, extra) x
+    	in
+    	   {exp = TAbs.SeqExp(inp @ [texp]), ty = typ}
+    	end
+     |  ((x,p)::xs) =>
+      let
+      val texp as {exp = _, ty = typ} = transExp(venv,tenv, extra) x
+		  in
+          case typ of
+            Ty.NIL => (errorNilSeq(p);getSeqFromExps(venv, tenv, xs, inp @ [{exp = TAbs.ErrorExp, ty = Ty.ERROR}], extra))
+          | _      => getSeqFromExps(venv, tenv, xs, inp @ [texp], extra)
+		  end
 and transDec (venv, tenv, A.VarDec {name, escape, typ = NONE, init, pos}, extra : extra) =
-    let
+      let
         val {exp, ty} = transExp(venv, tenv, {break = true, assign = NONE}) init
-    in
-	case actualTy ty pos of
-	    Ty.NIL => (errorNil(pos,name); {decl = makeVarDec(name,escape,Ty.ERROR,
-							      {exp = exp, ty = Ty.ERROR}),
-					    tenv = tenv,
-					    venv = S.enter(venv, name, E.VarEntry{ty = Ty.ERROR})})
+      in
+    	case actualTy ty pos of
+    	    Ty.NIL => (errorNil(pos,name); {decl = makeVarDec(name,escape,Ty.ERROR,
+    							      {exp = exp, ty = Ty.ERROR}),
+    					    tenv = tenv,
+    					    venv = S.enter(venv, name, E.VarEntry{ty = Ty.ERROR})})
 	  | Ty.UNIT => (errorUnitNotAllowed(pos); {decl = makeVarDec(name,escape,Ty.ERROR,
 								     {exp = exp, ty = Ty.ERROR}),
 						   tenv = tenv,
@@ -850,6 +859,12 @@ and transDecs (venv, tenv, decls, extra : extra) =
     end
 
 fun transProg absyn = case absyn of A.NilExp => (errorNilOnly (0); {exp = TAbs.ErrorExp, ty = Ty.ERROR})
-| _ => transExp (Env.baseVenv, Env.baseTenv, {break = false, assign = NONE}) absyn
+
+| _ => let
+         val res as {exp,ty} = transExp (Env.baseVenv, Env.baseTenv, {break = false, assign = NONE}) absyn
+       in
+         case ty of Ty.NIL => (errorNilOnly (0); {exp = TAbs.ErrorExp, ty = Ty.ERROR})
+         | _ => res
+       end
 
 end (* Semant *)

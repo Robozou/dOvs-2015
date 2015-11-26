@@ -1,0 +1,18 @@
+let
+	type my_record = {}
+	var a : my_record := nil
+	function f(p: my_record):my_record = p
+	type rec = {}
+	var r:rec := nil
+	var r1:rec := (let in nil end)
+in
+	a := nil;
+	if a <> nil then 1 else 2;
+	if nil <> a then 1 else 2;
+	if a = nil then 1 else 2;
+	f(nil);
+	if 1 then r else nil;
+	r = (if 1 then nil else nil);
+	r = (123; nil);
+	r
+end

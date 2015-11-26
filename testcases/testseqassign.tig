@@ -1,0 +1,22 @@
+let
+	var i := 5
+	function rs(): int = 6
+	function rss(): int = 7
+	var p := (i:=rs();rss())
+in
+	if p = 7
+	then print("TRUE")
+	else print("FALSE")
+end
+/*
+let
+	var i := "lel"
+	function rs(): string = "lol"
+	function rss(): string = "bob"
+	var p := (i:=rs();rss())
+in
+	if p = "bob"
+	then print("TRUE")
+	else print("FALSE")
+end
+*/

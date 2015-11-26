@@ -1,0 +1,33 @@
+if 1 
+then nil 
+else nil NOT ALLOWED
+
+let
+type rec = {}
+	var r:rec := rec{}
+in
+	if 1
+	then r
+	else nil
+				ALLOWED
+end
+
+
+let
+type rec = {}
+	var r:rec := rec{}
+in
+	r = (if 1
+		then nil
+		else nil)
+				ALLOWED
+end
+
+blacklist nil cases i stedet for whitelisting
+
+(123; nil)
+(nil; 123)
+
+nil = nil
+
+

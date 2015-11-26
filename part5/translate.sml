@@ -131,16 +131,17 @@ let
     val nilL = Temp.newLabel "field_nil"
     val nonNilL = Temp.newLabel "field_nonNil"
     val addressT = Temp.newtemp ()
+    val varT = Temp.newtemp ()
 in
-  Ex (T.ESEQ(seq [T.CJUMP(T.EQ,var', T.CONST(0), nilL, nonNilL)
+  Ex (T.ESEQ(seq [T.MOVE(T.TEMP varT, var')
+     , T.CJUMP(T.EQ, T.TEMP varT, T.CONST(0), nilL, nonNilL)
 		 , T.LABEL nilL
 		 , T.EXP (F.externalCall("recFieldError", [])) (* No JUMP because exit(1) is called *)
 		 , T.LABEL nonNilL
-		 , T.MOVE(T.TEMP addressT, T.BINOP(T.PLUS, var',
+		 , T.MOVE(T.TEMP addressT, T.BINOP(T.PLUS, T.TEMP varT,
 						   (T.BINOP(T.MUL,T.CONST(offset), T.CONST(F.wordSize)))))]
 	   ,T.MEM(T.TEMP addressT)))
 end
-
 
 fun assign2IR (var, exp) =
     let
@@ -306,7 +307,7 @@ fun intOp2IR (TAbs.PlusOp, left, right)     = binop2IR (T.PLUS, left, right)
   | intOp2IR (TAbs.MinusOp, left, right)    = binop2IR (T.MINUS, left, right)
   | intOp2IR (TAbs.TimesOp, left, right)    = binop2IR (T.MUL, left, right)
   | intOp2IR (TAbs.DivideOp, left, right)   = binop2IR (T.DIV, left, right)
-  | intOp2IR (TAbs.ExponentOp, left, right) = Ex(F.externalCall("exponent", [(T.TEMP F.FP),unEx(left),unEx(right)]))
+  | intOp2IR (TAbs.ExponentOp, left, right) = Ex(F.externalCall("exponent", [unEx(left),unEx(right)]))
   | intOp2IR (TAbs.EqOp, left, right)       = relop2IR (T.EQ, left, right)
   | intOp2IR (TAbs.NeqOp, left, right)      = relop2IR (T.NE, left, right)
   | intOp2IR (TAbs.LtOp, left, right)       = relop2IR (T.LT, left, right)
@@ -383,19 +384,19 @@ fun for2IR (var, done, lo, hi, body) =
         val hiT = Temp.newtemp ()
         val bodyL = Temp.newLabel "for_body"
         val nextL = Temp.newLabel "for_next"
-	val beginL = Temp.newLabel "for_begin"
+	      val beginL = Temp.newLabel "for_begin"
     in
         Nx(seq [ T.MOVE(T.TEMP loT, lo')
                , T.MOVE(T.TEMP hiT, hi')
-	       , T.CJUMP(T.GT, T.TEMP loT, T.TEMP hiT, done, beginL)
-	       , T.LABEL beginL
+	             , T.CJUMP(T.GT, T.TEMP loT, T.TEMP hiT, done, beginL)
+	             , T.LABEL beginL
                , T.MOVE(var',T.TEMP(loT))
-	       , T.JUMP (T.NAME nextL, [nextL])
+	             , T.JUMP (T.NAME nextL, [nextL])
                , T.LABEL bodyL
                , body'
-	       , T.MOVE(var', T.BINOP(T.PLUS, var', T.CONST(1)))
-	       , T.LABEL nextL
-	       , T.CJUMP(T.LE, var', T.TEMP(hiT), bodyL, done)
+	             , T.MOVE(var', T.BINOP(T.PLUS, var', T.CONST(1)))
+	             , T.LABEL nextL
+	             , T.CJUMP(T.LE, var', T.TEMP(hiT), bodyL, done)
                , T.LABEL done
                 ])
     end
